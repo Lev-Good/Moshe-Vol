@@ -17,8 +17,8 @@
                 extend: {
                     colors: {
                         brand: {
-                            primary: '#174353', // Blue-Petrol
-                            secondary: '#d96c4a', // Rust-Orange
+                            primary: '#174353', 
+                            secondary: '#d96c4a', 
                             light: '#f8fafc',
                             dark: '#0f2933'
                         }
@@ -33,9 +33,10 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
-        body { transition: background-color 0.3s ease, color 0.3s ease; }
+        body { transition: background-color 0.3s ease, color 0.3s ease, font-size 0.3s ease; }
         html.dark body { background-color: #0f172a; color: #f8fafc; }
         html:not(.dark) body { background-color: #f8fafc; color: #1e293b; }
         
@@ -56,59 +57,80 @@
         @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         
-        /* Floating WhatsApp Button */
+        /* WhatsApp Button */
         .whatsapp-float {
-            position: fixed;
-            width: 60px;
-            height: 60px;
-            bottom: 20px;
-            left: 20px;
-            background-color: #25d366;
-            color: #FFF;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 30px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
+            position: fixed; width: 60px; height: 60px; bottom: 20px; left: 20px;
+            background-color: #25d366; color: #FFF; border-radius: 50px;
+            text-align: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            z-index: 100; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
         }
         .whatsapp-float:hover { transform: scale(1.1); background-color: #128C7E; }
+
+        /* Marquee Styles */
+        .marquee-wrapper {
+            display: flex; overflow: hidden; user-select: none; gap: 1.5rem;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        }
+        .marquee-content {
+            flex-shrink: 0; display: flex; justify-content: space-around; gap: 1.5rem;
+            min-width: 100%; animation: scroll-rtl 40s linear infinite;
+        }
+        .marquee-wrapper:hover .marquee-content { animation-play-state: paused; }
+        @keyframes scroll-rtl { from { transform: translateX(0); } to { transform: translateX(100%); } }
+
+        /* A11y Styles */
+        .a11y-readable-font * { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.5px !important; }
+        .a11y-highlight-links a, .a11y-highlight-links button { text-decoration: underline !important; font-weight: 800 !important; }
     </style>
 </head>
 <body className="antialiased">
     <div id="root"></div>
 
-    <!-- Firebase SDK Imports -->
+    <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        window.FB = { initializeApp, getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc };
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuQR6wgh64bRHC4cj34HcaTwJbEN040ew",
+            authDomain: "pisga-d3773.firebaseapp.com",
+            projectId: "pisga-d3773",
+            storageBucket: "pisga-d3773.firebasestorage.app",
+            messagingSenderId: "160680335558",
+            appId: "1:160680335558:web:237838b6db44b602a6dfc7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.FB = { auth, db, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, signInAnonymously, onAuthStateChanged };
         window.dispatchEvent(new Event('firebaseReady'));
     </script>
 
     <script type="text/babel">
         // ----------------------------------------------------
-        // Constants & Configuration
+        // Configuration & Constants
         // ----------------------------------------------------
-        const ADMIN_PASSWORD = "פסגה2024"; // <-- Password for Admin Login
+        const ADMIN_PASSWORD = "פסגה2024"; 
         const WHATSAPP_LINK = "https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws";
         const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@moshevol8942";
 
-        // ----------------------------------------------------
-        // Icons Component
-        // ----------------------------------------------------
+        const CSV_URLS = {
+            ARTICLES: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT6OmRPxlNhfecg0vfv-jgnWAgHk9C2NcsLwutzb64KGnisPymHTR02K6LXJBU3fuz15nq9dQTdq3uE/pub?gid=1100608744&single=true&output=csv",
+            SCHEDULE: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT6OmRPxlNhfecg0vfv-jgnWAgHk9C2NcsLwutzb64KGnisPymHTR02K6LXJBU3fuz15nq9dQTdq3uE/pub?gid=1693315274&single=true&output=csv"
+        };
+
         const { 
-            Home, Folder, FolderOpen, FileText, FileVideo, 
-            Search, ChevronLeft, ChevronRight, Menu, X, BookOpen, Info,
-            PlayCircle, ExternalLink, ShieldCheck, TrendingUp,
+            Home, Folder, FolderOpen, FileText, FileVideo, FileAudio, Headphones,
+            Search, ChevronLeft, ChevronRight, Menu, X, BookOpen, Info, Clock, Calendar,
+            PlayCircle, ExternalLink, ShieldCheck, TrendingUp, History,
             Mountain, User, LogOut, Lock, MessageCircle, RefreshCw,
-            MessageSquare, Trash2, Ghost, Youtube, CheckCircle,
-            CreditCard, Target, Lightbulb, Settings, Plus, Crown, Unlock
+            MessageSquare, Trash2, Ghost, Youtube, CheckCircle, ArrowUp,
+            CreditCard, Target, Lightbulb, Settings, Plus, Crown, Unlock,
+            Accessibility, ZoomIn, ZoomOut, Underline, Type, Quote
         } = lucide;
 
         const Icon = ({ name, size = 24, className = "" }) => {
@@ -129,64 +151,117 @@
         };
 
         // ----------------------------------------------------
-        // Initial Data Fallbacks
+        // Hooks & CSV Parsers
+        // ----------------------------------------------------
+        const useCSVData = (url, mapRowFn, cacheKey) => {
+            const [data, setData] = React.useState(() => {
+                try { const cached = localStorage.getItem(cacheKey); return cached ? JSON.parse(cached) : []; } 
+                catch(e) { return []; }
+            });
+            const [loading, setLoading] = React.useState(data.length === 0);
+            const [error, setError] = React.useState(null);
+
+            React.useEffect(() => {
+                if (!window.Papa) return;
+                window.Papa.parse(url, {
+                    download: true, header: true, skipEmptyLines: true,
+                    complete: (results) => {
+                        try {
+                            const mapped = results.data.map(mapRowFn).filter(Boolean);
+                            setData(mapped);
+                            localStorage.setItem(cacheKey, JSON.stringify(mapped));
+                            setLoading(false);
+                        } catch (err) { setError(err.message); setLoading(false); }
+                    },
+                    error: (err) => { setError(err.message); setLoading(false); }
+                });
+            }, [url, cacheKey]);
+
+            return { data, loading, error };
+        };
+
+        const mapScheduleRow = (row, index) => {
+            const vals = Object.values(row);
+            const getVal = (keywords, fallbackIndex) => {
+                const foundKey = Object.keys(row).find(k => keywords.some(keyword => k.toLowerCase().includes(keyword)));
+                return foundKey ? row[foundKey] : vals[fallbackIndex];
+            };
+            return {
+                id: index, title: getVal(['כותרת', 'שם', 'נושא', 'title'], 0) || 'ללא כותרת',
+                date: getVal(['תאריך', 'date'], 1) || '', time: getVal(['שעה', 'זמן', 'time'], 2) || '',
+                description: getVal(['תיאור', 'פירוט', 'desc'], 3) || ''
+            };
+        };
+
+        const mapArticleRow = (row, index) => {
+            const vals = Object.values(row);
+            const getVal = (keywords, fallbackIndex) => {
+                const foundKey = Object.keys(row).find(k => keywords.some(keyword => k.toLowerCase().includes(keyword)));
+                return foundKey ? row[foundKey] : vals[fallbackIndex];
+            };
+            return {
+                id: index, title: getVal(['כותרת', 'שם', 'title'], 0) || 'ללא כותרת',
+                summary: getVal(['תקציר', 'תיאור', 'summary', 'תוכן'], 1) || '',
+                date: getVal(['תאריך', 'date'], 2) || '', url: getVal(['קישור', 'url', 'link'], 3) || '#'
+            };
+        };
+
+        // ----------------------------------------------------
+        // Initial Data Fallback
         // ----------------------------------------------------
         const INITIAL_COURSES = [
             {
-                id: "course_webinars",
-                name: "סדרת הוובינרים המלאה",
-                isFolder: true,
+                id: "course_webinars", name: "סדרת הוובינרים המלאה", isFolder: true,
                 lessons: [
-                    { id: "w1", name: "וובינר מספר 1 - הדיפלומה הנסתרת", url: "https://drive.google.com/file/u/0/d/1Vriu7SyPzGt6lYEtU9HZZNmuXq2QYYH7/view", type: "video" },
-                    { id: "w2", name: "וובינר מספר 2 - פרדוקס היעילות", url: "https://drive.google.com/file/d/1ryD7kd4GVKf189gJfm7AmpnG2KUhn8Ak/view", type: "video" },
-                    { id: "w3", name: "וובינר מספר 3 - מנישה למוצר", url: "https://drive.google.com/file/d/1trpWtzIf9HtP82rJ7zoaYtvK77nsHuoJ/view", type: "video" },
-                    { id: "w4", name: "וובינר מספר 4 - בניית הקפסולה", url: "https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/view", type: "video" },
-                    { id: "w5", name: "וובינר מספר 5 - שימוש בAI ומילון הכאב", url: "https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/view", type: "video" },
-                    { id: "w6", name: "וובינר מספר 6 - זיהוי וחסמי שיווק", url: "https://drive.google.com/file/d/1ocgx7J3lP-o7hLfg2dtdMmvtltbe2d-9/view", type: "video" }
+                    { id: "w1", name: "וובינר 1 - הדיפלומה הנסתרת", url: "https://drive.google.com/file/d/1Vriu7SyPzGt6lYEtU9HZZNmuXq2QYYH7/view", type: "video" },
+                    { id: "w2", name: "וובינר 2 - פרדוקס היעילות", url: "https://drive.google.com/file/d/1ryD7kd4GVKf189gJfm7AmpnG2KUhn8Ak/view", type: "video" },
+                    { id: "w3", name: "וובינר 3 - מנישה למוצר", url: "https://drive.google.com/file/d/1trpWtzIf9HtP82rJ7zoaYtvK77nsHuoJ/view", type: "video" },
+                    { id: "w4", name: "וובינר 4 - בניית הקפסולה", url: "https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/view", type: "video" },
+                    { id: "w5", name: "וובינר 5 - שימוש בAI ומילון הכאב", url: "https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/view", type: "video" },
+                    { id: "w6", name: "וובינר 6 - זיהוי וחסמי שיווק", url: "https://drive.google.com/file/d/1ocgx7J3lP-o7hLfg2dtdMmvtltbe2d-9/view", type: "video" }
                 ]
             }
         ];
 
-        const INITIAL_FORUM_TOPICS = [
-            { 
-                id: 1, 
-                title: "ברוכים הבאים לפורום המועדון",
-                author: 'משה וולנר', 
-                realAuthor: 'משה וולנר', 
-                content: 'כאן המקום לפתוח נושאים, להתייעץ ולצמוח יחד.', 
-                date: new Date().toISOString(), 
-                isAnonymous: false, 
-                isAdminPost: true,
-                replies: []
-            }
-        ];
-
         // ----------------------------------------------------
-        // Shared Components
+        // UI Helpers & Components
         // ----------------------------------------------------
         const CustomMessageBox = ({ message, title="הודעת מערכת", onClose }) => (
             <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl border border-brand-primary/20">
-                    <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-primary">
-                        <Icon name="Info" size={32} />
-                    </div>
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{title}</h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{message}</p>
-                    <button onClick={onClose} className="w-full bg-brand-primary hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition">סגור</button>
+                    <button onClick={onClose} className="w-full bg-brand-primary text-white px-6 py-3 rounded-xl font-bold transition">סגור</button>
                 </div>
             </div>
         );
 
         const SplashScreen = () => (
             <div className="fixed inset-0 z-[9999] bg-brand-light dark:bg-gray-900 flex flex-col items-center justify-center animate-splash-out">
-                <div className="w-40 h-40 bg-brand-primary/10 dark:bg-brand-primary/20 rounded-full flex items-center justify-center animate-pulse-soft mb-6 shadow-[0_0_40px_rgba(217,108,74,0.3)]">
-                    <Icon name="Mountain" size={80} className="text-brand-primary dark:text-brand-secondary" />
-                </div>
-                <h1 className="text-4xl sm:text-5xl font-black text-brand-primary tracking-tight">פסגה</h1>
-                <p className="text-brand-secondary mt-3 font-bold text-xl tracking-wide">הבית העסקי למאמנים ומטפלים</p>
-                <p className="text-gray-500 mt-2">בהובלת משה וולנר</p>
+                <Icon name="Mountain" size={80} className="text-brand-primary mb-4 animate-pulse-soft" />
+                <h1 className="text-4xl font-black text-brand-primary">פסגה</h1>
+                <p className="text-brand-secondary font-bold">הבית העסקי למאמנים ומטפלים</p>
             </div>
         );
+
+        const DynamicLoader = ({ texts = ["טוען נתונים...", "מסנכרן מידע...", "מכין את התוכן..."] }) => {
+            const [idx, setIdx] = React.useState(0);
+            React.useEffect(() => {
+                const interval = setInterval(() => setIdx(i => (i + 1) % texts.length), 2000);
+                return () => clearInterval(interval);
+            }, [texts.length]);
+            return (
+                <div className="flex flex-col items-center justify-center h-64 w-full animate-fade-in">
+                    <Icon name="RefreshCw" size={32} className="text-brand-primary animate-spin mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 font-bold animate-pulse">{texts[idx]}</p>
+                </div>
+            );
+        };
+
+        const formatDate = (isoString) => {
+            const d = new Date(isoString);
+            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        };
 
         // ----------------------------------------------------
         // PayPal Payment Component
@@ -199,7 +274,6 @@
                     script.src = "https://www.paypal.com/sdk/js?client-id=AVzkCndNLYwIWWPkbYTSJh934d8VF-qKy1eyRXLAnyaXK2keXd2qcJ5DFBR2otfGSSNjYvdOa_lh4gla&vault=true&intent=subscription";
                     script.setAttribute("data-sdk-integration-source", "button-factory");
                     script.async = true;
-                    
                     script.onload = () => {
                         if (window.paypal) {
                             window.paypal.Buttons({
@@ -212,7 +286,7 @@
                     document.body.appendChild(script);
                 } else if (window.paypal) {
                     try {
-                            window.paypal.Buttons({
+                        window.paypal.Buttons({
                             style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'subscribe' },
                             createSubscription: function(data, actions) { return actions.subscription.create({ plan_id: 'P-2H242596WM328212DNHQMPHI' }); },
                             onApprove: function(data, actions) { onSuccess(data.subscriptionID); }
@@ -231,574 +305,424 @@
             );
         };
 
-        const formatDate = (isoString) => {
-            const d = new Date(isoString);
-            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-        };
-
-        // ----------------------------------------------------
-        // Home Page (Split Entrance)
-        // ----------------------------------------------------
-        const HomePage = ({ navigate }) => {
-            return (
-                <div className="animate-fade-in space-y-12 relative max-w-5xl mx-auto mt-4 px-4">
-                    <div className="text-center mb-10">
-                        <Icon name="Mountain" size={64} className="mx-auto mb-4 text-brand-secondary" />
-                        <h1 className="text-4xl md:text-5xl font-black mb-4 text-brand-primary dark:text-white tracking-tight">ברוכים הבאים לקהילת פסגה</h1>
-                        <h2 className="text-xl md:text-2xl font-medium text-gray-600 dark:text-gray-400">הבית העסקי למאמנים ומטפלים בהובלת משה וולנר</h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Pro Entrance */}
-                        <div onClick={() => navigate('explorer')} className="bg-gradient-to-br from-brand-primary to-brand-dark rounded-[2.5rem] p-10 text-white shadow-2xl hover:shadow-[0_20px_40px_rgba(23,67,83,0.3)] transition-all cursor-pointer group relative overflow-hidden transform hover:-translate-y-2 flex flex-col justify-between h-full">
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                            <div className="relative z-10 flex flex-col items-center text-center">
-                                <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md border border-white/20 group-hover:bg-brand-secondary transition-colors duration-500">
-                                    <Icon name="Crown" size={40} className="text-brand-secondary group-hover:text-white" />
-                                </div>
-                                <h3 className="text-3xl font-black mb-3">כניסת Pro</h3>
-                                <h4 className="text-lg font-bold text-brand-secondary mb-4">לחברי מועדון פסגה</h4>
-                                <p className="text-gray-300 font-medium leading-relaxed mb-8">
-                                    גישה מלאה לכל הקורסים המקצועיים, ההדרכות, הכלים לניהול העסק והשתתפות פעילה בפורום התלמידים.
-                                </p>
-                            </div>
-                            <button className="bg-brand-secondary hover:bg-[#c15c3c] text-white w-full py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 group-hover:scale-105 transition-transform relative z-10">
-                                <Icon name="Lock" size={20} /> היכנסו לספריית המועדון
-                            </button>
-                        </div>
-
-                        {/* Free Entrance */}
-                        <div onClick={() => navigate('youtube')} className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-[2.5rem] p-10 text-brand-primary dark:text-white shadow-xl hover:border-brand-secondary/50 hover:shadow-[0_20px_40px_rgba(217,108,74,0.15)] transition-all cursor-pointer group relative flex flex-col justify-between h-full transform hover:-translate-y-2">
-                            <div className="relative z-10 flex flex-col items-center text-center">
-                                <div className="w-20 h-20 bg-gray-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center mb-6 border border-gray-200 dark:border-gray-600 group-hover:bg-red-500 transition-colors duration-500">
-                                    <Icon name="Unlock" size={40} className="text-gray-400 group-hover:text-white" />
-                                </div>
-                                <h3 className="text-3xl font-black mb-3">כניסה פתוחה</h3>
-                                <h4 className="text-lg font-bold text-gray-500 dark:text-gray-400 mb-4">לשאינם חברים (חינם)</h4>
-                                <p className="text-gray-600 dark:text-gray-300 font-medium leading-relaxed mb-8">
-                                    צפייה חופשית במבחר הדרכות, וובינרים וסרטונים מערוץ היוטיוב של משה וולנר. הדרך המושלמת להכיר את העשייה שלנו.
-                                </p>
-                            </div>
-                            <button className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-brand-primary dark:text-white w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 group-hover:bg-red-500 group-hover:text-white transition-colors relative z-10">
-                                <Icon name="Youtube" size={20} /> צפו בתכנים הפתוחים
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // ----------------------------------------------------
-        // Admin Panel Component (Forum ONLY)
-        // ----------------------------------------------------
-        const AdminPage = ({ forumTopics, setForumTopics, setMessage }) => {
-            const handleDeleteTopic = async (topic) => {
-                if(confirm(`האם אתה בטוח שברצונך למחוק את הנושא: "${topic.title}" ואת כל התגובות שלו?`)) {
-                    if (window.db && topic.dbId) {
-                        try {
-                            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                            await window.FB.deleteDoc(window.FB.doc(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.dbId));
-                            setMessage("הנושא נמחק בהצלחה מהענן.");
-                        } catch (err) { setMessage("שגיאה במחיקת הנושא: " + err.message); }
-                    } else {
-                        setForumTopics(forumTopics.filter(t => t.id !== topic.id));
-                        setMessage("הנושא נמחק בהצלחה (מקומי).");
-                    }
-                }
-            };
-
-            const handleDeleteReply = async (topic, replyId) => {
-                if(confirm("למחוק תגובה זו?")) {
-                    const updatedReplies = topic.replies.filter(r => r.id !== replyId);
-                    if (window.db && topic.dbId) {
-                        try {
-                            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                            await window.FB.updateDoc(window.FB.doc(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.dbId), { replies: updatedReplies });
-                            setMessage("התגובה נמחקה.");
-                        } catch (err) { setMessage("שגיאה במחיקת תגובה: " + err.message); }
-                    } else {
-                        setForumTopics(forumTopics.map(t => t.id === topic.id ? { ...t, replies: updatedReplies } : t));
-                        setMessage("התגובה נמחקה (מקומי).");
-                    }
-                }
-            };
+        const TestimonialsMarquee = () => {
+            const feedbacks = [
+                { text: "הקהילה הזו פשוט שינתה לי את כל ההסתכלות על העסק. הכלים של משה מדויקים!", author: "משתתף במועדון" },
+                { text: "תודה על הליווי המקצועי, יצאתי מהקליניקה לקדמת הבמה בזכותכם.", author: "מטפלת קלינית" },
+                { text: "הוובינרים נותנים המון ערך, מרגישה שיש לי בית מקצועי אמיתי שתומך בי.", author: "מאמנת אישית" },
+                { text: "ממליץ בחום לכל מאמן או מטפל שרוצה לקחת את העסק לשלב הבא ולהצליח.", author: "יועץ זוגי" },
+                { text: "סוף סוף מישהו שמבין את האתגרים שלנו כמטפלים ונותן פתרונות תכל'ס.", author: "משתתפת בקורס" }
+            ];
 
             return (
-                <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12">
-                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-brand-primary/20">
-                        <div className="flex items-center justify-between mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
-                            <div className="flex items-center gap-4">
-                                <Icon name="Settings" size={32} className="text-brand-secondary" />
-                                <h2 className="text-3xl font-black text-brand-primary dark:text-white">ממשק מנהל - ניהול פורום</h2>
-                            </div>
-                            <span className="bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> מחובר לענן
-                            </span>
-                        </div>
-
-                        <div className="space-y-6">
-                            {forumTopics.length === 0 ? (
-                                <div className="text-center py-10 text-gray-500">אין נושאים בפורום כרגע.</div>
-                            ) : (
-                                forumTopics.map(topic => (
-                                    <div key={topic.id} className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-                                        {/* Topic Header */}
-                                        <div className="bg-gray-50 dark:bg-gray-900 p-4 flex justify-between items-start">
-                                            <div>
-                                                <h3 className="font-bold text-lg text-brand-primary dark:text-white">{topic.title}</h3>
-                                                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                                    נפתח ע"י: <span className="font-bold">{topic.realAuthor}</span> {topic.isAnonymous && <span className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded ml-2">(אנונימי לקהל)</span>} | {formatDate(topic.date)}
-                                                </div>
-                                            </div>
-                                            <button onClick={() => handleDeleteTopic(topic)} className="bg-red-100 hover:bg-red-200 text-red-600 p-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-bold">
-                                                <Icon name="Trash2" size={16} /> מחק נושא שלם
-                                            </button>
-                                        </div>
-                                        {/* Main Post Content */}
-                                        <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300">
-                                            <span className="font-bold text-xs text-gray-400 mb-1 block">תוכן הפוסט הראשי:</span>
-                                            {topic.content}
-                                        </div>
-                                        {/* Replies */}
-                                        <div className="p-4 bg-gray-50/50 dark:bg-gray-800/50">
-                                            <span className="font-bold text-sm text-brand-primary dark:text-brand-secondary mb-3 block">תגובות באשכול ({topic.replies.length}):</span>
-                                            {topic.replies.length === 0 ? <p className="text-xs text-gray-500">אין תגובות.</p> : (
-                                                <div className="space-y-2">
-                                                    {topic.replies.map(reply => (
-                                                        <div key={reply.id} className="flex justify-between items-start bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-100 dark:border-gray-600 text-sm">
-                                                            <div>
-                                                                <span className="font-bold text-gray-800 dark:text-white">{reply.realAuthor}</span> 
-                                                                {reply.isAnonymous && <span className="text-[10px] bg-gray-200 dark:bg-gray-600 px-1 rounded mx-1">אנונימי</span>}
-                                                                <span className="text-gray-500 mx-2">{formatDate(reply.date)}</span>
-                                                                <p className="mt-1 text-gray-700 dark:text-gray-300">{reply.content}</p>
-                                                            </div>
-                                                            <button onClick={() => handleDeleteReply(topic, reply.id)} className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors" title="מחק תגובה">
-                                                                <Icon name="X" size={16} />
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
+                <div className="mt-16 bg-white dark:bg-gray-800 rounded-3xl p-8 border border-brand-secondary/20 shadow-sm overflow-hidden relative">
+                    <div className="text-center mb-8">
+                        <h3 className="text-2xl font-black text-brand-primary dark:text-brand-secondary flex items-center justify-center gap-3">
+                            <Icon name="TrendingUp" className="text-brand-secondary" size={32} /> ההצלחות של חברי הקהילה
+                        </h3>
                     </div>
-                </div>
-            );
-        }
-
-        // ----------------------------------------------------
-        // Explorer Page (Hierarchical Courses)
-        // ----------------------------------------------------
-        const ExplorerPage = ({ onFileInteract, user, setShowPayment, courses }) => {
-            const [currentFolder, setCurrentFolder] = React.useState(null); 
-            const [searchQuery, setSearchQuery] = React.useState("");
-
-            const isSubscribed = user && user.isSubscribed;
-
-            const handleItemClick = (item, isCourseFolder) => {
-                if (isCourseFolder) {
-                    setCurrentFolder(item);
-                    setSearchQuery("");
-                } else {
-                    if (isSubscribed || user?.isAdmin) { onFileInteract(item); } 
-                    else { setShowPayment(true); }
-                }
-            };
-
-            const displayItems = () => {
-                if (searchQuery.trim() !== "") {
-                    let results = [];
-                    courses.forEach(course => {
-                        course.lessons.forEach(lesson => {
-                            if (lesson.name.toLowerCase().includes(searchQuery.toLowerCase()) || course.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-                                results.push({ ...lesson, courseName: course.name });
-                            }
-                        });
-                    });
-                    return results;
-                }
-                if (currentFolder) return currentFolder.lessons;
-                return courses;
-            };
-
-            const items = displayItems();
-
-            return (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden min-h-[600px] flex flex-col relative animate-fade-in max-w-6xl mx-auto">
-                    
-                    {!isSubscribed && !user?.isAdmin && (
-                        <div className="bg-brand-secondary/10 dark:bg-brand-secondary/20 border-b border-brand-secondary/30 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                                <Icon name="Lock" className="text-brand-secondary" />
-                                <span className="font-bold text-gray-800 dark:text-gray-200">צפייה בשיעורים דורשת מנוי פעיל במועדון.</span>
-                            </div>
-                            <button onClick={() => setShowPayment(true)} className="bg-brand-secondary hover:bg-[#c15c3c] text-white px-6 py-2 rounded-xl text-sm font-bold transition w-full sm:w-auto shadow-md">
-                                פתיחת הגישה לקורסים
-                            </button>
-                        </div>
-                    )}
-
-                    <div className="bg-gray-50 dark:bg-gray-900 p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300 font-medium overflow-x-auto w-full md:w-auto whitespace-nowrap scrollbar-hide">
-                            <button onClick={() => {setCurrentFolder(null); setSearchQuery("");}} className="hover:text-brand-primary dark:hover:text-white p-1 flex items-center gap-1">
-                                <Icon name="FolderOpen" size={20} /> <span className="font-bold">ספריית הקורסים המלאה</span>
-                            </button>
-                            {currentFolder && (
-                                <React.Fragment>
-                                    <Icon name="ChevronLeft" size={16} className="text-gray-400" />
-                                    <span className="text-brand-primary dark:text-brand-secondary font-bold">{currentFolder.name}</span>
-                                </React.Fragment>
-                            )}
-                        </div>
-                        
-                        <div className="relative w-full md:w-64">
-                            <input 
-                                type="text" placeholder="חיפוש שיעורים..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-4 pr-10 py-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:border-brand-primary text-sm transition-colors"
-                            />
-                            <div className="absolute top-2.5 right-3 text-gray-400 dark:text-gray-500"><Icon name="Search" size={18} /></div>
-                        </div>
-                    </div>
-
-                    <div className="p-6 flex-1 overflow-y-auto">
-                        {items.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500 py-12">
-                                <Icon name="FolderOpen" size={64} className="mb-4 opacity-50" />
-                                <p className="text-lg">לא נמצאו תכנים.</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                {items.map(item => (
-                                    item.isFolder ? (
-                                        <div key={item.id} onClick={() => handleItemClick(item, true)} className="group flex flex-col items-center justify-center p-8 bg-gradient-to-b from-gray-50 to-white dark:from-gray-700/50 dark:to-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600 hover:border-brand-primary dark:hover:border-brand-secondary hover:shadow-lg cursor-pointer transition-all">
-                                            <Icon name="Folder" className="text-brand-primary dark:text-brand-secondary mb-4 group-hover:scale-110 transition-transform" size={56} />
-                                            <span className="text-gray-800 dark:text-gray-200 font-black text-center text-lg">{item.name}</span>
-                                            <span className="text-gray-500 text-sm mt-2">{item.lessons.length} שיעורים</span>
-                                        </div>
-                                    ) : (
-                                        <div key={item.id} onClick={() => handleItemClick(item, false)} className="group flex flex-col p-5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-brand-secondary dark:hover:border-brand-secondary hover:shadow-md transition-all cursor-pointer relative overflow-hidden h-full">
-                                            {(!isSubscribed && !user?.isAdmin) && (
-                                                <div className="absolute top-3 left-3 text-brand-secondary opacity-70 bg-white/80 dark:bg-gray-800/80 p-1 rounded-full">
-                                                    <Icon name="Lock" size={16} />
-                                                </div>
-                                            )}
-                                            <div className="w-12 h-12 bg-brand-primary/10 rounded-xl flex items-center justify-center mb-4 text-brand-primary dark:text-white group-hover:bg-brand-secondary group-hover:text-white transition-colors">
-                                                <Icon name={item.type === 'pdf' ? "FileText" : "PlayCircle"} size={24} />
-                                            </div>
-                                            <span className="text-gray-800 dark:text-gray-200 font-bold text-base leading-snug mb-2 flex-1" dir="rtl">{item.name}</span>
-                                            {item.courseName && <span className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded inline-block mt-auto w-max">{item.courseName}</span>}
-                                        </div>
-                                    )
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
-        // ----------------------------------------------------
-        // Forum Page (Threads & Replies)
-        // ----------------------------------------------------
-        const ForumPage = ({ user, setShowAuthModal, topics, setTopics }) => {
-            const [currentTopic, setCurrentTopic] = React.useState(null);
-            
-            // New Topic Form
-            const [newTopicTitle, setNewTopicTitle] = React.useState("");
-            const [newTopicContent, setNewTopicContent] = React.useState("");
-            const [isAnonymousTopic, setIsAnonymousTopic] = React.useState(false);
-            
-            // New Reply Form
-            const [newReplyContent, setNewReplyContent] = React.useState("");
-            const [isAnonymousReply, setIsAnonymousReply] = React.useState(false);
-            
-            const [isPublishing, setIsPublishing] = React.useState(false);
-
-            const isAdmin = user && user.isAdmin;
-
-            // -- Create New Topic --
-            const handleCreateTopic = async (e) => {
-                e.preventDefault();
-                if (!user) { setShowAuthModal(true); return; }
-                if (!newTopicTitle.trim() || !newTopicContent.trim()) return;
-
-                setIsPublishing(true);
-                const newTopic = {
-                    id: Date.now().toString(),
-                    title: newTopicTitle,
-                    content: newTopicContent,
-                    author: isAnonymousTopic ? 'משתמש אנונימי' : user.name,
-                    realAuthor: user.name,
-                    date: new Date().toISOString(),
-                    isAnonymous: isAnonymousTopic,
-                    isAdminPost: isAdmin && !isAnonymousTopic,
-                    replies: []
-                };
-
-                if (window.db) {
-                    try {
-                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                        await window.FB.addDoc(window.FB.collection(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics'), newTopic);
-                    } catch(err) {
-                        alert("שגיאה בחיבור לענן. הפוסט יישמר מקומית.");
-                        setTopics([newTopic, ...topics]);
-                    }
-                } else {
-                    setTopics([newTopic, ...topics]); 
-                }
-
-                setNewTopicTitle("");
-                setNewTopicContent("");
-                setIsAnonymousTopic(false);
-                setIsPublishing(false);
-            };
-
-            // -- Add Reply to Topic --
-            const handleAddReply = async (e) => {
-                e.preventDefault();
-                if (!user) { setShowAuthModal(true); return; }
-                if (!newReplyContent.trim() || !currentTopic) return;
-
-                setIsPublishing(true);
-                const newReply = {
-                    id: Date.now().toString(),
-                    content: newReplyContent,
-                    author: isAnonymousReply ? 'משתמש אנונימי' : user.name,
-                    realAuthor: user.name,
-                    date: new Date().toISOString(),
-                    isAnonymous: isAnonymousReply,
-                    isAdminPost: isAdmin && !isAnonymousReply
-                };
-
-                // Find latest topic data to append reply
-                const updatedReplies = [...currentTopic.replies, newReply];
-
-                if (window.db && currentTopic.dbId) {
-                    try {
-                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                        const topicRef = window.FB.doc(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics', currentTopic.dbId);
-                        await window.FB.updateDoc(topicRef, { replies: updatedReplies });
-                        // Local state update for immediate feel inside the current view
-                        setCurrentTopic({ ...currentTopic, replies: updatedReplies });
-                    } catch(err) {
-                        alert("שגיאה בהוספת תגובה בענן.");
-                    }
-                } else {
-                    const updatedTopics = topics.map(t => t.id === currentTopic.id ? { ...t, replies: updatedReplies } : t);
-                    setTopics(updatedTopics);
-                    setCurrentTopic({ ...currentTopic, replies: updatedReplies });
-                }
-
-                setNewReplyContent("");
-                setIsAnonymousReply(false);
-                setIsPublishing(false);
-            };
-
-            // Re-sync currentTopic if topics update from cloud
-            React.useEffect(() => {
-                if(currentTopic) {
-                    const updated = topics.find(t => t.id === currentTopic.id);
-                    if(updated) setCurrentTopic(updated);
-                }
-            }, [topics]);
-
-            // VIEW 1: TOPIC LIST
-            if (!currentTopic) {
-                return (
-                    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-12">
-                        <div className="text-center mb-8">
-                            <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-3 flex items-center justify-center gap-3">
-                                <Icon name="MessageSquare" size={32} className="text-brand-secondary" />
-                                פורום התייעצויות ודיונים
-                            </h2>
-                            <p className="text-gray-600 dark:text-gray-400 text-lg">המקום לפתוח נושאים, לשאול שאלות וללמוד יחד.</p>
-                        </div>
-
-                        {/* Create Topic Form */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-6 relative">
-                            {!user && (
-                                <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center rounded-2xl">
-                                    <p className="text-lg font-bold text-brand-primary dark:text-white mb-3">יש להתחבר כדי לפתוח דיון</p>
-                                    <button onClick={() => setShowAuthModal(true)} className="bg-brand-primary text-white px-6 py-2 rounded-full font-bold">התחברות</button>
-                                </div>
-                            )}
-                            <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><Icon name="Plus" size={20} className="text-brand-secondary"/> פתיחת נושא חדש לדיון</h3>
-                            <form onSubmit={handleCreateTopic} className="space-y-4">
-                                <input 
-                                    type="text" value={newTopicTitle} onChange={e => setNewTopicTitle(e.target.value)} required
-                                    placeholder="כותרת הנושא (לדוגמה: איך מתמחרים פגישה ראשונה?)"
-                                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white focus:ring-2 focus:ring-brand-primary outline-none font-bold"
-                                />
-                                <textarea 
-                                    value={newTopicContent} onChange={e => setNewTopicContent(e.target.value)} required
-                                    placeholder="פרטו כאן את השאלה, הדילמה או התובנה שלכם..."
-                                    className="w-full h-32 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 focus:ring-2 focus:ring-brand-primary outline-none resize-none text-gray-800 dark:text-white"
-                                ></textarea>
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                    <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
-                                        <input type="checkbox" checked={isAnonymousTopic} onChange={e => setIsAnonymousTopic(e.target.checked)} className="w-4 h-4 text-brand-primary rounded" />
-                                        <Icon name="Ghost" size={16} /> פתח נושא בעילום שם
-                                    </label>
-                                    <button type="submit" disabled={isPublishing} className="bg-brand-secondary hover:bg-[#c15c3c] text-white px-8 py-2.5 rounded-full font-bold transition w-full sm:w-auto disabled:opacity-50 flex justify-center items-center gap-2">
-                                        {isPublishing ? <Icon name="RefreshCw" className="animate-spin" size={18} /> : null} פרסם נושא
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* Topics List */}
-                        <div className="space-y-4">
-                            <h3 className="font-black text-xl text-brand-primary dark:text-white border-b-2 border-brand-secondary inline-block pb-1">נושאים אחרונים בפורום</h3>
-                            {topics.length === 0 ? <p className="text-gray-500 py-6 text-center">אין נושאים עדיין. תהיו הראשונים!</p> : null}
-                            {topics.map(topic => (
-                                <div key={topic.id} onClick={() => setCurrentTopic(topic)} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:border-brand-primary hover:shadow-md transition-all cursor-pointer flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group">
-                                    <div className="flex-1">
-                                        <h4 className="text-xl font-bold text-gray-800 dark:text-white group-hover:text-brand-primary transition-colors flex items-center gap-2">
-                                            {topic.isAdminPost && <Icon name="ShieldCheck" size={18} className="text-brand-secondary" title="הודעת מערכת" />}
-                                            {topic.title}
-                                        </h4>
-                                        <div className="flex items-center gap-3 text-sm text-gray-500 mt-2">
-                                            <span className="flex items-center gap-1"><Icon name={topic.isAnonymous ? "Ghost" : "User"} size={14} /> {topic.author}</span>
-                                            <span>•</span>
-                                            <span>{formatDate(topic.date)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="bg-brand-primary/10 text-brand-primary dark:bg-gray-700 dark:text-gray-300 px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shrink-0">
-                                        <Icon name="MessageCircle" size={16} /> {topic.replies ? topic.replies.length : 0} תגובות
-                                    </div>
+                    <div className="marquee-wrapper">
+                        <div className="marquee-content">
+                            {feedbacks.map((item, i) => (
+                                <div key={i} className="bg-brand-light dark:bg-gray-700 p-6 rounded-2xl border-t-4 border-brand-secondary shadow-sm relative w-80 flex-shrink-0 flex flex-col">
+                                    <Icon name="Quote" className="text-brand-primary/10 dark:text-gray-600 absolute top-4 right-4" size={32} />
+                                    <p className="text-gray-700 dark:text-gray-300 text-sm italic relative z-10 mb-6 font-medium leading-relaxed mt-4">"{item.text}"</p>
+                                    <span className="text-xs font-extrabold text-brand-primary dark:text-brand-secondary block mt-auto">- {item.author}</span>
                                 </div>
                             ))}
                         </div>
+                        <div className="marquee-content" aria-hidden="true">
+                            {feedbacks.map((item, i) => (
+                                <div key={`dup-${i}`} className="bg-brand-light dark:bg-gray-700 p-6 rounded-2xl border-t-4 border-brand-secondary shadow-sm relative w-80 flex-shrink-0 flex flex-col">
+                                    <Icon name="Quote" className="text-brand-primary/10 dark:text-gray-600 absolute top-4 right-4" size={32} />
+                                    <p className="text-gray-700 dark:text-gray-300 text-sm italic relative z-10 mb-6 font-medium leading-relaxed mt-4">"{item.text}"</p>
+                                    <span className="text-xs font-extrabold text-brand-primary dark:text-brand-secondary block mt-auto">- {item.author}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ----------------------------------------------------
+        // Main Pages
+        // ----------------------------------------------------
+        const HomePage = ({ navigate }) => (
+            <div className="animate-fade-in space-y-12 max-w-5xl mx-auto mt-4 px-4">
+                <div className="text-center mb-10">
+                    <Icon name="Mountain" size={64} className="mx-auto mb-4 text-brand-secondary" />
+                    <h1 className="text-4xl md:text-5xl font-black text-brand-primary dark:text-white tracking-tight">ברוכים הבאים לקהילת פסגה</h1>
+                    <h2 className="text-xl font-medium text-gray-600 dark:text-gray-400">הבית העסקי למאמנים ומטפלים בהובלת משה וולנר</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div onClick={() => navigate('explorer')} className="bg-gradient-to-br from-brand-primary to-brand-dark rounded-[2.5rem] p-10 text-white shadow-2xl hover:shadow-xl transition-all cursor-pointer group flex flex-col justify-between h-full transform hover:-translate-y-2">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-secondary transition-colors">
+                                <Icon name="Crown" size={40} className="text-brand-secondary group-hover:text-white" />
+                            </div>
+                            <h3 className="text-3xl font-black mb-3">כניסת Pro</h3>
+                            <p className="text-gray-300 mb-8">גישה מלאה לכל הקורסים, הכלים והקהילה.</p>
+                        </div>
+                        <button className="bg-brand-secondary text-white py-4 rounded-xl font-bold text-lg">כניסת חברי מועדון</button>
+                    </div>
+                    <div onClick={() => navigate('youtube')} className="bg-white dark:bg-gray-800 border-2 border-gray-100 rounded-[2.5rem] p-10 text-brand-primary shadow-xl hover:shadow-lg transition-all cursor-pointer group flex flex-col justify-between h-full transform hover:-translate-y-2">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-red-500 transition-colors">
+                                <Icon name="Unlock" size={40} className="text-gray-400 group-hover:text-white" />
+                            </div>
+                            <h3 className="text-3xl font-black mb-3">כניסה פתוחה</h3>
+                            <p className="text-gray-600 mb-8">צפייה חופשית בתכנים נבחרים מיוטיוב.</p>
+                        </div>
+                        <button className="bg-gray-100 text-brand-primary py-4 rounded-xl font-bold text-lg">צפו בחינם</button>
+                    </div>
+                </div>
+
+                <TestimonialsMarquee />
+            </div>
+        );
+
+        const AboutPage = () => (
+            <div className="max-w-4xl mx-auto space-y-12 pb-12 animate-fade-in">
+                <div className="bg-white dark:bg-gray-800 rounded-[3rem] p-8 md:p-16 shadow-xl border border-gray-100 dark:border-gray-700 relative overflow-hidden text-center md:text-right flex flex-col md:flex-row gap-10 items-center">
+                    <div className="absolute top-0 left-0 w-32 h-32 bg-brand-secondary/10 rounded-br-full"></div>
+                    <div className="absolute bottom-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-tl-full"></div>
+
+                    <div className="flex-1 relative z-10 space-y-6">
+                        <h1 className="text-4xl md:text-5xl font-black text-brand-primary dark:text-white leading-tight">
+                            הייתי שם.
+                        </h1>
+                        <div className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed space-y-4 font-medium">
+                            <p>
+                                הייתי הנער שחיפש כיוון. הייתי זה שהלך לאיבוד בין השבילים כי לא היה מי שיאיר את הדרך. היום אני יודע שאתם הייתם שם - המטפלים, המאמנים, אנשי הלב והמקצוע. הייתם שם, אבל לא ראיתי אתכם. המותג שלי, והספר הזה, נולדו כדי להיות הגשר.
+                            </p>
+                            <p className="text-brand-secondary font-bold text-2xl pt-2">
+                                להפוך את המטפלים ה"נסתרים" לכתובת גלויה וברורה.
+                            </p>
+                            <p>
+                                קהילת פסגה, ממש כמו הספר שלי "מומחה שכיר, מומחה יוצר", היא לא עוד מדריך שיווקי. היא המדריך שלך להפוך את הכישרון והנתינה שלך למפעל חיים משגשג.
+                            </p>
+                            <p>
+                                כאן תלמדו איך לצאת מהקליניקה הסגורה אל קדמת הבמה, איך לבנות מוצרים שיגיעו לכל בית שזקוק להם, ואיך לייצר ביטחון כלכלי שיאפשר לכם להמשיך לתת.
+                            </p>
+                        </div>
+                        <div className="pt-6 border-t border-gray-200 dark:border-gray-700 inline-block text-center w-full md:text-right">
+                            <h3 className="text-2xl font-black text-brand-primary dark:text-white">משה וולנר,</h3>
+                            <p className="text-brand-secondary font-bold">מלווה עסקי למטפלים ומאמנים</p>
+                        </div>
+                    </div>
+                    
+                    <div className="shrink-0 relative z-10 hidden md:block">
+                        <div className="w-48 h-64 bg-gradient-to-br from-brand-primary to-brand-dark rounded-xl shadow-2xl flex flex-col items-center justify-center p-6 text-white text-center transform rotate-3">
+                            <Icon name="Mountain" size={48} className="text-brand-secondary mb-4" />
+                            <h2 className="font-black text-2xl leading-none mb-2">מומחה<br/>שכיר</h2>
+                            <div className="w-full h-px bg-white/30 my-2"></div>
+                            <h2 className="font-black text-2xl leading-none text-brand-secondary">מומחה<br/>יוצר</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const HistoryPage = ({ localHistory, onFileInteract }) => {
+            return (
+                <div className="max-w-4xl mx-auto space-y-6 animate-fade-in relative px-4">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-2 flex justify-center items-center gap-2">
+                            <Icon name="History" size={32} className="text-brand-secondary" /> היסטוריית צפייה
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400">כל הקורסים והסרטונים שפתחת נשמרים כאן לגישה מהירה.</p>
+                    </div>
+
+                    {(!localHistory || localHistory.length === 0) ? (
+                        <div className="text-center py-16 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                            <Icon name="History" size={48} className="mx-auto mb-3 opacity-50" />
+                            עדיין לא צפית בשיעורים.
+                        </div>
+                    ) : (
+                        <div className="grid gap-4">
+                            {localHistory.map((item, idx) => (
+                                <div key={idx} onClick={() => onFileInteract(item)} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between hover:border-brand-primary dark:hover:border-brand-secondary transition cursor-pointer group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-14 h-14 bg-brand-primary/10 dark:bg-brand-primary/20 rounded-full flex items-center justify-center group-hover:scale-105 transition-transform">
+                                            <Icon name={item.type === 'audio' ? 'Headphones' : item.type === 'video' || item.type === 'youtube' ? 'FileVideo' : 'FileText'} size={24} className="text-brand-primary dark:text-brand-secondary" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-800 dark:text-gray-200 text-lg leading-tight">{item.name}</h4>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
+                                                <Icon name="Clock" size={12} /> נצפה לאחרונה: {item.lastWatched || "היום"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button className="mt-4 md:mt-0 bg-brand-light dark:bg-gray-700 text-brand-primary dark:text-white font-bold py-2.5 px-6 rounded-xl text-sm transition flex items-center justify-center gap-2 group-hover:bg-brand-primary group-hover:text-white">
+                                        המשך צפייה <Icon name="PlayCircle" size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const SchedulePage = () => {
+            const { data, loading, error } = useCSVData(CSV_URLS.SCHEDULE, mapScheduleRow, 'pisga_csv_schedule');
+            return (
+                <div className="space-y-6 animate-fade-in px-4">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-3">לוח זמנים והדרכות</h2>
+                        <p className="text-gray-600 dark:text-gray-400">התעדכנו בשידורים החיים, הוובינרים והסדנאות הקרובות שלנו.</p>
+                    </div>
+                    <div className="grid gap-4 max-w-4xl mx-auto">
+                        {loading ? <DynamicLoader texts={["טוען לוח זמנים..."]} /> : data.length === 0 ? <p className="text-center text-gray-500">אין אירועים כרגע.</p> : data.map(item => (
+                            <div key={item.id} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row items-start md:items-center gap-6 hover:border-brand-secondary transition-colors">
+                                <div className="bg-brand-primary/10 text-brand-primary dark:text-brand-secondary rounded-xl p-4 flex flex-col items-center justify-center min-w-[100px] shrink-0">
+                                    <Icon name="Calendar" size={24} className="mb-1" />
+                                    <span className="font-bold">{item.date}</span>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 text-brand-secondary font-medium mb-1">
+                                        <Icon name="Clock" size={16} /> <span>בשעה {item.time}</span>
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{item.title}</h3>
+                                    <p className="text-gray-600 dark:text-gray-400">{item.description}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const ArticlesPage = () => {
+            const { data, loading, error } = useCSVData(CSV_URLS.ARTICLES, mapArticleRow, 'pisga_csv_articles');
+            return (
+                <div className="space-y-8 animate-fade-in px-4">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-3">מאמרים וכלים עסקיים</h2>
+                        <p className="text-gray-600 dark:text-gray-400">ידע מקצועי וערכי להעמקת הפעילות העסקית בקליניקה שלכם.</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {loading ? <DynamicLoader texts={["טוען מאמרים..."]} /> : data.length === 0 ? <p className="text-center text-gray-500 col-span-full">אין מאמרים כרגע.</p> : data.map(article => (
+                            <div key={article.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+                                <div className="h-2 bg-brand-secondary w-full"></div>
+                                <div className="p-6 flex-1 flex flex-col">
+                                    <span className="text-xs text-gray-400 dark:text-gray-500 mb-2 block">{article.date}</span>
+                                    <h3 className="text-xl font-bold text-brand-primary dark:text-white mb-3">{article.title}</h3>
+                                    <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1 text-sm leading-relaxed">{article.summary}</p>
+                                    <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-brand-secondary font-bold flex items-center gap-1 hover:text-brand-primary dark:hover:text-white transition-colors mt-auto w-max">
+                                        קראו עוד <Icon name="ChevronLeft" size={16} />
+                                    </a>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const AdminPage = ({ forumTopics, setForumTopics, setMessage }) => {
+            const handleDeleteTopic = async (topic) => {
+                if(!confirm("מחיקת נושא זה תסיר אותו לצמיתות מהענן. להמשיך?")) return;
+                try {
+                    await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'pisga_forum', topic.id));
+                    setMessage("הנושא נמחק בהצלחה.");
+                } catch (e) { setMessage("שגיאה במחיקה: " + e.message); }
+            };
+
+            return (
+                <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12 px-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-brand-primary/20">
+                        <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                            <div className="flex items-center gap-4">
+                                <Icon name="Settings" size={32} className="text-brand-secondary" />
+                                <h2 className="text-3xl font-black text-brand-primary dark:text-white">ניהול פורום</h2>
+                            </div>
+                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">מחובר לענן חי</span>
+                        </div>
+                        <div className="space-y-6">
+                            {forumTopics.map(topic => (
+                                <div key={topic.id} className="border border-gray-200 rounded-xl p-4 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
+                                    <div>
+                                        <h3 className="font-bold text-lg">{topic.title}</h3>
+                                        <p className="text-sm text-gray-500">מחבר: {topic.realAuthor} | תגובות: {topic.replies?.length || 0}</p>
+                                    </div>
+                                    <button onClick={() => handleDeleteTopic(topic)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition"><Icon name="Trash2" /></button>
+                                </div>
+                            ))}
+                            {forumTopics.length === 0 && <p className="text-center text-gray-500">אין פוסטים כרגע.</p>}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ForumPage = ({ user, setShowAuthModal, topics }) => {
+            const [currentTopic, setCurrentTopic] = React.useState(null);
+            const [newTitle, setNewTitle] = React.useState("");
+            const [newContent, setNewContent] = React.useState("");
+            const [newReply, setNewReply] = React.useState("");
+            const [isAnon, setIsAnon] = React.useState(false);
+            const [loading, setLoading] = React.useState(false);
+
+            const handleCreate = async (e) => {
+                e.preventDefault();
+                if(!user) return setShowAuthModal(true);
+                setLoading(true);
+                try {
+                    await window.FB.addDoc(window.FB.collection(window.FB.db, 'pisga_forum'), {
+                        title: newTitle, content: newContent, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
+                        date: new Date().toISOString(), isAnonymous: isAnon, replies: [], isAdminPost: user.isAdmin
+                    });
+                    setNewTitle(""); setNewContent("");
+                } catch(e) { alert("שגיאה בענן"); }
+                setLoading(false);
+            };
+
+            const handleReply = async (e) => {
+                e.preventDefault();
+                if(!user) return setShowAuthModal(true);
+                setLoading(true);
+                const updatedReplies = [...(currentTopic.replies || []), {
+                    id: Date.now().toString(), content: newReply, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
+                    date: new Date().toISOString(), isAnonymous: isAnon
+                }];
+                try {
+                    await window.FB.updateDoc(window.FB.doc(window.FB.db, 'pisga_forum', currentTopic.id), { replies: updatedReplies });
+                    setNewReply("");
+                } catch(e) { alert("שגיאה בענן"); }
+                setLoading(false);
+            };
+
+            if (currentTopic) {
+                const topicData = topics.find(t => t.id === currentTopic.id) || currentTopic;
+                return (
+                    <div className="max-w-4xl mx-auto p-4 animate-fade-in">
+                        <button onClick={() => setCurrentTopic(null)} className="mb-4 flex items-center gap-2 font-bold text-gray-500"><Icon name="ChevronRight" /> חזרה</button>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border-b-4 border-brand-primary mb-6">
+                            <h2 className="text-2xl font-black text-brand-primary mb-2">{topicData.title}</h2>
+                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{topicData.content}</p>
+                            <div className="mt-4 text-xs text-gray-500">פורסם ע"י {topicData.author} בתאריך {formatDate(topicData.date)}</div>
+                        </div>
+                        <div className="space-y-4 mb-8">
+                            {topicData.replies?.map(r => (
+                                <div key={r.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-100">
+                                    <p className="text-gray-800 dark:text-white">{r.content}</p>
+                                    <div className="mt-2 text-[10px] text-gray-400">{r.author} • {formatDate(r.date)}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <form onSubmit={handleReply} className="space-y-2">
+                            <textarea value={newReply} onChange={e=>setNewReply(e.target.value)} required placeholder="הגב לנושא..." className="w-full p-4 rounded-xl border focus:ring-2 focus:ring-brand-primary outline-none"></textarea>
+                            <div className="flex justify-between items-center">
+                                <label className="text-sm"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} /> הגב בעילום שם</label>
+                                <button type="submit" disabled={loading} className="bg-brand-primary text-white px-6 py-2 rounded-xl font-bold">שלח תגובה</button>
+                            </div>
+                        </form>
                     </div>
                 );
             }
 
-            // VIEW 2: TOPIC DETAILS & REPLIES
             return (
-                <div className="max-w-4xl mx-auto space-y-6 animate-fade-in pb-12">
-                    <button onClick={() => setCurrentTopic(null)} className="text-gray-500 hover:text-brand-primary font-bold flex items-center gap-1 transition-colors mb-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm w-max border border-gray-200 dark:border-gray-700">
-                        <Icon name="ChevronRight" size={20} /> חזרה לרשימת הנושאים
-                    </button>
-
-                    {/* Original Post */}
-                    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-md border ${currentTopic.isAdminPost ? 'border-brand-primary/50' : 'border-gray-200 dark:border-gray-700'} p-6 md:p-8`}>
-                        <h2 className="text-2xl font-black text-brand-primary dark:text-white mb-4">{currentTopic.title}</h2>
-                        <div className="flex items-center gap-3 mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${currentTopic.isAdminPost ? 'bg-brand-primary' : currentTopic.isAnonymous ? 'bg-gray-400' : 'bg-brand-secondary'}`}>
-                                {currentTopic.isAdminPost ? <Icon name="Mountain" size={24} /> : currentTopic.isAnonymous ? <Icon name="Ghost" size={24} /> : currentTopic.author.charAt(0)}
-                            </div>
-                            <div>
-                                <div className="font-bold text-gray-800 dark:text-white flex items-center gap-1">
-                                    {currentTopic.author} {currentTopic.isAdminPost && <Icon name="CheckCircle" size={14} className="text-brand-primary" />}
-                                </div>
-                                <div className="text-xs text-gray-500">{formatDate(currentTopic.date)}</div>
-                            </div>
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed text-lg">{currentTopic.content}</p>
+                <div className="max-w-5xl mx-auto p-4 space-y-8 animate-fade-in">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-black text-brand-primary">פורום המועדון</h2>
+                        <p className="text-gray-500">דיונים, התייעצויות וצמיחה קהילתית בזמן אמת.</p>
                     </div>
-
-                    {/* Replies List */}
-                    <div className="space-y-4 pl-0 md:pl-10">
-                        <h3 className="font-bold text-lg text-gray-700 dark:text-gray-300 mr-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                            תגובות ({currentTopic.replies ? currentTopic.replies.length : 0})
-                        </h3>
-                        {(!currentTopic.replies || currentTopic.replies.length === 0) && (
-                            <p className="text-gray-500 text-center py-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">אין תגובות עדיין. היו הראשונים להגיב!</p>
-                        )}
-                        {currentTopic.replies && currentTopic.replies.map((reply, idx) => (
-                            <div key={reply.id} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 relative">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="font-bold text-sm text-gray-800 dark:text-white flex items-center gap-1">
-                                        {reply.isAdminPost && <Icon name="ShieldCheck" size={14} className="text-brand-primary" />}
-                                        {reply.author}
-                                    </span>
-                                    <span className="text-xs text-gray-400">• {formatDate(reply.date)}</span>
-                                </div>
-                                <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed">{reply.content}</p>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Add Reply Form */}
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-brand-primary/20 p-6 mt-8 relative pl-0 md:pl-10">
-                        {!user && (
-                            <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center rounded-2xl">
-                                <button onClick={() => setShowAuthModal(true)} className="bg-brand-primary text-white px-6 py-2 rounded-full font-bold">התחברו כדי להגיב</button>
-                            </div>
-                        )}
-                        <form onSubmit={handleAddReply}>
-                            <textarea 
-                                value={newReplyContent} onChange={e => setNewReplyContent(e.target.value)} required
-                                placeholder="כתבו תגובה לנושא זה..."
-                                className="w-full h-24 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 focus:ring-2 focus:ring-brand-secondary outline-none resize-none text-gray-800 dark:text-white text-sm"
-                            ></textarea>
-                            <div className="flex flex-col sm:flex-row items-center justify-between mt-3 gap-3">
-                                <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
-                                    <input type="checkbox" checked={isAnonymousReply} onChange={e => setIsAnonymousReply(e.target.checked)} className="rounded" /> פרסם כאנונימי
-                                </label>
-                                <button type="submit" disabled={isPublishing} className="bg-brand-primary hover:bg-brand-dark text-white px-6 py-2 rounded-full font-bold transition text-sm flex items-center gap-2">
-                                    {isPublishing ? <Icon name="RefreshCw" className="animate-spin" size={16} /> : <Icon name="MessageSquare" size={16}/>} שלח תגובה
-                                </button>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
+                        <form onSubmit={handleCreate} className="space-y-4">
+                            <input type="text" value={newTitle} onChange={e=>setNewTitle(e.target.value)} required placeholder="כותרת הנושא..." className="w-full p-3 rounded-xl border font-bold" />
+                            <textarea value={newContent} onChange={e=>setNewContent(e.target.value)} required placeholder="פרטו כאן את השאלה או הדילמה..." className="w-full p-3 rounded-xl border h-24"></textarea>
+                            <div className="flex justify-between items-center">
+                                <label className="text-sm"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} /> פרסם בעילום שם</label>
+                                <button type="submit" disabled={loading} className="bg-brand-secondary text-white px-8 py-2 rounded-xl font-bold">פתח נושא לדיון</button>
                             </div>
                         </form>
+                    </div>
+                    <div className="space-y-4">
+                        {topics.map(t => (
+                            <div key={t.id} onClick={() => setCurrentTopic(t)} className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:border-brand-primary transition">
+                                <h4 className="text-xl font-bold flex items-center gap-2">{t.isAdminPost && <Icon name="ShieldCheck" className="text-brand-secondary" />} {t.title}</h4>
+                                <div className="text-xs text-gray-400 mt-2">{t.author} • {t.replies?.length || 0} תגובות</div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             );
         };
 
-        // ----------------------------------------------------
-        // Youtube Free Channel Component
-        // ----------------------------------------------------
-        const YoutubePage = ({ onFileInteract, ytChannelId }) => {
+        const ExplorerPage = ({ onFileInteract, user, setShowPayment, courses }) => {
+            const [currentFolder, setCurrentFolder] = React.useState(null); 
+            const isSubscribed = user && user.isSubscribed;
+            const handleItemClick = (item, isCourseFolder) => {
+                if (isCourseFolder) { setCurrentFolder(item); } 
+                else { if (isSubscribed || user?.isAdmin) { onFileInteract(item); } else { setShowPayment(true); } }
+            };
+            const items = currentFolder ? currentFolder.lessons : courses;
+            return (
+                <div className="max-w-6xl mx-auto p-4 min-h-[600px] flex flex-col">
+                    {!isSubscribed && !user?.isAdmin && (
+                        <div className="bg-brand-secondary/10 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 border border-brand-secondary/30">
+                            <span className="font-bold">צפייה בשיעורים דורשת מנוי פעיל במועדון.</span>
+                            <button onClick={() => setShowPayment(true)} className="bg-brand-secondary text-white px-6 py-2 rounded-xl text-sm font-bold shadow-md">פתיחת הגישה לקורסים</button>
+                        </div>
+                    )}
+                    <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-t-xl border-b flex items-center gap-2">
+                        <button onClick={() => setCurrentFolder(null)} className="font-bold text-brand-primary flex items-center gap-1"><Icon name="Home" size={18}/> ספרייה</button>
+                        {currentFolder && <><Icon name="ChevronLeft" size={16} /><span className="font-bold">{currentFolder.name}</span></>}
+                    </div>
+                    <div className="p-6 bg-white dark:bg-gray-800 rounded-b-xl border flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {items.map(item => (
+                            item.isFolder ? (
+                                <div key={item.id} onClick={() => handleItemClick(item, true)} className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-2xl border hover:border-brand-primary cursor-pointer transition">
+                                    <Icon name="Folder" className="text-brand-primary mb-4" size={56} />
+                                    <span className="font-black text-center">{item.name}</span>
+                                </div>
+                            ) : (
+                                <div key={item.id} onClick={() => handleItemClick(item, false)} className="p-5 bg-white dark:bg-gray-700 rounded-2xl border hover:shadow-md cursor-pointer relative flex flex-col h-full">
+                                    {(!isSubscribed && !user?.isAdmin) && <Icon name="Lock" size={16} className="absolute top-3 left-3 text-brand-secondary" />}
+                                    <Icon name={item.type === 'pdf' ? "FileText" : "PlayCircle"} size={24} className="mb-4 text-brand-primary" />
+                                    <span className="font-bold text-sm leading-tight flex-1">{item.name}</span>
+                                </div>
+                            )
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const YoutubePage = ({ onFileInteract }) => {
             const [videos, setVideos] = React.useState([]);
             const [loading, setLoading] = React.useState(true);
-
             React.useEffect(() => {
-                const fetchYouTubeRss = async () => {
+                const fetchYT = async () => {
                     try {
-                        const cid = ytChannelId || 'UC_x5XG1OV2P6uZZ5FSM9Ttw'; 
-                        const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${cid}`;
-                        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-                        
-                        const response = await fetch(apiUrl);
-                        const data = await response.json();
-                        
-                        if (data.status === 'ok') {
-                            const mappedVideos = data.items.map((item, idx) => ({
-                                id: `yt_${idx}`, name: item.title, url: item.link, thumbnail: item.thumbnail, date: item.pubDate.split(' ')[0], type: 'youtube'
-                            }));
-                            setVideos(mappedVideos);
-                        }
-                    } catch (err) { console.log(err); }
+                        const rss = `https://www.youtube.com/feeds/videos.xml?channel_id=UC_x5XG1OV2P6uZZ5FSM9Ttw`; 
+                        const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
+                        const res = await fetch(api);
+                        const data = await res.json();
+                        if (data.status === 'ok') setVideos(data.items.map((i, idx) => ({ id: `yt_${idx}`, name: i.title, url: i.link, thumbnail: i.thumbnail, type: 'youtube' })));
+                    } catch (e) {}
                     setLoading(false);
                 };
-                fetchYouTubeRss();
-            }, [ytChannelId]);
-
+                fetchYT();
+            }, []);
             return (
-                <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-12">
-                    <div className="text-center mb-10 bg-red-50 dark:bg-red-900/10 p-8 rounded-3xl border border-red-100 dark:border-red-900/30">
+                <div className="max-w-6xl mx-auto p-4 space-y-8 animate-fade-in">
+                    <div className="text-center p-8 bg-red-50 dark:bg-red-900/10 rounded-3xl border border-red-100">
                         <Icon name="Youtube" size={48} className="text-red-600 mx-auto mb-4" />
-                        <h2 className="text-3xl font-black text-gray-800 dark:text-white mb-3">ספריית התוכן הפתוח</h2>
-                        <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">מבחר סרטונים והדרכות ישירות מערוץ היוטיוב של משה וולנר, פתוחים לכולם בחינם.</p>
+                        <h2 className="text-3xl font-black">ספריית התוכן הפתוח</h2>
+                        <p className="text-gray-500">מבחר הדרכות ישירות מהיוטיוב, פתוחות לכולם בחינם.</p>
                     </div>
-
-                    {loading ? <div className="text-center py-12"><Icon name="RefreshCw" className="animate-spin mx-auto text-red-500 mb-4" size={32}/> טוען סרטונים...</div> : 
+                    {loading ? <div className="text-center py-12 animate-spin"><Icon name="RefreshCw" /></div> : 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {videos.map(video => (
-                                <div key={video.id} onClick={() => onFileInteract(video)} className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all cursor-pointer group flex flex-col">
-                                    <div className="relative aspect-video overflow-hidden bg-gray-200">
-                                        {video.thumbnail && <img src={video.thumbnail} alt={video.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
-                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Icon name="PlayCircle" size={48} className="text-white" />
-                                        </div>
+                            {videos.map(v => (
+                                <div key={v.id} onClick={() => onFileInteract(v)} className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg cursor-pointer group">
+                                    <div className="relative aspect-video bg-gray-200">
+                                        <img src={v.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><Icon name="PlayCircle" size={48} className="text-white" /></div>
                                     </div>
-                                    <div className="p-5 flex-1 flex flex-col">
-                                        <h3 className="font-bold text-gray-800 dark:text-gray-200 leading-tight mb-2 flex-1" dir="rtl">{video.name}</h3>
-                                    </div>
+                                    <div className="p-4 font-bold text-sm h-16 overflow-hidden">{v.name}</div>
                                 </div>
                             ))}
                         </div>
@@ -807,312 +731,249 @@
             );
         };
 
-        // ----------------------------------------------------
-        // Global Modal for viewing files
-        // ----------------------------------------------------
         const GlobalFileViewer = ({ file, onClose }) => {
             if (!file) return null;
-            const getEmbedUrl = (file) => {
-                if (file.type === 'youtube' || file.url.includes('youtube.com') || file.url.includes('youtu.be')) {
-                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                    const match = file.url.match(regExp);
-                    if (match && match[2].length === 11) return `https://www.youtube.com/embed/${match[2]}?autoplay=1`;
+            const getUrl = (f) => {
+                if (f.url.includes('youtube.com') || f.url.includes('youtu.be')) {
+                    const id = f.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&]{11})/);
+                    return id ? `https://www.youtube.com/embed/${id[1]}?autoplay=1` : f.url;
                 }
-                if (file.url.includes('drive.google.com')) return file.url.replace(/\/view.*$/, '/preview');
-                return file.url;
+                return f.url.replace('/view', '/preview');
             };
-            const embedUrl = getEmbedUrl(file);
-            const isYoutube = file.type === 'youtube' || embedUrl.includes('youtube.com/embed');
-
             return (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-2 md:p-8 animate-fade-in">
-                    <div className="bg-black w-full max-w-6xl h-full md:h-[85vh] rounded-2xl overflow-hidden flex flex-col shadow-2xl border border-gray-800">
-                        <div className="bg-gray-900 text-white p-4 flex justify-between items-center shadow-md z-10">
-                            <div className="flex items-center gap-3 truncate pr-4">
-                                <Icon name={isYoutube ? "Youtube" : "PlayCircle"} size={24} className={isYoutube ? "text-red-500" : "text-brand-secondary"} />
-                                <h3 className="font-bold text-lg truncate" dir="rtl">{file.name}</h3>
-                            </div>
-                            <button onClick={onClose} className="p-2 hover:bg-gray-800 rounded-full transition-colors shrink-0"><Icon name="X" size={24} /></button>
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-2 sm:p-8 animate-fade-in">
+                    <div className="bg-black w-full max-w-6xl h-full md:h-[85vh] rounded-2xl overflow-hidden flex flex-col shadow-2xl">
+                        <div className="bg-gray-900 text-white p-4 flex justify-between items-center">
+                            <h3 className="font-bold truncate pr-4">{file.name}</h3>
+                            <button onClick={onClose} className="p-2 bg-gray-800 rounded-full"><Icon name="X" /></button>
                         </div>
-                        <div className="flex-1 relative w-full h-full bg-black flex items-center justify-center">
-                            {embedUrl ? <iframe src={embedUrl} className="w-full h-full border-none absolute inset-0" allow="autoplay; fullscreen" allowFullScreen title={file.name}></iframe> : 
-                            <a href={file.url} target="_blank" rel="noopener noreferrer" className="bg-brand-primary text-white px-6 py-3 rounded-full flex items-center gap-2">פתיחת הקובץ בחלון חדש <Icon name="ExternalLink" size={16} /></a>}
-                        </div>
+                        <iframe src={getUrl(file)} className="flex-1 w-full h-full border-none" allow="autoplay; fullscreen" allowFullScreen></iframe>
                     </div>
                 </div>
             );
         };
 
         // ----------------------------------------------------
-        // Main App Component
+        // Main App
         // ----------------------------------------------------
         const App = () => {
             const [showSplash, setShowSplash] = React.useState(true);
-            const [isDarkMode, setIsDarkMode] = React.useState(() => localStorage.getItem('darkMode') === 'true');
-            
-            const [user, setUser] = React.useState(() => {
-                const savedUser = localStorage.getItem('pisga_user');
-                return savedUser ? JSON.parse(savedUser) : null;
-            });
-            const [courses, setCourses] = React.useState(() => {
-                const saved = localStorage.getItem('pisga_courses');
-                return saved ? JSON.parse(saved) : INITIAL_COURSES;
-            });
-            const [forumTopics, setForumTopics] = React.useState(() => {
-                const saved = localStorage.getItem('pisga_forum_topics');
-                return saved ? JSON.parse(saved) : INITIAL_FORUM_TOPICS;
-            });
-            const [ytChannelId, setYoutubeId] = React.useState(localStorage.getItem('pisga_yt_id') || "");
-            
+            const [user, setUser] = React.useState(() => JSON.parse(localStorage.getItem('pisga_user')) || null);
+            const [localHistory, setLocalHistory] = React.useState(() => JSON.parse(localStorage.getItem('pisga_history')) || []);
+            const [courses, setCourses] = React.useState(() => JSON.parse(localStorage.getItem('pisga_courses')) || INITIAL_COURSES);
+            const [forumTopics, setForumTopics] = React.useState([]);
             const [currentPage, setCurrentPage] = React.useState('home');
-            const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
             const [globalFile, setGlobalFile] = React.useState(null);
-            const [alertMessage, setAlertMessage] = React.useState(null);
+            const [alertMsg, setAlertMsg] = React.useState(null);
+            
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+            const [showBackToTop, setShowBackToTop] = React.useState(false);
+            const [showA11y, setShowA11y] = React.useState(false);
+            const [isDarkMode, setIsDarkMode] = React.useState(() => localStorage.getItem('darkMode') === 'true');
 
-            // Modals State
             const [showAuthModal, setShowAuthModal] = React.useState(false);
             const [showPaymentModal, setShowPaymentModal] = React.useState(false);
             const [authName, setAuthName] = React.useState('');
             const [authPass, setAuthPass] = React.useState('');
-            const [showPassField, setShowPassField] = React.useState(false);
-
-            // Cloud DB State
-            const [fbUser, setFbUser] = React.useState(null);
 
             React.useEffect(() => { setTimeout(() => setShowSplash(false), 2000); }, []);
-            React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('darkMode', isDarkMode); }, [isDarkMode]);
-            React.useEffect(() => { localStorage.setItem('pisga_courses', JSON.stringify(courses)); }, [courses]);
-            React.useEffect(() => { if (!window.db) localStorage.setItem('pisga_forum_topics', JSON.stringify(forumTopics)); }, [forumTopics]);
-
-            // Reveal Password Field if Admin Name typed
+            
             React.useEffect(() => {
-                if(authName.includes('משה וולנר') || authName.includes('מנהל')) {
-                    setShowPassField(true);
-                } else {
-                    setShowPassField(false);
-                }
-            }, [authName]);
+                document.documentElement.classList.toggle('dark', isDarkMode);
+                localStorage.setItem('darkMode', isDarkMode);
+            }, [isDarkMode]);
 
-            // --- Cloud Setup (Firebase / Firestore) ---
+            React.useEffect(() => {
+                const handleScroll = () => setShowBackToTop(window.scrollY > 300);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
             React.useEffect(() => {
                 if (!window.FB) return;
-                try {
-                    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-                    if (!firebaseConfig) return;
-                    
-                    const app = window.FB.initializeApp(firebaseConfig);
-                    const auth = window.FB.getAuth(app);
-                    window.db = window.FB.getFirestore(app);
-                    
-                    const initAuth = async () => {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await window.FB.signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await window.FB.signInAnonymously(auth);
-                        }
-                    };
-                    initAuth();
-                    
-                    const unsubscribe = window.FB.onAuthStateChanged(auth, setFbUser);
-                    return () => unsubscribe();
-                } catch(e) { console.log("Cloud db not configured, falling back to local storage.", e); }
+                const unsubscribe = window.FB.onAuthStateChanged(window.FB.auth, (fbUser) => {
+                    if (fbUser && !user) window.FB.signInAnonymously(window.FB.auth);
+                });
+                const q = window.FB.query(window.FB.collection(window.FB.db, 'pisga_forum'));
+                const unsubForum = window.FB.onSnapshot(q, (snapshot) => {
+                    const list = [];
+                    snapshot.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+                    setForumTopics(list.sort((a,b) => new Date(b.date) - new Date(a.date)));
+                });
+                return () => { unsubscribe(); unsubForum(); };
             }, []);
 
-            // --- Fetch Posts from Cloud ---
-            React.useEffect(() => {
-                if (!fbUser || !window.db) return;
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const q = window.FB.collection(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics');
+            const saveToHistoryAndOpen = (item) => {
+                setGlobalFile(item);
+                if (!user) return;
+                const d = new Date();
+                const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
                 
-                const unsubscribe = window.FB.onSnapshot(q, (snapshot) => {
-                    const topics = [];
-                    snapshot.forEach(doc => {
-                        topics.push({ dbId: doc.id, ...doc.data() });
-                    });
-                    topics.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    setForumTopics(topics);
-                }, (error) => { console.error("Cloud Error: ", error); });
-                return () => unsubscribe();
-            }, [fbUser]);
+                const newItem = { name: item.name, type: item.type, url: item.url, lastWatched: dateStr };
+                const newHistory = [newItem, ...localHistory.filter(h => h.name !== item.name)].slice(0, 50); 
+                setLocalHistory(newHistory);
+                localStorage.setItem('pisga_history', JSON.stringify(newHistory));
+            };
 
-            const handleAuthSubmit = (e) => {
+            const handleAuth = (e) => {
                 e.preventDefault();
-                let isAdmin = false;
-                
-                // Secure Admin Check
-                if (showPassField) {
-                    if (authPass === ADMIN_PASSWORD) {
-                        isAdmin = true;
-                    } else {
-                        setAlertMessage({title: "שגיאת התחברות", text: "סיסמת מנהל שגויה."});
-                        return;
-                    }
-                }
-
-                const loggedUser = { name: authName || 'משתמש', isSubscribed: isAdmin, isAdmin: isAdmin };
-                localStorage.setItem('pisga_user', JSON.stringify(loggedUser));
-                setUser(loggedUser);
-                setShowAuthModal(false);
-                setAuthPass(''); // clear pass
-                setAlertMessage({title: "התחברת בהצלחה", text: `ברוך הבא, ${loggedUser.name}!`});
+                const isAdmin = authName.includes("משה וולנר") || authName.includes("מנהל");
+                if (isAdmin && authPass !== ADMIN_PASSWORD) return setAlertMsg({t: "שגיאה", m: "סיסמת מנהל שגויה"});
+                const newUser = { name: authName, isSubscribed: isAdmin, isAdmin };
+                localStorage.setItem('pisga_user', JSON.stringify(newUser));
+                setUser(newUser); setShowAuthModal(false); setAuthPass('');
             };
 
-            const handleLogout = () => { localStorage.removeItem('pisga_user'); setUser(null); };
-
-            const handlePaymentSuccess = (subscriptionID) => {
-                const finalUser = user ? { ...user, isSubscribed: true, subId: subscriptionID } : { name: 'חבר מועדון', isSubscribed: true, subId: subscriptionID };
-                localStorage.setItem('pisga_user', JSON.stringify(finalUser));
-                setUser(finalUser);
-                setShowPaymentModal(false);
-                setAlertMessage({title: "תשלום אושר", text: "תודה רבה! המנוי שלך אושר בהצלחה. כעת כל הקורסים פתוחים עבורך."});
-            };
-
-            React.useEffect(() => {
-                const handleHashChange = () => {
-                    const hash = window.location.hash.replace('#', '') || 'home';
-                    setCurrentPage(hash);
-                };
-                handleHashChange(); 
-                window.addEventListener('hashchange', handleHashChange);
-                return () => window.removeEventListener('hashchange', handleHashChange);
+            const navigate = (id) => { window.location.hash = id; setCurrentPage(id); setIsMobileMenuOpen(false); };
+            React.useEffect(() => { 
+                const h = window.location.hash.replace('#','') || 'home';
+                setCurrentPage(h);
             }, []);
 
-            React.useEffect(() => { window.scrollTo(0, 0); }, [currentPage]);
-
-            const navigate = (pageId) => { window.location.hash = pageId; setIsMobileMenuOpen(false); };
+            // A11y Functions
+            const toggleA11yMenu = () => setShowA11y(!showA11y);
+            const changeFontSize = (step) => document.body.style.fontSize = `${parseFloat(getComputedStyle(document.body).fontSize || 16) + step}px`;
+            const toggleReadableFont = () => document.body.classList.toggle('a11y-readable-font');
+            const toggleHighlightLinks = () => document.body.classList.toggle('a11y-highlight-links');
+            const resetA11y = () => { document.body.style.fontSize = ''; document.body.classList.remove('a11y-readable-font', 'a11y-highlight-links'); setShowA11y(false); };
 
             const navItems = [
-                { id: 'home', label: 'ראשי', icon: 'Home' },
-                { id: 'explorer', label: 'קורסי המועדון (פרו)', icon: 'FolderOpen' },
-                { id: 'forum', label: 'פורום קהילתי', icon: 'MessageSquare' },
-                { id: 'youtube', label: 'תוכן חופשי', icon: 'Youtube' }
+                {id:'home', l:'ראשי', i:'Home'},
+                {id:'explorer', l:'קורסים', i:'FolderOpen'},
+                {id:'forum', l:'פורום', i:'MessageSquare'},
+                {id:'schedule', l:'לו"ז', i:'Calendar'},
+                {id:'articles', l:'מאמרים', i:'BookOpen'},
+                {id:'history', l:'היסטוריה', i:'History'},
+                {id:'youtube', l:'חינם', i:'Youtube'},
+                {id:'about', l:'אודות', i:'Info'}
             ];
 
-            const renderPage = () => {
-                if(currentPage === 'admin' && user?.isAdmin) return <AdminPage forumTopics={forumTopics} setForumTopics={setForumTopics} setMessage={(msg) => setAlertMessage({title: "ניהול פנימי", text: msg})} />;
-                switch(currentPage) {
-                    case 'explorer': return <ExplorerPage onFileInteract={setGlobalFile} user={user} setShowPayment={setShowPaymentModal} courses={courses} />;
-                    case 'forum': return <ForumPage user={user} setShowAuthModal={setShowAuthModal} topics={forumTopics} setTopics={setForumTopics} />;
-                    case 'youtube': return <YoutubePage onFileInteract={setGlobalFile} ytChannelId={ytChannelId} />;
-                    default: return <HomePage navigate={navigate} />;
-                }
-            };
-
             return (
-                <div className="min-h-screen flex flex-col font-sans relative pb-20 md:pb-0 bg-gray-50 dark:bg-[#0b1b24]">
+                <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0b1b24] font-sans relative">
                     {showSplash && <SplashScreen />}
-                    {alertMessage && <CustomMessageBox title={alertMessage.title} message={alertMessage.text} onClose={() => setAlertMessage(null)} />}
-                    <GlobalFileViewer file={globalFile} onClose={() => setGlobalFile(null)} />
+                    {alertMsg && <CustomMessageBox title={alertMsg.t} message={alertMsg.m} onClose={()=>setAlertMsg(null)} />}
+                    <GlobalFileViewer file={globalFile} onClose={()=>setGlobalFile(null)} />
                     
                     <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 border-b-4 border-brand-secondary">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="flex justify-between items-center h-20">
-                                <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('home')}>
-                                    <Icon name="Mountain" size={36} className="text-brand-primary dark:text-brand-secondary group-hover:scale-110 transition-transform" />
-                                    <div><h1 className="font-black text-xl text-brand-primary dark:text-white leading-none">פסגה</h1></div>
+                        <div className="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
+                            <div onClick={()=>navigate('home')} className="flex items-center gap-3 cursor-pointer">
+                                <Icon name="Mountain" className="text-brand-primary" size={36} />
+                                <h1 className="font-black text-xl text-brand-primary dark:text-white hidden sm:block">פסגה</h1>
+                            </div>
+                            <nav className="hidden lg:flex gap-1 overflow-x-auto scrollbar-hide px-2">
+                                {navItems.map(n => (
+                                    <button key={n.id} onClick={()=>navigate(n.id)} className={`px-3 py-2 rounded-full font-bold text-sm flex items-center gap-1.5 whitespace-nowrap ${currentPage===n.id?'bg-brand-primary/10 text-brand-primary dark:bg-brand-secondary/20 dark:text-brand-secondary':'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
+                                        <Icon name={n.i} size={16}/> {n.l}
+                                    </button>
+                                ))}
+                                {user?.isAdmin && <button onClick={()=>navigate('admin')} className="px-3 py-2 rounded-full font-bold text-sm bg-gray-800 text-white flex items-center gap-1.5"><Icon name="Settings" size={16}/> ניהול</button>}
+                            </nav>
+                            <div className="flex items-center gap-2 sm:gap-4">
+                                {!user ? <button onClick={()=>setShowAuthModal(true)} className="text-sm font-bold text-brand-primary border border-brand-primary/30 px-3 sm:px-4 py-1.5 rounded-full hover:bg-brand-primary hover:text-white transition">התחברות</button> : 
+                                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 p-1.5 px-3 rounded-full border border-gray-200 dark:border-gray-700">
+                                    <span className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate max-w-[80px]">{user.name}</span>
+                                    <button onClick={()=>{localStorage.removeItem('pisga_user');setUser(null);navigate('home')}} className="text-gray-400 hover:text-red-500"><Icon name="LogOut" size={16}/></button>
+                                </div>}
+                                <div className="flex items-center gap-1">
+                                    <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full"><Icon name={isDarkMode ? "Sun" : "Moon"} size={20} /></button>
+                                    <button onClick={toggleA11yMenu} className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full"><Icon name="Accessibility" size={20} /></button>
                                 </div>
-
-                                <div className="flex items-center gap-2 sm:gap-4">
-                                    <nav className="hidden lg:flex gap-1">
-                                        {navItems.map(item => (
-                                            <button key={item.id} onClick={() => navigate(item.id)} className={`px-4 py-2 rounded-full flex items-center gap-2 font-bold transition-all text-sm ${currentPage === item.id ? 'bg-brand-primary text-white dark:bg-brand-secondary' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
-                                                <Icon name={item.icon} size={18} /> {item.label}
-                                            </button>
-                                        ))}
-                                        {user?.isAdmin && (
-                                            <button onClick={() => navigate('admin')} className={`px-4 py-2 rounded-full flex items-center gap-2 font-bold transition-all text-sm ${currentPage === 'admin' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-200'}`}>
-                                                <Icon name="Settings" size={18} /> ניהול
-                                            </button>
-                                        )}
-                                    </nav>
-
-                                    <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 hidden lg:block mx-2"></div>
-
-                                    <div className="flex items-center gap-2">
-                                        {!user ? (
-                                            <button onClick={() => setShowAuthModal(true)} className="text-sm font-bold text-brand-primary border border-brand-primary/30 rounded-full px-4 py-1.5 hover:bg-brand-primary hover:text-white transition">התחברות</button>
-                                        ) : (
-                                            <div className="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full">
-                                                <span className="text-sm font-bold truncate max-w-[100px]">{user.name}</span>
-                                                <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 p-1"><Icon name="LogOut" size={16} /></button>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <button onClick={() => setIsDarkMode(!isDarkMode)} className="hidden sm:block p-2 text-gray-500 hover:text-brand-primary rounded-full"><Icon name={isDarkMode ? "Sun" : "Moon"} size={20} /></button>
-                                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2 text-brand-primary"><Icon name={isMobileMenuOpen ? "X" : "Menu"} size={26} /></button>
-                                </div>
+                                <button onClick={()=>setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-1 text-brand-primary dark:text-white"><Icon name={isMobileMenuOpen ? "X" : "Menu"} size={26}/></button>
                             </div>
                         </div>
-
-                        {isMobileMenuOpen && (
-                            <div className="lg:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 absolute w-full shadow-2xl pb-4 z-40">
-                                <div className="px-4 pt-4 pb-4 space-y-2">
-                                    {navItems.map(item => (
-                                        <button key={item.id} onClick={() => navigate(item.id)} className="w-full text-right px-4 py-3 rounded-xl flex items-center gap-3 font-bold text-gray-700 dark:text-gray-200"><Icon name={item.icon} size={20} /> {item.label}</button>
-                                    ))}
-                                    {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right px-4 py-3 rounded-xl flex items-center gap-3 font-bold text-brand-primary"><Icon name="Settings" size={20} /> ניהול פורום</button>}
-                                </div>
-                            </div>
-                        )}
                     </header>
 
-                    {showAuthModal && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center relative shadow-2xl">
-                                <button onClick={() => setShowAuthModal(false)} className="absolute top-4 left-4 p-2 bg-gray-100 rounded-full"><Icon name="X" size={20} /></button>
-                                <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-primary"><Icon name="User" size={32} /></div>
-                                <h3 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">התחברות</h3>
-                                <form onSubmit={handleAuthSubmit} className="space-y-4">
-                                    <input type="text" required value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="הזן שם מלא" className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 bg-gray-50 dark:bg-gray-900 focus:border-brand-primary outline-none" />
-                                    
-                                    {showPassField && (
-                                        <div className="animate-fade-in">
-                                            <input type="password" required value={authPass} onChange={e=>setAuthPass(e.target.value)} placeholder="הזן סיסמת מנהל" className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 bg-brand-primary/5 focus:border-brand-primary outline-none" />
-                                            <p className="text-xs text-brand-secondary mt-2 font-bold text-right">דרושה סיסמת מנהל לצורך אימות.</p>
-                                        </div>
-                                    )}
+                    {isMobileMenuOpen && (
+                        <div className="lg:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 absolute w-full shadow-2xl pb-4 z-40">
+                            <div className="px-4 pt-4 pb-4 space-y-2">
+                                {navItems.map(item => (
+                                    <button key={item.id} onClick={() => navigate(item.id)} className="w-full text-right px-4 py-3 rounded-xl flex items-center gap-3 font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"><Icon name={item.icon} size={20} /> {item.label}</button>
+                                ))}
+                                {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right px-4 py-3 rounded-xl flex items-center gap-3 font-bold text-brand-primary"><Icon name="Settings" size={20} /> ניהול</button>}
+                            </div>
+                        </div>
+                    )}
 
-                                    <button type="submit" className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition">היכנס</button>
+                    {showAuthModal && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 animate-fade-in">
+                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center relative shadow-2xl">
+                                <button onClick={()=>setShowAuthModal(false)} className="absolute top-4 left-4 p-2 bg-gray-100 dark:bg-gray-700 rounded-full"><Icon name="X" size={20}/></button>
+                                <Icon name="User" size={32} className="mx-auto mb-4 text-brand-primary dark:text-brand-secondary" />
+                                <h3 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">התחברות</h3>
+                                <form onSubmit={handleAuth} className="space-y-4">
+                                    <input type="text" required value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="שם מלא" className="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-3 outline-none" />
+                                    {(authName.includes("משה וולנר") || authName.includes("מנהל")) && <input type="password" required value={authPass} onChange={e=>setAuthPass(e.target.value)} placeholder="סיסמת מנהל" className="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-3 outline-none" />}
+                                    <button type="submit" className="w-full bg-brand-primary text-white font-bold py-3 rounded-xl">היכנס</button>
                                 </form>
                             </div>
                         </div>
                     )}
 
                     {showPaymentModal && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 overflow-y-auto animate-fade-in">
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 animate-fade-in overflow-y-auto">
                             <div className="relative w-full max-w-md my-8">
-                                <button onClick={() => setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 hover:bg-white/40 p-2 rounded-full transition"><Icon name="X" size={24} /></button>
-                                <PayPalSubscription onSuccess={handlePaymentSuccess} />
+                                <button onClick={()=>setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 p-2 rounded-full"><Icon name="X" size={24}/></button>
+                                <PayPalSubscription onSuccess={(id)=>{ const u={...user, isSubscribed:true}; setUser(u); localStorage.setItem('pisga_user', JSON.stringify(u)); setShowPaymentModal(false); setAlertMsg({t:"תודה",m:"המנוי הופעל בהצלחה!"}) }} />
                             </div>
                         </div>
                     )}
 
-                    <main className="flex-1 w-full pb-16 pt-8 relative z-10">
-                        {renderPage()}
+                    {showA11y && (
+                        <div className="fixed top-24 left-4 sm:left-8 z-[100] flex flex-col items-start animate-fade-in">
+                            <div className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-2xl border-2 border-brand-secondary mb-3 w-64 text-right">
+                                <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-3">
+                                    <button onClick={toggleA11yMenu} className="text-gray-400 hover:text-red-500 transition"><Icon name="X" size={20} /></button>
+                                    <h3 className="font-bold text-brand-primary dark:text-white flex items-center gap-2">נגישות <Icon name="Accessibility" size={20} className="text-brand-secondary" /></h3>
+                                </div>
+                                <div className="space-y-2.5">
+                                    <button onClick={() => changeFontSize(2)} className="w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">הגדל טקסט <Icon name="ZoomIn" size={16} /></button>
+                                    <button onClick={() => changeFontSize(-2)} className="w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">הקטן טקסט <Icon name="ZoomOut" size={16} /></button>
+                                    <button onClick={toggleHighlightLinks} className="w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">הדגשת קישורים <Icon name="Underline" size={16} /></button>
+                                    <button onClick={toggleReadableFont} className="w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">גופן קריא <Icon name="Type" size={16} /></button>
+                                    <div className="w-full h-px bg-gray-200 dark:bg-gray-700 my-2"></div>
+                                    <button onClick={resetA11y} className="w-full bg-red-50 dark:bg-red-900/30 text-red-600 px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">איפוס הגדרות <Icon name="RefreshCw" size={16} /></button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <main className="flex-1 pb-20 pt-8">
+                        {currentPage==='admin' && user?.isAdmin ? <AdminPage forumTopics={forumTopics} setForumTopics={setForumTopics} setMessage={(m)=>setAlertMsg({t:"ניהול",m})} /> : 
+                         currentPage==='explorer' ? <ExplorerPage courses={courses} user={user} onFileInteract={saveToHistoryAndOpen} setShowPayment={setShowPaymentModal} /> : 
+                         currentPage==='forum' ? <ForumPage topics={forumTopics} user={user} setShowAuthModal={setShowAuthModal} /> : 
+                         currentPage==='schedule' ? <SchedulePage /> :
+                         currentPage==='articles' ? <ArticlesPage /> :
+                         currentPage==='about' ? <AboutPage /> :
+                         currentPage==='history' ? <HistoryPage localHistory={localHistory} onFileInteract={saveToHistoryAndOpen} /> :
+                         currentPage==='youtube' ? <YoutubePage onFileInteract={saveToHistoryAndOpen} /> : 
+                         <HomePage navigate={navigate} />}
                     </main>
 
-                    <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="whatsapp-float" title="הצטרפו לקבוצת הוואטסאפ">
-                        <Icon name="MessageCircle" size={32} />
-                    </a>
+                    <button 
+                        onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} 
+                        className={`fixed bottom-20 sm:bottom-8 right-6 sm:left-6 sm:right-auto bg-brand-primary text-white p-3 rounded-full shadow-xl transition-all duration-300 z-40 hover:scale-110 ${showBackToTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
+                    >
+                        <Icon name="ArrowUp" size={24} />
+                    </button>
 
-                    <footer className="bg-brand-dark text-white py-10 mt-auto">
+                    <a href={WHATSAPP_LINK} target="_blank" className="whatsapp-float"><Icon name="MessageCircle" size={32}/></a>
+                    
+                    <footer className="bg-brand-dark dark:bg-gray-900 text-white py-10 transition-colors border-t-4 border-brand-secondary relative z-10">
                         <div className="max-w-7xl mx-auto px-4 text-center">
                             <h2 className="text-2xl font-black mb-2">קהילת פסגה</h2>
                             <p className="text-gray-400 mb-6">הבית העסקי למאמנים ומטפלים בהובלת משה וולנר</p>
-                            <p className="text-sm text-gray-500">© {new Date().getFullYear()} כל הזכויות שמורות.</p>
+                            <p className="text-sm text-gray-500 mb-1">© {new Date().getFullYear()} כל הזכויות שמורות.</p>
+                            <p className="mt-3 text-sm text-brand-light/60 bg-black/20 inline-block px-4 py-1.5 rounded-full">
+                                נבנה על ידי <a href="https://lev-good.github.io/Good-heart/" target="_blank" rel="noopener noreferrer" className="text-brand-secondary hover:text-white font-bold transition">לב טוב</a>
+                            </p>
                         </div>
                     </footer>
                 </div>
             );
         };
 
-        const initReact = () => {
-            const root = ReactDOM.createRoot(document.getElementById('root'));
-            root.render(<App />);
-        };
-        
-        if (window.FB) { initReact(); } else { window.addEventListener('firebaseReady', initReact); }
+        const init = () => ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        if (window.FB) init(); else window.addEventListener('firebaseReady', init);
     </script>
 </body>
 </html>
