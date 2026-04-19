@@ -11,839 +11,344 @@
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Custom styles to hide views by default */
-        .view-section {
-            display: none;
-        }
-        .view-section.active {
-            display: block;
-        }
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        body { font-family: system-ui, -apple-system, sans-serif; }
     </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-800 flex flex-col">
 
     <!-- Top B"H -->
-    <div class="bg-slate-100 text-xs text-slate-500 px-4 py-1 text-right">
-        בס"ד
-    </div>
+    <div class="bg-slate-100 text-xs text-slate-500 px-4 py-1 text-right">בס"ד</div>
 
     <!-- Navigation Bar -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
                 <div class="flex items-center cursor-pointer" onclick="navigateTo('home')">
                     <span class="text-2xl font-bold text-blue-700">מרכז הלמידה</span>
                 </div>
-
-                <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-reverse space-x-8 items-center">
                     <button onclick="navigateTo('home')" class="nav-btn text-sm font-medium hover:text-blue-600 transition-colors" data-target="home">דף הבית</button>
                     <button onclick="navigateTo('free-content')" class="nav-btn text-sm font-medium hover:text-blue-600 transition-colors" data-target="free-content">תכנים בחינם</button>
-                    
-                    <!-- Only visible when logged in -->
                     <button onclick="navigateTo('paid-courses')" class="nav-btn auth-required hidden text-sm font-medium hover:text-blue-600 transition-colors" data-target="paid-courses">הקורסים שלי</button>
                     <button onclick="navigateTo('forum')" class="nav-btn auth-required hidden text-sm font-medium hover:text-blue-600 transition-colors" data-target="forum">השולחן העגול</button>
-
                     <div class="mr-6 border-r pr-6 border-slate-200 flex items-center">
-                        <!-- Logged out state -->
                         <div id="nav-logged-out">
                             <button onclick="navigateTo('auth')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2">
-                                <i class="fa-solid fa-user"></i>
-                                כניסת תלמידים
+                                <i class="fa-solid fa-user"></i> כניסת תלמידים
                             </button>
                         </div>
-                        <!-- Logged in state -->
                         <div id="nav-logged-in" class="hidden flex items-center gap-4">
                             <span class="text-sm font-medium" id="user-greeting">שלום, תלמיד יקר</span>
-                            <button onclick="handleLogout()" class="text-slate-500 hover:text-red-500" title="התנתק">
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                            </button>
+                            <button onclick="handleLogout()" class="text-slate-500 hover:text-red-500"><i class="fa-solid fa-right-from-bracket"></i></button>
                         </div>
                     </div>
                 </nav>
-
-                <!-- Mobile Menu Button -->
                 <div class="md:hidden flex items-center">
-                    <button onclick="toggleMobileMenu()" class="text-slate-600 text-xl">
-                        <i id="mobile-menu-icon" class="fa-solid fa-bars"></i>
-                    </button>
+                    <button onclick="toggleMobileMenu()" class="text-slate-600 text-xl"><i id="mobile-menu-icon" class="fa-solid fa-bars"></i></button>
                 </div>
             </div>
         </div>
-
-        <!-- Mobile Navigation Dropdown -->
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 px-4 pt-2 pb-4 space-y-1 shadow-lg">
-            <button onclick="navigateTo('home')" class="block w-full text-right px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600">דף הבית</button>
-            <button onclick="navigateTo('free-content')" class="block w-full text-right px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600">תכנים בחינם</button>
-            
+            <button onclick="navigateTo('home')" class="block w-full text-right px-3 py-2 text-base font-medium">דף הבית</button>
+            <button onclick="navigateTo('free-content')" class="block w-full text-right px-3 py-2 text-base font-medium">תכנים בחינם</button>
             <div class="auth-required hidden">
-                <button onclick="navigateTo('paid-courses')" class="block w-full text-right px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600">הקורסים שלי</button>
-                <button onclick="navigateTo('forum')" class="block w-full text-right px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600">השולחן העגול</button>
-                <button onclick="handleLogout()" class="block w-full text-right px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 mt-4 border-t border-slate-100">התנתק</button>
+                <button onclick="navigateTo('paid-courses')" class="block w-full text-right px-3 py-2 text-base font-medium">הקורסים שלי</button>
+                <button onclick="navigateTo('forum')" class="block w-full text-right px-3 py-2 text-base font-medium">השולחן העגול</button>
             </div>
-            
             <div id="mobile-logged-out">
-                <button onclick="navigateTo('auth')" class="block w-full text-right px-3 py-2 rounded-md text-base font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 mt-4">כניסת תלמידים / הרשמה</button>
+                <button onclick="navigateTo('auth')" class="block w-full text-right px-3 py-2 text-blue-600 bg-blue-50 mt-4">כניסת תלמידים</button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Area -->
     <main class="flex-grow">
-        
-        <!-- ================= HOME VIEW ================= -->
+        <!-- Views remain the same structure -->
         <div id="view-home" class="view-section active">
-            <!-- Hero Section -->
-            <div class="bg-blue-700 text-white py-16 md:py-24 px-4 text-center">
-                <h1 class="text-4xl md:text-5xl font-extrabold mb-6">ברוכים הבאים למרכז הלמידה</h1>
-                <p class="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto mb-10">
-                    המקום שבו הידע פוגש את ההצלחה. הצטרפו לקהילת הלומדים שלנו, קבלו תוכן איכותי והתחילו להתקדם למטרה שלכם.
-                </p>
-                
-                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-lg mx-auto">
-                    <button onclick="navigateTo('auth')" class="auth-hidden w-full sm:w-auto bg-white text-blue-700 px-8 py-3 rounded-full font-bold text-lg hover:bg-slate-100 transition shadow-lg flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-user"></i> כניסת תלמידים
-                    </button>
-                    <button onclick="navigateTo('free-content')" class="w-full sm:w-auto bg-blue-600 border border-blue-400 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-blue-500 transition shadow-lg flex items-center justify-center gap-2">
-                        <i class="fa-regular fa-circle-play"></i> צפייה בתכנים פתוחים בחינם
-                    </button>
+            <div class="bg-blue-700 text-white py-16 px-4 text-center">
+                <h1 class="text-4xl font-extrabold mb-6">ברוכים הבאים למרכז הלמידה</h1>
+                <p class="text-lg text-blue-100 max-w-2xl mx-auto mb-10">הצטרפו לקהילת הלומדים שלנו וקבלו תוכן איכותי.</p>
+                <div class="flex justify-center gap-4">
+                    <button onclick="navigateTo('auth')" class="auth-hidden bg-white text-blue-700 px-8 py-3 rounded-full font-bold">כניסת תלמידים</button>
+                    <button onclick="navigateTo('free-content')" class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold">תכנים בחינם</button>
                 </div>
             </div>
-
             <!-- WhatsApp Section -->
             <div class="bg-white py-8 border-b border-slate-200">
-                <div class="max-w-3xl mx-auto px-4 text-center flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="max-w-3xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div class="text-right">
-                        <h3 class="text-xl font-bold text-slate-800">הישארו מעודכנים!</h3>
-                        <p class="text-slate-600">הצטרפו לקבוצת הוואטסאפ השקטה שלנו לקבלת עדכונים וטיפים חמים.</p>
+                        <h3 class="text-xl font-bold">הישארו מעודכנים!</h3>
+                        <p class="text-slate-600">הצטרפו לקבוצת הוואטסאפ השקטה שלנו.</p>
                     </div>
-                    <a href="https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 transition shadow whitespace-nowrap">
+                    <a href="https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws" target="_blank" class="bg-green-500 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 transition shadow">
                         <i class="fa-brands fa-whatsapp text-xl"></i> הצטרף לקבוצת הוואטסאפ
                     </a>
                 </div>
             </div>
-
-            <!-- Sneak Peek Section -->
-            <div class="max-w-7xl mx-auto px-4 py-16">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-4">הצצה לקורסים שלנו</h2>
-                    <p class="text-slate-600">[ הערה למנהל: ניתן לנהל ולעדכן את רשימת הקורסים דרך ממשק הניהול ]</p>
-                </div>
-
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Course Card -->
-                    <div class="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden hover:shadow-lg transition">
-                        <div class="h-48 bg-slate-200 relative">
-                            <img src="https://placehold.co/600x400/1e40af/ffffff?text=Course+Cover" alt="Course" class="w-full h-full object-cover">
-                            <div class="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-blue-700 shadow">קורס הדגל</div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-slate-800 mb-2">קורס יסודות מקיף</h3>
-                            <p class="text-slate-600 mb-6 text-sm">הקורס המלא שייקח אותך צעד אחר צעד משלב ההתחלה ועד לרמה מקצועית.</p>
-                            <div class="space-y-2 mb-6">
-                                <div class="flex items-center text-sm text-slate-500 gap-2">
-                                    <i class="fa-solid fa-circle-check text-blue-500"></i><span>פרק 1: מבוא ומושגי יסוד</span>
-                                </div>
-                                <div class="flex items-center text-sm text-slate-500 gap-2">
-                                    <i class="fa-solid fa-circle-check text-blue-500"></i><span>פרק 2: הצעדים הראשונים</span>
-                                </div>
-                                <div class="flex items-center text-sm text-slate-500 gap-2">
-                                    <i class="fa-solid fa-circle-check text-blue-500"></i><span>פרק 3: טכניקות מתקדמות</span>
-                                </div>
-                                <div class="text-sm text-slate-400 italic mt-2">+ ועוד תכנים רבים...</div>
-                            </div>
-                            <button onclick="navigateTo('auth')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium py-2 rounded-lg transition">לפרטים והרשמה</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
-        <!-- ================= AUTH VIEW ================= -->
         <div id="view-auth" class="view-section">
             <div class="min-h-[80vh] flex items-center justify-center p-4">
-                <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md">
-                    <div class="text-center mb-8">
-                        <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fa-solid fa-lock text-blue-600 text-2xl"></i>
-                        </div>
-                        <h2 id="auth-title" class="text-2xl font-bold text-slate-800">כניסת תלמידים</h2>
-                        <p id="auth-subtitle" class="text-slate-500 mt-2">הזן את פרטי ההתחברות שלך כדי לגשת לתכנים הסגורים.</p>
-                    </div>
-
-                    <form onsubmit="handleLogin(event)" id="login-form" class="space-y-5">
+                <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+                    <div class="text-center mb-8"><h2 id="auth-title" class="text-2xl font-bold">כניסת תלמידים</h2></div>
+                    <form onsubmit="handleLogin(event)" class="space-y-5">
                         <div id="auth-name-field" class="hidden">
-                            <label class="block text-sm font-medium text-slate-700 mb-1">שם מלא</label>
-                            <input type="text" id="auth-name" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="ישראל ישראלי">
+                            <label class="block text-sm font-medium mb-1">שם מלא</label>
+                            <input type="text" id="auth-name" class="w-full border p-2 rounded-lg">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">כתובת אימייל</label>
-                            <input type="email" id="auth-email" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="your@email.com">
+                            <label class="block text-sm font-medium mb-1">כתובת אימייל</label>
+                            <input type="email" id="auth-email" required class="w-full border p-2 rounded-lg">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">סיסמה</label>
-                            <input type="password" id="auth-password" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••">
+                            <label class="block text-sm font-medium mb-1">סיסמה</label>
+                            <input type="password" id="auth-password" required class="w-full border p-2 rounded-lg">
                         </div>
-
-                        <div id="auth-error-msg" class="text-red-500 text-sm hidden font-medium text-center"></div>
-
-                        <button type="submit" id="auth-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow-md">
-                            היכנס למערכת
-                        </button>
+                        <div id="auth-error-msg" class="text-red-500 text-sm hidden text-center"></div>
+                        <button type="submit" id="auth-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg">היכנס למערכת</button>
                     </form>
-
-                    <!-- Registration Options Section -->
-                    <div id="register-section" class="hidden space-y-5">
-                        <p class="text-center text-sm font-medium text-slate-700 mb-4">כדי לקבל גישה לכל הוובינרים, יש להשלים את הרכישה (מנוי) דרך פייפאל. לאחר התשלום תוכל להתחבר.</p>
-                        
-                        <div class="w-full flex flex-col justify-center gap-4">
-                            <!-- Direct PayPal Link instead of Smart Button to prevent iframe errors -->
-                            <a href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-2H242596WM328212DNHQMPHI" target="_blank" class="w-full bg-[#FFC439] hover:bg-[#F2BA36] text-slate-800 font-bold py-3 px-4 rounded-full flex items-center justify-center gap-2 transition shadow-md text-lg">
-                                <i class="fa-brands fa-paypal text-[#003087] text-xl"></i>
-                                לחץ כאן לתשלום ב-PayPal
-                            </a>
-                            
-                            <button type="button" onclick="handleLoginDemoMode(event)" class="text-sm text-slate-500 hover:text-blue-600 underline text-center">
-                                * למטרת בדיקה בסביבה זו: לחץ כאן כדי לדמות התחברות ללא תשלום
-                            </button>
-                        </div>
+                    <div id="register-section" class="hidden mt-4 space-y-4">
+                        <a href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-2H242596WM328212DNHQMPHI" target="_blank" class="w-full bg-[#FFC439] text-slate-800 font-bold py-3 rounded-full flex justify-center gap-2">
+                            <i class="fa-brands fa-paypal"></i> לתשלום ב-PayPal
+                        </a>
+                        <button onclick="handleLoginDemoMode(event)" class="w-full text-sm text-slate-400 underline">דימוי כניסה לבדיקה</button>
                     </div>
-
-                    <div class="mt-6 text-center text-sm text-slate-600 border-t border-slate-100 pt-6">
-                        <span id="auth-toggle-text">עדיין אין לך חשבון? </span>
-                        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-blue-600 font-bold hover:underline">לחץ כאן להרשמה ותשלום</button>
+                    <div class="mt-6 text-center text-sm border-t pt-6">
+                        <span id="auth-toggle-text">אין חשבון? </span>
+                        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-blue-600 font-bold">להרשמה ותשלום</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ================= PAID COURSES VIEW ================= -->
         <div id="view-paid-courses" class="view-section">
             <div class="max-w-7xl mx-auto px-4 py-8">
-                <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-slate-800">קורס יסודות מקיף</h1>
-                    <p class="text-slate-600 mt-2">הקורס המלא שייקח אותך צעד אחר צעד משלב ההתחלה ועד לרמה מקצועית.</p>
-                </div>
-
+                <h1 class="text-3xl font-bold mb-6">קורס יסודות מקיף</h1>
                 <div class="flex flex-col lg:flex-row gap-8">
-                    <!-- Sidebar -->
-                    <div class="w-full lg:w-1/3 xl:w-1/4 bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden flex flex-col h-[600px]">
-                        <div class="bg-slate-50 p-4 border-b border-slate-200">
-                            <h3 class="font-bold text-lg text-slate-800">תוכן העניינים</h3>
-                        </div>
-                        <div id="course-chapters-list" class="overflow-y-auto flex-grow p-2 space-y-1">
-                            <!-- Chapters injected via JS -->
-                        </div>
+                    <div class="w-full lg:w-1/4 bg-white border rounded-xl overflow-hidden h-[600px]">
+                        <div class="bg-slate-50 p-4 font-bold border-b">תוכן העניינים</div>
+                        <div id="course-chapters-list" class="overflow-y-auto p-2"></div>
                     </div>
-
-                    <!-- Main Video Area -->
-                    <div class="w-full lg:w-2/3 xl:w-3/4">
-                        <div class="bg-black aspect-video rounded-xl shadow-lg relative flex items-center justify-center overflow-hidden mb-6">
-                            <iframe id="video-iframe" class="absolute inset-0 w-full h-full" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    <div class="w-full lg:w-3/4">
+                        <div class="bg-black aspect-video rounded-xl relative mb-6">
+                            <iframe id="video-iframe" class="absolute inset-0 w-full h-full" src="" frameborder="0" allowfullscreen></iframe>
                         </div>
-                        
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <h2 id="video-info-title" class="text-2xl font-bold text-slate-800 mb-2">פרק 1: מבוא ומושגי יסוד</h2>
-                            <p class="text-slate-600">
-                                ברוכים הבאים לשיעור. כאן יופיע תיאור מפורט של השיעור הנוכחי, קישורים לקבצי עזר, סיכומים וכל חומר רלוונטי אחר שהתלמיד יצטרך בזמן הצפייה.
-                            </p>
-                            <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
-                               <button onclick="navigateTo('forum')" class="text-blue-600 font-medium hover:underline flex items-center gap-2">
-                                 <i class="fa-regular fa-message"></i> שאלות על השיעור? עבור לפורום
-                               </button>
-                            </div>
+                        <div class="bg-white p-6 border rounded-xl">
+                            <h2 id="video-info-title" class="text-2xl font-bold mb-2"></h2>
+                            <p class="text-slate-600">צפו בשיעור המלא והשתמשו בחומרי העזר.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ================= FREE CONTENT VIEW ================= -->
         <div id="view-free-content" class="view-section">
-            <div class="max-w-7xl mx-auto px-4 py-12">
-                <div class="text-center mb-12 max-w-2xl mx-auto">
-                    <h1 class="text-4xl font-bold text-slate-800 mb-4">תכנים פתוחים בחינם</h1>
-                    <p class="text-lg text-slate-600 mb-8">
-                        טעימה קטנה מהתכנים המעולים שלנו. צפו בסרטונים הנבחרים ישירות מערוץ היוטיוב שלנו, 
-                        ואם תרצו לקחת את זה לשלב הבא - הקורס המלא מחכה לכם!
-                    </p>
-                    <a href="https://www.youtube.com/@moshevol8942" target="_blank" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold text-xl transition shadow-lg">
-                        <i class="fa-brands fa-youtube text-2xl"></i>
-                        מעבר לערוץ היוטיוב הרשמי
-                    </a>
-                </div>
-
-                <div id="free-videos-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Free videos injected via JS -->
-                </div>
+            <div class="max-w-7xl mx-auto px-4 py-12 text-center">
+                <h1 class="text-4xl font-bold mb-4">תכנים פתוחים בחינם</h1>
+                <a href="https://www.youtube.com/@moshevol8942" target="_blank" class="bg-red-600 text-white px-8 py-4 rounded-full font-bold inline-block mb-12">למעבר לערוץ היוטיוב</a>
+                <div id="free-videos-grid" class="grid md:grid-cols-3 gap-8 text-right"></div>
             </div>
         </div>
 
-        <!-- ================= FORUM VIEW ================= -->
         <div id="view-forum" class="view-section">
-            
-            <!-- Forum List View -->
             <div id="forum-list-container" class="max-w-4xl mx-auto px-4 py-8">
-                <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-                    <div>
-                        <h1 class="text-3xl font-bold text-slate-800">השולחן העגול</h1>
-                        <p class="text-slate-600 mt-1">המקום שלכם להתייעץ, לשאול ולשתף</p>
-                    </div>
-                    <button onclick="showForumForm()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-bold shadow-sm flex items-center gap-2 w-full sm:w-auto justify-center">
-                        <i class="fa-solid fa-plus"></i> פתח דיון חדש
-                    </button>
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold">השולחן העגול</h1>
+                    <button onclick="showForumForm()" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold">+ פתח דיון</button>
                 </div>
-                <div id="forum-posts-list" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <!-- Posts injected via JS -->
-                </div>
+                <div id="forum-posts-list" class="bg-white border rounded-xl"></div>
             </div>
-
-            <!-- New Post Form View -->
             <div id="forum-form-container" class="max-w-3xl mx-auto px-4 py-8 hidden">
-                <button onclick="showForumList()" class="flex items-center gap-2 text-slate-500 hover:text-slate-800 mb-6">
-                    <i class="fa-solid fa-chevron-right"></i> חזור לפורום
-                </button>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-2xl font-bold mb-6">פתיחת דיון חדש</h2>
-                    <form onsubmit="handleCreatePost(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">כותרת הדיון / השאלה</label>
-                            <input type="text" id="new-post-title" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="כתוב כותרת קצרה וברורה...">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">תוכן</label>
-                            <textarea id="new-post-content" required rows="5" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="פרט את השאלה או השיתוף שלך כאן..."></textarea>
-                        </div>
-                        <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                            <button type="button" onclick="showForumList()" class="px-6 py-2 rounded-lg text-slate-600 hover:bg-slate-100 font-medium">ביטול</button>
-                            <button type="submit" id="submit-post-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-bold shadow-sm">פרסם דיון</button>
-                        </div>
-                    </form>
-                </div>
+                <button onclick="showForumList()" class="mb-4">← חזור</button>
+                <form onsubmit="handleCreatePost(event)" class="bg-white p-6 border rounded-xl space-y-4">
+                    <input type="text" id="new-post-title" required class="w-full border p-2 rounded-lg" placeholder="כותרת הדיון">
+                    <textarea id="new-post-content" required rows="5" class="w-full border p-2 rounded-lg" placeholder="תוכן ההודעה"></textarea>
+                    <button type="submit" id="submit-post-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">פרסם</button>
+                </form>
             </div>
-
-            <!-- Single Post View -->
             <div id="forum-post-details" class="max-w-4xl mx-auto px-4 py-8 hidden">
-                <button onclick="showForumList()" class="flex items-center gap-2 text-slate-500 hover:text-slate-800 mb-6">
-                    <i class="fa-solid fa-chevron-right"></i> חזור לרשימת הדיונים
-                </button>
-                
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
-                    <h2 id="sp-title" class="text-2xl font-bold text-slate-800 mb-2"></h2>
-                    <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
-                        <i class="fa-solid fa-user"></i> <span id="sp-author"></span>
-                        <span>•</span>
-                        <span id="sp-date"></span>
-                    </div>
-                    <div id="sp-content" class="text-slate-700 whitespace-pre-wrap"></div>
+                <button onclick="showForumList()" class="mb-4">← חזור לרשימה</button>
+                <div class="bg-white p-6 border rounded-xl mb-6">
+                    <h2 id="sp-title" class="text-2xl font-bold mb-2"></h2>
+                    <p id="sp-content" class="text-slate-700"></p>
                 </div>
-
-                <div class="mb-6">
-                    <h3 class="font-bold text-lg mb-4 text-slate-800">תגובות (<span id="sp-replies-count"></span>)</h3>
-                    <div id="sp-replies-list" class="space-y-4">
-                        <!-- Replies injected via JS -->
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <form onsubmit="handleAddReply(event)" class="flex gap-3">
-                        <input type="text" id="new-reply-content" required placeholder="כתוב תגובה..." class="flex-grow border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-bold flex items-center gap-2">
-                            <span>שלח</span>
-                            <i class="fa-solid fa-paper-plane rotate-180"></i>
-                        </button>
-                    </form>
-                </div>
+                <div id="sp-replies-list" class="space-y-4 mb-6"></div>
+                <form onsubmit="handleAddReply(event)" class="flex gap-2">
+                    <input type="text" id="new-reply-content" required placeholder="הוסף תגובה..." class="flex-grow border p-2 rounded-lg">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">שלח</button>
+                </form>
             </div>
         </div>
-
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-slate-500 text-sm">
-            כל הזכויות שמורות למרכז הלמידה © <span id="current-year"></span>
-        </div>
-    </footer>
+    <footer class="bg-white border-t p-6 text-center text-slate-500 text-sm">כל הזכויות שמורות למרכז הלמידה © <span id="current-year"></span></footer>
 
-    <!-- App Logic (Vanilla JS + Supabase) -->
     <script>
         document.getElementById('current-year').textContent = new Date().getFullYear();
 
-        // ==========================================
-        // SUPABASE CONFIGURATION - עריכה נדרשת כאן!
-        // ==========================================
-        // כדי להפעיל את המסד האמיתי, הכנס את הנתונים מהפרויקט שלך ב-Supabase.
-        // כל עוד השורות האלו לא מעודכנות, המערכת תעבוד במצב 'הדגמה' (Mock).
-        const SUPABASE_URL = 'הכנס_כאן_את_ה_URL_שלך';
-        const SUPABASE_KEY = 'הכנס_כאן_את_ה_API_KEY_שלך';
+        // --- הדרכה להדבקה ---
+        // 1. את הכתובת שמצאת מעל המפתחות (Project URL) הדבק במקום 'YOUR_URL'
+        // 2. את המפתח שסימנת בתמונה (Publishable key) הדבק במקום 'YOUR_KEY'
+        const SUPABASE_URL = 'ftadievbbmgggsnhpgbq'; 
+        const SUPABASE_KEY = 'sb_publishable_IJ_GZbysTs08LM7y9cIqSA_zvjlRfcC'; 
         
         let supabaseClient = null;
-        if (SUPABASE_URL !== 'הכנס_כאן_את_ה_URL_שלך' && typeof supabase !== 'undefined') {
+        if (SUPABASE_URL.startsWith('http') && typeof supabase !== 'undefined') {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log("Supabase Client Initialized");
         }
-        // ==========================================
 
-        // --- Mock Data (Fallback) ---
         const MOCK_CHAPTERS = [
-            { id: 101, title: 'וובינר מספר 1 - הדיפלומה הנסתרת', duration: 'וובינר', link: 'https://drive.google.com/file/d/1Vriu7SyPzGt6lYEtU9HZZNmuXq2QYYH7/preview' },
-            { id: 102, title: 'וובינר מספר 2 - פרדוקס היעילות', duration: 'וובינר', link: 'https://drive.google.com/file/d/1ryD7kd4GVKf189gJfm7AmpnG2KUhn8Ak/preview' },
-            { id: 103, title: 'וובינר מספר 3 - מנישה למוצר', duration: 'וובינר', link: 'https://drive.google.com/file/d/1trpWtzIf9HtP82rJ7zoaYtvK77nsHuoJ/preview' },
-            { id: 104, title: 'וובינר מספר 4 - בניית הקפסולה', duration: 'וובינר', link: 'https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/preview' },
-            { id: 105, title: 'וובינר מספר 5 - שימוש בAI ומילון הכאב', duration: 'וובינר', link: 'https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/preview' },
-            { id: 106, title: 'וובינר מספר 6 - זיהוי וחסמי שיווק', duration: 'וובינר', link: 'https://drive.google.com/file/d/1ocgx7J3lP-o7hLfg2dtdMmvtltbe2d-9/preview' }
+            { id: 101, title: 'וובינר 1 - הדיפלומה הנסתרת', link: 'https://drive.google.com/file/d/1Vriu7SyPzGt6lYEtU9HZZNmuXq2QYYH7/preview' },
+            { id: 102, title: 'וובינר 2 - פרדוקס היעילות', link: 'https://drive.google.com/file/d/1ryD7kd4GVKf189gJfm7AmpnG2KUhn8Ak/preview' },
+            { id: 103, title: 'וובינר 3 - מנישה למוצר', link: 'https://drive.google.com/file/d/1trpWtzIf9HtP82rJ7zoaYtvK77nsHuoJ/preview' },
+            { id: 104, title: 'וובינר 4 - בניית הקפסולה', link: 'https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/preview' },
+            { id: 105, title: 'וובינר 5 - AI ומילון הכאב', link: 'https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/preview' },
+            { id: 106, title: 'וובינר 6 - חסמי שיווק', link: 'https://drive.google.com/file/d/1ocgx7J3lP-o7hLfg2dtdMmvtltbe2d-9/preview' }
         ];
 
-        const MOCK_FREE_VIDEOS = [
-            { id: 1, title: 'הדרכות שיווק ומכירות', thumbnail: 'https://placehold.co/600x400/dc2626/ffffff?text=YouTube+Video+1' },
-            { id: 2, title: 'פיתוח עסקי מעשי', thumbnail: 'https://placehold.co/600x400/dc2626/ffffff?text=YouTube+Video+2' },
-            { id: 3, title: 'כלי AI ויעילות', thumbnail: 'https://placehold.co/600x400/dc2626/ffffff?text=YouTube+Video+3' }
-        ];
-
-        let forumPosts = [
-            { 
-                id: 1, 
-                author_name: 'ישראל ישראלי', 
-                title: 'שאלה לגבי פרק 2 - טכניקות', 
-                content: 'שלום לכולם, לא כל כך הבנתי את ההסבר בדקה ה-15 לגבי היישום של הטכניקה. מישהו יכול לחדד?',
-                replies: [
-                    { id: 101, author: 'מנהל הקורס', content: 'היי ישראל, הכוונה שם היא קודם כל לבסס את היסודות לפני שקופצים לשלב הבא.' }
-                ],
-                created_at: new Date().toISOString()
-            }
-        ];
-
-        // --- State ---
+        let forumPosts = [];
         let isLoggedIn = false;
         let currentUser = null;
-        let isLoginMode = true; // For Auth form
-        let activeVideoId = MOCK_CHAPTERS[0].id;
-        let currentPostId = null;
+        let activeVideoId = 101;
 
-        // --- Initialization ---
         async function initApp() {
             renderChapters();
             renderFreeContent();
-            
             if (supabaseClient) {
-                // בדיקה אם המשתמש כבר מחובר ממקודם
                 const { data: { session } } = await supabaseClient.auth.getSession();
-                if (session) {
-                    processSuccessfulLogin(session.user, session.user.email);
-                }
+                if (session) processSuccessfulLogin(session.user, session.user.email);
                 await fetchForumPostsFromDB();
             } else {
-                renderForum(); // רנדור של נתוני ההדגמה
+                renderForum();
             }
         }
 
-        // --- Navigation ---
-        function navigateTo(viewId) {
-            if ((viewId === 'paid-courses' || viewId === 'forum') && !isLoggedIn) {
-                navigateTo('auth');
-                return;
-            }
-
+        function navigateTo(v) {
+            if ((v === 'paid-courses' || v === 'forum') && !isLoggedIn) { navigateTo('auth'); return; }
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            const target = document.getElementById(`view-${viewId}`);
-            if (target) target.classList.add('active');
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === viewId) {
-                    btn.classList.add('text-blue-600');
-                    btn.classList.remove('text-slate-600');
-                } else {
-                    btn.classList.remove('text-blue-600');
-                    btn.classList.add('text-slate-600');
-                }
-            });
-
+            document.getElementById(`view-${v}`).classList.add('active');
             document.getElementById('mobile-menu').classList.add('hidden');
-            
-            if(viewId === 'forum') {
-                showForumList();
-                if (supabaseClient) fetchForumPostsFromDB();
-                else renderForum();
-            }
-
+            if(v === 'forum') { showForumList(); if (supabaseClient) fetchForumPostsFromDB(); }
             window.scrollTo(0, 0);
         }
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const icon = document.getElementById('mobile-menu-icon');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-xmark');
-            } else {
-                menu.classList.add('hidden');
-                icon.classList.remove('fa-xmark');
-                icon.classList.add('fa-bars');
-            }
-        }
-
-        // --- Authentication ---
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').textContent = isLoginMode ? 'כניסת תלמידים' : 'השלמת הרשמה (לאחר תשלום)';
-            document.getElementById('auth-subtitle').textContent = isLoginMode ? 'הזן את אימייל והסיסמה כדי לגשת לתכנים הסגורים.' : 'צור את החשבון שלך כעת.';
-            document.getElementById('auth-toggle-text').textContent = isLoginMode ? 'עדיין אין לך חשבון? ' : 'כבר רשום למערכת? ';
-            document.getElementById('auth-toggle-btn').textContent = isLoginMode ? 'לחץ כאן להרשמה ותשלום' : 'לחץ כאן להתחברות';
-            document.getElementById('auth-error-msg').classList.add('hidden');
-            document.getElementById('auth-submit-btn').textContent = isLoginMode ? 'היכנס למערכת' : 'צור חשבון';
-
-            const nameField = document.getElementById('auth-name-field');
-            const registerSection = document.getElementById('register-section');
-            if(isLoginMode) {
-                nameField.classList.add('hidden');
-                registerSection.classList.add('hidden');
-                document.getElementById('auth-name').removeAttribute('required');
-            } else {
-                nameField.classList.remove('hidden');
-                registerSection.classList.remove('hidden');
-                document.getElementById('auth-name').setAttribute('required', 'true');
-            }
+            document.getElementById('auth-name-field').classList.toggle('hidden', isLoginMode);
+            document.getElementById('register-section').classList.toggle('hidden', isLoginMode);
+            document.getElementById('login-form').classList.toggle('hidden', !isLoginMode);
+            document.getElementById('auth-title').innerText = isLoginMode ? 'כניסת תלמידים' : 'הרשמה (לאחר תשלום)';
         }
 
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
-            const name = document.getElementById('auth-name').value || 'תלמיד יקר';
-            const errorMsg = document.getElementById('auth-error-msg');
-            const submitBtn = document.getElementById('auth-submit-btn');
-            
-            errorMsg.classList.add('hidden');
-
-            if (!supabaseClient) {
-                // === מצב הדגמה (ללא סופאבייס) ===
-                alert("שים לב: האתר במצב הדגמה כי לא הוגדרו מפתחות Supabase. מחבר אותך ללא שמירה בענן...");
-                processSuccessfulLogin({ id: 'mock-id' }, name);
-                return;
-            }
-
-            // === חיבור אמיתי ל-Supabase ===
-            submitBtn.textContent = 'טוען...';
-            submitBtn.disabled = true;
-
+            if (!supabaseClient) { processSuccessfulLogin({id:'demo'}, email); return; }
             try {
-                if (isLoginMode) {
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                    if (error) throw error;
-                    processSuccessfulLogin(data.user, email);
-                } else {
-                    // הרשמה (Sign Up)
-                    const { data, error } = await supabaseClient.auth.signUp({
-                        email, 
-                        password,
-                        options: { data: { display_name: name } }
-                    });
-                    if (error) throw error;
-                    alert('חשבון נוצר בהצלחה! (ייתכן שנדרש אימות במייל, תלוי בהגדרות ה-Supabase שלך)');
-                    processSuccessfulLogin(data.user, name);
-                }
-            } catch (error) {
-                errorMsg.textContent = 'שגיאה: ' + (error.message.includes('Invalid login') ? 'פרטים שגויים' : error.message);
-                errorMsg.classList.remove('hidden');
-            } finally {
-                submitBtn.textContent = isLoginMode ? 'היכנס למערכת' : 'צור חשבון';
-                submitBtn.disabled = false;
-            }
+                const { data, error } = isLoginMode 
+                    ? await supabaseClient.auth.signInWithPassword({ email, password })
+                    : await supabaseClient.auth.signUp({ email, password, options: { data: { display_name: document.getElementById('auth-name').value } } });
+                if (error) throw error;
+                processSuccessfulLogin(data.user, email);
+            } catch (err) { alert(err.message); }
         }
 
-        function handleLoginDemoMode(e) {
-            e.preventDefault();
-            const name = document.getElementById('auth-name').value || 'תלמיד יקר (הדגמה)';
-            processSuccessfulLogin({ id: 'demo' }, name);
-        }
+        function handleLoginDemoMode(e) { e.preventDefault(); processSuccessfulLogin({id:'demo'}, 'תלמיד הדגמה'); }
 
-        function processSuccessfulLogin(userObj, displayName) {
-            isLoggedIn = true;
-            currentUser = userObj;
-            
-            const nameToDisplay = userObj?.user_metadata?.display_name || displayName || 'תלמיד יקר';
-            document.getElementById('user-greeting').textContent = `שלום, ${nameToDisplay}`;
-            
+        function processSuccessfulLogin(user, name) {
+            isLoggedIn = true; currentUser = user;
+            document.getElementById('user-greeting').innerText = `שלום, ${user?.user_metadata?.display_name || name}`;
             document.querySelectorAll('.auth-required').forEach(el => el.classList.remove('hidden'));
             document.querySelectorAll('.auth-hidden').forEach(el => el.classList.add('hidden'));
-            
             document.getElementById('nav-logged-out').classList.add('hidden');
             document.getElementById('nav-logged-in').classList.remove('hidden');
-            document.getElementById('nav-logged-in').classList.add('flex');
-            
-            document.getElementById('mobile-logged-out').classList.add('hidden');
-
             navigateTo('paid-courses');
+            selectVideo(101);
         }
 
         async function handleLogout() {
-            if (supabaseClient) {
-                await supabaseClient.auth.signOut();
-            }
-            
-            isLoggedIn = false;
-            currentUser = null;
-            
-            document.querySelectorAll('.auth-required').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.auth-hidden').forEach(el => el.classList.remove('hidden'));
-            
-            document.getElementById('nav-logged-out').classList.remove('hidden');
-            document.getElementById('nav-logged-in').classList.add('hidden');
-            document.getElementById('nav-logged-in').classList.remove('flex');
-            
-            document.getElementById('mobile-logged-out').classList.remove('hidden');
-
-            navigateTo('home');
+            if (supabaseClient) await supabaseClient.auth.signOut();
+            location.reload();
         }
 
-        // --- Render Paid Courses ---
         function renderChapters() {
             const list = document.getElementById('course-chapters-list');
-            list.innerHTML = MOCK_CHAPTERS.map((chapter, index) => {
-                const isActive = chapter.id === activeVideoId;
-                const btnClass = isActive 
-                    ? 'bg-blue-50 text-blue-700 font-bold border border-blue-100' 
-                    : 'hover:bg-slate-50 text-slate-700';
-                const circleClass = isActive 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-slate-200 text-slate-600';
-
-                return `
-                    <button onclick="selectVideo(${chapter.id})" class="w-full text-right p-3 rounded-lg transition flex items-center justify-between ${btnClass}">
-                        <div class="flex items-center gap-3">
-                            <span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm ${circleClass}">
-                                ${index + 1}
-                            </span>
-                            <span class="text-sm truncate">${chapter.title}</span>
-                        </div>
-                        <span class="text-xs text-slate-400 font-normal">${chapter.duration}</span>
-                    </button>
-                `;
-            }).join('');
+            list.innerHTML = MOCK_CHAPTERS.map((c, i) => `
+                <button onclick="selectVideo(${c.id})" class="w-full text-right p-3 mb-1 rounded-lg ${c.id === activeVideoId ? 'bg-blue-600 text-white' : 'hover:bg-slate-50'}">
+                    ${i+1}. ${c.title}
+                </button>
+            `).join('');
         }
 
         function selectVideo(id) {
             activeVideoId = id;
-            const chapter = MOCK_CHAPTERS.find(c => c.id === id);
-            
-            const iframe = document.getElementById('video-iframe');
-            if(chapter.link) {
-                iframe.src = chapter.link;
-            }
-
-            document.getElementById('video-info-title').textContent = chapter.title;
-            renderChapters(); // Re-render to update active styling
+            const c = MOCK_CHAPTERS.find(x => x.id === id);
+            document.getElementById('video-iframe').src = c.link;
+            document.getElementById('video-info-title').innerText = c.title;
+            renderChapters();
         }
 
-        // --- Render Free Content ---
         function renderFreeContent() {
             const grid = document.getElementById('free-videos-grid');
-            grid.innerHTML = MOCK_FREE_VIDEOS.map(video => `
-                <div class="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden flex flex-col">
-                    <div class="aspect-video relative cursor-pointer group">
-                        <img src="${video.thumbnail}" alt="${video.title}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition">
-                            <i class="fa-brands fa-youtube text-white text-5xl opacity-80 group-hover:opacity-100 group-hover:scale-110 transition"></i>
-                        </div>
-                    </div>
-                    <div class="p-6 flex flex-col flex-grow">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4">${video.title}</h3>
-                        <p class="text-slate-600 text-sm mb-6 flex-grow">
-                            כנסו עכשיו לערוץ היוטיוב הרשמי כדי לצפות בהדרכות מלאות וטיפים בחינם.
-                        </p>
-                        <a href="https://www.youtube.com/@moshevol8942" target="_blank" class="w-full bg-red-50 text-red-700 font-bold py-3 rounded-lg border border-red-200 hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-2">
-                            צפה בערוץ היוטיוב
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </a>
-                    </div>
+            grid.innerHTML = [1,2,3].map(i => `
+                <div class="bg-white border rounded-xl p-4">
+                    <div class="bg-slate-200 aspect-video mb-4 rounded flex items-center justify-center"><i class="fa-brands fa-youtube text-4xl text-red-600"></i></div>
+                    <h3 class="font-bold mb-2">שיעור חינם ${i}</h3>
+                    <a href="https://www.youtube.com/@moshevol8942" target="_blank" class="text-blue-600 text-sm">צפה ביוטיוב ←</a>
                 </div>
             `).join('');
         }
 
-        // --- Forum Logic (Supabase + Vanilla) ---
-        
         async function fetchForumPostsFromDB() {
             if (!supabaseClient) return;
-            try {
-                const { data, error } = await supabaseClient
-                    .from('forum_posts')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                if (data) forumPosts = data;
-                renderForum();
-            } catch (err) {
-                console.error("Error fetching posts:", err);
-            }
-        }
-
-        function showForumList() {
-            document.getElementById('forum-list-container').classList.remove('hidden');
-            document.getElementById('forum-form-container').classList.add('hidden');
-            document.getElementById('forum-post-details').classList.add('hidden');
-            currentPostId = null;
-        }
-
-        function showForumForm() {
-            document.getElementById('forum-list-container').classList.add('hidden');
-            document.getElementById('forum-form-container').classList.remove('hidden');
-            document.getElementById('forum-post-details').classList.add('hidden');
-        }
-
-        function showPostDetails(id) {
-            currentPostId = id;
-            const post = forumPosts.find(p => p.id == id);
-            if(!post) return;
-            
-            const dateStr = new Date(post.created_at).toLocaleDateString('he-IL');
-            const repliesArray = post.replies || []; // יכול להיות מערך JSON
-
-            document.getElementById('sp-title').textContent = post.title;
-            document.getElementById('sp-author').textContent = post.author_name || 'אנונימי';
-            document.getElementById('sp-date').textContent = dateStr;
-            document.getElementById('sp-content').textContent = post.content;
-            document.getElementById('sp-replies-count').textContent = repliesArray.length;
-
-            const repliesContainer = document.getElementById('sp-replies-list');
-            if(repliesArray.length === 0) {
-                repliesContainer.innerHTML = `<div class="text-center text-slate-500 py-6 bg-slate-50 rounded-lg border border-slate-100">אין עדיין תגובות. היה הראשון להגיב!</div>`;
-            } else {
-                repliesContainer.innerHTML = repliesArray.map(reply => `
-                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 flex gap-4">
-                       <div class="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 flex-shrink-0">
-                         <i class="fa-solid fa-user"></i>
-                       </div>
-                       <div>
-                         <div class="font-bold text-slate-800 text-sm mb-1">${reply.author}</div>
-                         <div class="text-slate-700">${reply.content}</div>
-                       </div>
-                    </div>
-                `).join('');
-            }
-
-            document.getElementById('forum-list-container').classList.add('hidden');
-            document.getElementById('forum-form-container').classList.add('hidden');
-            document.getElementById('forum-post-details').classList.remove('hidden');
+            const { data } = await supabaseClient.from('forum_posts').select('*').order('created_at', { ascending: false });
+            if (data) forumPosts = data;
+            renderForum();
         }
 
         function renderForum() {
             const list = document.getElementById('forum-posts-list');
-            if (forumPosts.length === 0) {
-                list.innerHTML = '<div class="p-8 text-center text-slate-500">אין עדיין דיונים בפורום.</div>';
-                return;
-            }
+            list.innerHTML = forumPosts.map(p => `
+                <div onclick="showPostDetails('${p.id}')" class="p-4 border-b hover:bg-slate-50 cursor-pointer">
+                    <div class="font-bold text-blue-700">${p.title}</div>
+                    <div class="text-xs text-slate-400">${p.author_name} • ${new Date(p.created_at).toLocaleDateString()}</div>
+                </div>
+            `).join('') || '<div class="p-8 text-center text-slate-400">אין עדיין דיונים</div>';
+        }
 
-            list.innerHTML = forumPosts.map((post, index) => {
-                const borderClass = index !== forumPosts.length - 1 ? 'border-b border-slate-100' : '';
-                const dateStr = new Date(post.created_at).toLocaleDateString('he-IL');
-                const repliesCount = post.replies ? post.replies.length : 0;
-
-                return `
-                    <div onclick="showPostDetails('${post.id}')" class="p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 cursor-pointer hover:bg-slate-50 transition ${borderClass}">
-                        <div>
-                            <h3 class="text-lg font-bold text-blue-700 hover:underline mb-1">${post.title}</h3>
-                            <div class="flex items-center gap-2 text-sm text-slate-500">
-                                <i class="fa-solid fa-user text-xs"></i> <span>${post.author_name || 'אנונימי'}</span>
-                                <span>•</span>
-                                <span>${dateStr}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 text-slate-500 text-sm bg-slate-100 px-3 py-1 rounded-full self-start sm:self-auto">
-                            <i class="fa-regular fa-message"></i>
-                            <span>${repliesCount} תגובות</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+        function showForumList() { document.getElementById('forum-list-container').classList.remove('hidden'); document.getElementById('forum-form-container').classList.add('hidden'); document.getElementById('forum-post-details').classList.add('hidden'); }
+        function showForumForm() { document.getElementById('forum-list-container').classList.add('hidden'); document.getElementById('forum-form-container').classList.remove('hidden'); }
+        function showPostDetails(id) {
+            const p = forumPosts.find(x => x.id == id); if(!p) return;
+            document.getElementById('sp-title').innerText = p.title;
+            document.getElementById('sp-content').innerText = p.content;
+            document.getElementById('sp-replies-list').innerHTML = (p.replies || []).map(r => `<div class="bg-slate-100 p-3 rounded-lg text-sm"><b>${r.author}:</b> ${r.content}</div>`).join('');
+            document.getElementById('forum-list-container').classList.add('hidden');
+            document.getElementById('forum-post-details').classList.remove('hidden');
+            currentPostId = id;
         }
 
         async function handleCreatePost(e) {
             e.preventDefault();
-            const titleInput = document.getElementById('new-post-title');
-            const contentInput = document.getElementById('new-post-content');
-            const btn = document.getElementById('submit-post-btn');
-            
-            const authorName = currentUser?.user_metadata?.display_name || document.getElementById('auth-name').value || 'תלמיד';
-
-            const newPost = {
-                title: titleInput.value,
-                content: contentInput.value,
-                author_name: authorName,
-                replies: []
-            };
-
-            btn.disabled = true;
-            btn.textContent = 'שומר...';
-
-            if (supabaseClient) {
-                try {
-                    const { data, error } = await supabaseClient.from('forum_posts').insert([newPost]).select();
-                    if (error) throw error;
-                    // הצלחה
-                    forumPosts.unshift(data[0]); 
-                } catch (err) {
-                    alert('שגיאה בשמירת הפוסט: ' + err.message);
-                }
-            } else {
-                // מצב הדגמה
-                newPost.id = Date.now();
-                newPost.created_at = new Date().toISOString();
-                forumPosts.unshift(newPost); 
-            }
-
-            btn.disabled = false;
-            btn.textContent = 'פרסם דיון';
-            titleInput.value = '';
-            contentInput.value = '';
-            
-            showForumList();
-            renderForum();
+            const post = { title: document.getElementById('new-post-title').value, content: document.getElementById('new-post-content').value, author_name: currentUser?.user_metadata?.display_name || 'תלמיד', replies: [] };
+            if (supabaseClient) await supabaseClient.from('forum_posts').insert([post]);
+            else { post.id = Date.now(); post.created_at = new Date().toISOString(); forumPosts.unshift(post); }
+            showForumList(); if (supabaseClient) fetchForumPostsFromDB(); else renderForum();
         }
 
         async function handleAddReply(e) {
             e.preventDefault();
-            const replyInput = document.getElementById('new-reply-content');
-            const content = replyInput.value;
-            const authorName = currentUser?.user_metadata?.display_name || document.getElementById('auth-name').value || 'תלמיד';
-
-            const postIndex = forumPosts.findIndex(p => p.id == currentPostId);
-            if (postIndex === -1) return;
-            
-            const post = forumPosts[postIndex];
-            const newReplies = [...(post.replies || []), { id: Date.now(), author: authorName, content: content }];
-
-            if (supabaseClient) {
-                try {
-                    const { error } = await supabaseClient
-                        .from('forum_posts')
-                        .update({ replies: newReplies })
-                        .eq('id', currentPostId);
-                    
-                    if (error) throw error;
-                    post.replies = newReplies; // עדכון הזיכרון המקומי
-                } catch (err) {
-                    alert('שגיאה בהוספת תגובה: ' + err.message);
-                    return;
-                }
-            } else {
-                 post.replies = newReplies;
-            }
-
-            replyInput.value = '';
-            showPostDetails(currentPostId); 
-            renderForum(); 
+            const content = document.getElementById('new-reply-content').value;
+            const post = forumPosts.find(x => x.id == currentPostId);
+            const r = { author: currentUser?.user_metadata?.display_name || 'תלמיד', content };
+            post.replies = [...(post.replies || []), r];
+            if (supabaseClient) await supabaseClient.from('forum_posts').update({ replies: post.replies }).eq('id', currentPostId);
+            document.getElementById('new-reply-content').value = ''; showPostDetails(currentPostId);
         }
 
-        // Start the App
         initApp();
-
     </script>
 </body>
 </html>
