@@ -81,27 +81,34 @@
 <body className="antialiased">
     <div id="root"></div>
 
-    <!-- Firebase SDK Imports (Built-in environment logic) -->
+    <!-- Firebase SDK Imports -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        window.FB = { initializeApp, getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc };
+        window.FB = { initializeApp, getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc };
         window.dispatchEvent(new Event('firebaseReady'));
     </script>
 
     <script type="text/babel">
         // ----------------------------------------------------
+        // Constants & Configuration
+        // ----------------------------------------------------
+        const ADMIN_PASSWORD = "פסגה2024"; // <-- Password for Admin Login
+        const WHATSAPP_LINK = "https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws";
+        const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@moshevol8942";
+
+        // ----------------------------------------------------
         // Icons Component
         // ----------------------------------------------------
         const { 
             Home, Folder, FolderOpen, FileText, FileVideo, 
-            Search, ChevronLeft, Menu, X, BookOpen, Info,
+            Search, ChevronLeft, ChevronRight, Menu, X, BookOpen, Info,
             PlayCircle, ExternalLink, ShieldCheck, TrendingUp,
             Mountain, User, LogOut, Lock, MessageCircle, RefreshCw,
             MessageSquare, Trash2, Ghost, Youtube, CheckCircle,
-            CreditCard, Target, Lightbulb, Settings, Code, Plus, Link, Users
+            CreditCard, Target, Lightbulb, Settings, Plus, Crown, Unlock
         } = lucide;
 
         const Icon = ({ name, size = 24, className = "" }) => {
@@ -122,7 +129,7 @@
         };
 
         // ----------------------------------------------------
-        // Initial Data 
+        // Initial Data Fallbacks
         // ----------------------------------------------------
         const INITIAL_COURSES = [
             {
@@ -140,8 +147,19 @@
             }
         ];
 
-        const WHATSAPP_LINK = "https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws";
-        const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@moshevol8942";
+        const INITIAL_FORUM_TOPICS = [
+            { 
+                id: 1, 
+                title: "ברוכים הבאים לפורום המועדון",
+                author: 'משה וולנר', 
+                realAuthor: 'משה וולנר', 
+                content: 'כאן המקום לפתוח נושאים, להתייעץ ולצמוח יחד.', 
+                date: new Date().toISOString(), 
+                isAnonymous: false, 
+                isAdminPost: true,
+                replies: []
+            }
+        ];
 
         // ----------------------------------------------------
         // Shared Components
@@ -154,9 +172,7 @@
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{title}</h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{message}</p>
-                    <button onClick={onClose} className="w-full bg-brand-primary hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition">
-                        סגור
-                    </button>
+                    <button onClick={onClose} className="w-full bg-brand-primary hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition">סגור</button>
                 </div>
             </div>
         );
@@ -206,7 +222,7 @@
             }, [onSuccess]);
 
             return (
-                <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 max-w-md mx-auto text-center">
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 max-w-md mx-auto text-center relative">
                     <Icon name="CreditCard" size={48} className="text-brand-secondary mx-auto mb-4" />
                     <h3 className="text-2xl font-bold text-brand-primary dark:text-white mb-2">הצטרפות למועדון פסגה</h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-6">קבלו גישה מלאה לכל הקורסים, הכלים והקהילה שלנו.</p>
@@ -215,197 +231,159 @@
             );
         };
 
-        // ----------------------------------------------------
-        // Formatting Helper
-        // ----------------------------------------------------
         const formatDate = (isoString) => {
             const d = new Date(isoString);
             return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         };
 
         // ----------------------------------------------------
-        // Admin Panel Component
+        // Home Page (Split Entrance)
         // ----------------------------------------------------
-        const AdminPage = ({ courses, setCourses, youtubeId, setYoutubeId, forumPosts, setForumPosts }) => {
-            const [activeTab, setActiveTab] = React.useState('forum'); 
-            const [scriptUrl, setScriptUrl] = React.useState(localStorage.getItem('pisga_script_url') || "");
-            const [syncLoading, setSyncLoading] = React.useState(false);
-            const [message, setMessage] = React.useState(null);
+        const HomePage = ({ navigate }) => {
+            return (
+                <div className="animate-fade-in space-y-12 relative max-w-5xl mx-auto mt-4 px-4">
+                    <div className="text-center mb-10">
+                        <Icon name="Mountain" size={64} className="mx-auto mb-4 text-brand-secondary" />
+                        <h1 className="text-4xl md:text-5xl font-black mb-4 text-brand-primary dark:text-white tracking-tight">ברוכים הבאים לקהילת פסגה</h1>
+                        <h2 className="text-xl md:text-2xl font-medium text-gray-600 dark:text-gray-400">הבית העסקי למאמנים ומטפלים בהובלת משה וולנר</h2>
+                    </div>
 
-            const appsScriptCode = `// העתק והדבק את הקוד הבא ב- Google Apps Script
-function doGet(e) {
-  var MAIN_FOLDER_ID = 'הכנס_כאן_את_מזהה_התיקיה'; 
-  try {
-    var mainFolder = DriveApp.getFolderById(MAIN_FOLDER_ID);
-    var courseFolders = mainFolder.getFolders();
-    var courses = [];
-    while (courseFolders.hasNext()) {
-      var folder = courseFolders.next();
-      var files = folder.getFiles();
-      var lessons = [];
-      while (files.hasNext()) {
-        var file = files.next();
-        lessons.push({ id: file.getId(), name: file.getName(), url: file.getUrl(), type: file.getMimeType().indexOf('video') > -1 ? 'video' : 'pdf' });
-      }
-      courses.push({ id: folder.getId(), name: folder.getName(), isFolder: true, lessons: lessons });
-    }
-    return ContentService.createTextOutput(JSON.stringify({status: 'success', data: courses})).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({status: 'error', message: error.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
-}`;
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Pro Entrance */}
+                        <div onClick={() => navigate('explorer')} className="bg-gradient-to-br from-brand-primary to-brand-dark rounded-[2.5rem] p-10 text-white shadow-2xl hover:shadow-[0_20px_40px_rgba(23,67,83,0.3)] transition-all cursor-pointer group relative overflow-hidden transform hover:-translate-y-2 flex flex-col justify-between h-full">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                            <div className="relative z-10 flex flex-col items-center text-center">
+                                <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md border border-white/20 group-hover:bg-brand-secondary transition-colors duration-500">
+                                    <Icon name="Crown" size={40} className="text-brand-secondary group-hover:text-white" />
+                                </div>
+                                <h3 className="text-3xl font-black mb-3">כניסת Pro</h3>
+                                <h4 className="text-lg font-bold text-brand-secondary mb-4">לחברי מועדון פסגה</h4>
+                                <p className="text-gray-300 font-medium leading-relaxed mb-8">
+                                    גישה מלאה לכל הקורסים המקצועיים, ההדרכות, הכלים לניהול העסק והשתתפות פעילה בפורום התלמידים.
+                                </p>
+                            </div>
+                            <button className="bg-brand-secondary hover:bg-[#c15c3c] text-white w-full py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 group-hover:scale-105 transition-transform relative z-10">
+                                <Icon name="Lock" size={20} /> היכנסו לספריית המועדון
+                            </button>
+                        </div>
 
-            const handleDriveSync = async () => {
-                if(!scriptUrl) { setMessage("אנא הזן את כתובת ה-Web App של הסקריפט שלך."); return; }
-                setSyncLoading(true);
-                localStorage.setItem('pisga_script_url', scriptUrl);
-                try {
-                    const response = await fetch(scriptUrl);
-                    const result = await response.json();
-                    if(result.status === 'success') {
-                        setCourses(result.data);
-                        setMessage("הקורסים סונכרנו בהצלחה מהדרייב!");
-                    } else { setMessage("שגיאה בסנכרון: " + result.message); }
-                } catch (e) { setMessage("שגיאת תקשורת. ודא שהסקריפט מוגדר כ- 'Anyone' (כל אחד) ויש לו הרשאות."); }
-                setSyncLoading(false);
-            };
+                        {/* Free Entrance */}
+                        <div onClick={() => navigate('youtube')} className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-[2.5rem] p-10 text-brand-primary dark:text-white shadow-xl hover:border-brand-secondary/50 hover:shadow-[0_20px_40px_rgba(217,108,74,0.15)] transition-all cursor-pointer group relative flex flex-col justify-between h-full transform hover:-translate-y-2">
+                            <div className="relative z-10 flex flex-col items-center text-center">
+                                <div className="w-20 h-20 bg-gray-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center mb-6 border border-gray-200 dark:border-gray-600 group-hover:bg-red-500 transition-colors duration-500">
+                                    <Icon name="Unlock" size={40} className="text-gray-400 group-hover:text-white" />
+                                </div>
+                                <h3 className="text-3xl font-black mb-3">כניסה פתוחה</h3>
+                                <h4 className="text-lg font-bold text-gray-500 dark:text-gray-400 mb-4">לשאינם חברים (חינם)</h4>
+                                <p className="text-gray-600 dark:text-gray-300 font-medium leading-relaxed mb-8">
+                                    צפייה חופשית במבחר הדרכות, וובינרים וסרטונים מערוץ היוטיוב של משה וולנר. הדרך המושלמת להכיר את העשייה שלנו.
+                                </p>
+                            </div>
+                            <button className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-brand-primary dark:text-white w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 group-hover:bg-red-500 group-hover:text-white transition-colors relative z-10">
+                                <Icon name="Youtube" size={20} /> צפו בתכנים הפתוחים
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
-            const handleDeletePost = async (post) => {
-                if(confirm("האם אתה בטוח שברצונך למחוק פוסט זה?")) {
-                    if (window.db && post.dbId) {
+        // ----------------------------------------------------
+        // Admin Panel Component (Forum ONLY)
+        // ----------------------------------------------------
+        const AdminPage = ({ forumTopics, setForumTopics, setMessage }) => {
+            const handleDeleteTopic = async (topic) => {
+                if(confirm(`האם אתה בטוח שברצונך למחוק את הנושא: "${topic.title}" ואת כל התגובות שלו?`)) {
+                    if (window.db && topic.dbId) {
                         try {
                             const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                            await window.FB.deleteDoc(window.FB.doc(window.db, 'artifacts', appId, 'public', 'data', 'forum_posts', post.dbId));
-                            setMessage("הפוסט נמחק בהצלחה מענן המערכת.");
-                        } catch (err) {
-                            setMessage("שגיאה במחיקת הפוסט: " + err.message);
-                        }
+                            await window.FB.deleteDoc(window.FB.doc(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.dbId));
+                            setMessage("הנושא נמחק בהצלחה מהענן.");
+                        } catch (err) { setMessage("שגיאה במחיקת הנושא: " + err.message); }
                     } else {
-                        // Fallback local deletion
-                        setForumPosts(forumPosts.filter(p => p.id !== post.id));
-                        setMessage("הפוסט נמחק בהצלחה.");
+                        setForumTopics(forumTopics.filter(t => t.id !== topic.id));
+                        setMessage("הנושא נמחק בהצלחה (מקומי).");
+                    }
+                }
+            };
+
+            const handleDeleteReply = async (topic, replyId) => {
+                if(confirm("למחוק תגובה זו?")) {
+                    const updatedReplies = topic.replies.filter(r => r.id !== replyId);
+                    if (window.db && topic.dbId) {
+                        try {
+                            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                            await window.FB.updateDoc(window.FB.doc(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.dbId), { replies: updatedReplies });
+                            setMessage("התגובה נמחקה.");
+                        } catch (err) { setMessage("שגיאה במחיקת תגובה: " + err.message); }
+                    } else {
+                        setForumTopics(forumTopics.map(t => t.id === topic.id ? { ...t, replies: updatedReplies } : t));
+                        setMessage("התגובה נמחקה (מקומי).");
                     }
                 }
             };
 
             return (
                 <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12">
-                    {message && <CustomMessageBox message={message} onClose={() => setMessage(null)} />}
                     <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-brand-primary/20">
-                        <div className="flex items-center gap-4 mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
-                            <Icon name="Settings" size={32} className="text-brand-secondary" />
-                            <h2 className="text-3xl font-black text-brand-primary dark:text-white">ממשק מנהל</h2>
+                        <div className="flex items-center justify-between mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
+                            <div className="flex items-center gap-4">
+                                <Icon name="Settings" size={32} className="text-brand-secondary" />
+                                <h2 className="text-3xl font-black text-brand-primary dark:text-white">ממשק מנהל - ניהול פורום</h2>
+                            </div>
+                            <span className="bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> מחובר לענן
+                            </span>
                         </div>
 
-                        <div className="flex gap-4 mb-8 border-b border-gray-200 dark:border-gray-700 pb-4 overflow-x-auto">
-                            <button onClick={()=>setActiveTab('forum')} className={`px-6 py-2 rounded-full font-bold transition whitespace-nowrap flex items-center gap-2 ${activeTab==='forum' ? 'bg-brand-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`}><Icon name="MessageSquare" size={18}/> ניהול פורום קהילה</button>
-                            <button onClick={()=>setActiveTab('drive')} className={`px-6 py-2 rounded-full font-bold transition whitespace-nowrap flex items-center gap-2 ${activeTab==='drive' ? 'bg-brand-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`}><Icon name="FolderOpen" size={18}/> סנכרון קורסים (Drive)</button>
-                            <button onClick={()=>setActiveTab('youtube')} className={`px-6 py-2 rounded-full font-bold transition whitespace-nowrap flex items-center gap-2 ${activeTab==='youtube' ? 'bg-brand-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`}><Icon name="Youtube" size={18}/> הגדרות יוטיוב</button>
-                        </div>
-
-                        {activeTab === 'forum' && (
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white">ניהול הודעות ומשתמשים <span className="text-xs font-normal text-green-600 mr-2 border border-green-600 px-2 rounded-full inline-block">מחובר לענן בזמן אמת</span></h3>
-                                    <span className="bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-full text-sm font-bold">{forumPosts.length} הודעות בפורום</span>
-                                </div>
-                                
-                                <div className="overflow-x-auto bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
-                                    <table className="w-full text-right text-sm">
-                                        <thead>
-                                            <tr className="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                                                <th className="p-4 font-bold w-1/6">תאריך</th>
-                                                <th className="p-4 font-bold w-1/4">מחבר (שם אמיתי)</th>
-                                                <th className="p-4 font-bold w-1/2">תוכן ההודעה</th>
-                                                <th className="p-4 font-bold w-1/12 text-center">פעולות</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {forumPosts.length === 0 ? (
-                                                <tr><td colSpan="4" className="p-8 text-center text-gray-500">אין הודעות בפורום כרגע.</td></tr>
-                                            ) : (
-                                                forumPosts.map(post => (
-                                                    <tr key={post.id} className="border-t border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 transition-colors">
-                                                        <td className="p-4 text-gray-600 dark:text-gray-400 align-top">{formatDate(post.date)}</td>
-                                                        <td className="p-4 align-top">
-                                                            <div className="font-bold text-gray-800 dark:text-white">{post.realAuthor}</div>
-                                                            {post.isAnonymous && (
-                                                                <span className="inline-block mt-1 text-xs bg-brand-secondary/10 text-brand-secondary border border-brand-secondary/20 px-2 py-0.5 rounded-md">
-                                                                    הוצג כאנונימי
-                                                                </span>
-                                                            )}
-                                                            {post.isAdminPost && (
-                                                                <span className="inline-block mt-1 text-xs bg-brand-primary/10 text-brand-primary border border-brand-primary/20 px-2 py-0.5 rounded-md">
-                                                                    הודעת הנהלה
-                                                                </span>
-                                                            )}
-                                                        </td>
-                                                        <td className="p-4 text-gray-700 dark:text-gray-300 align-top whitespace-pre-wrap">
-                                                            {post.content}
-                                                        </td>
-                                                        <td className="p-4 align-top text-center">
-                                                            <button onClick={() => handleDeletePost(post)} className="text-red-500 hover:text-white hover:bg-red-500 p-2 rounded-lg transition-colors" title="מחק פוסט">
-                                                                <Icon name="Trash2" size={18} />
+                        <div className="space-y-6">
+                            {forumTopics.length === 0 ? (
+                                <div className="text-center py-10 text-gray-500">אין נושאים בפורום כרגע.</div>
+                            ) : (
+                                forumTopics.map(topic => (
+                                    <div key={topic.id} className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                                        {/* Topic Header */}
+                                        <div className="bg-gray-50 dark:bg-gray-900 p-4 flex justify-between items-start">
+                                            <div>
+                                                <h3 className="font-bold text-lg text-brand-primary dark:text-white">{topic.title}</h3>
+                                                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                    נפתח ע"י: <span className="font-bold">{topic.realAuthor}</span> {topic.isAnonymous && <span className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded ml-2">(אנונימי לקהל)</span>} | {formatDate(topic.date)}
+                                                </div>
+                                            </div>
+                                            <button onClick={() => handleDeleteTopic(topic)} className="bg-red-100 hover:bg-red-200 text-red-600 p-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-bold">
+                                                <Icon name="Trash2" size={16} /> מחק נושא שלם
+                                            </button>
+                                        </div>
+                                        {/* Main Post Content */}
+                                        <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300">
+                                            <span className="font-bold text-xs text-gray-400 mb-1 block">תוכן הפוסט הראשי:</span>
+                                            {topic.content}
+                                        </div>
+                                        {/* Replies */}
+                                        <div className="p-4 bg-gray-50/50 dark:bg-gray-800/50">
+                                            <span className="font-bold text-sm text-brand-primary dark:text-brand-secondary mb-3 block">תגובות באשכול ({topic.replies.length}):</span>
+                                            {topic.replies.length === 0 ? <p className="text-xs text-gray-500">אין תגובות.</p> : (
+                                                <div className="space-y-2">
+                                                    {topic.replies.map(reply => (
+                                                        <div key={reply.id} className="flex justify-between items-start bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-100 dark:border-gray-600 text-sm">
+                                                            <div>
+                                                                <span className="font-bold text-gray-800 dark:text-white">{reply.realAuthor}</span> 
+                                                                {reply.isAnonymous && <span className="text-[10px] bg-gray-200 dark:bg-gray-600 px-1 rounded mx-1">אנונימי</span>}
+                                                                <span className="text-gray-500 mx-2">{formatDate(reply.date)}</span>
+                                                                <p className="mt-1 text-gray-700 dark:text-gray-300">{reply.content}</p>
+                                                            </div>
+                                                            <button onClick={() => handleDeleteReply(topic, reply.id)} className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors" title="מחק תגובה">
+                                                                <Icon name="X" size={16} />
                                                             </button>
-                                                        </td>
-                                                    </tr>
-                                                ))
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'drive' && (
-                            <div className="space-y-6">
-                                <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl border border-blue-200 dark:border-blue-800">
-                                    <h3 className="text-xl font-bold text-blue-800 dark:text-blue-300 mb-2">משיכת קורסים מגוגל דרייב</h3>
-                                    <p className="text-sm text-blue-700 dark:text-blue-400 mb-4 leading-relaxed">
-                                        כדי שהאתר ימשוך אוטומטית את כל הקורסים והשיעורים שלך מתיקיית הדרייב הראשית, עליך ליצור "Google Apps Script" שינגיש את המידע.
-                                    </p>
-                                    <ol className="list-decimal list-inside text-sm text-blue-800 dark:text-blue-300 space-y-2 mb-4 font-medium">
-                                        <li>כנסו ל- <a href="https://script.google.com" target="_blank" className="underline font-bold">script.google.com</a> וצרו פרויקט חדש.</li>
-                                        <li>העתיקו את הקוד שלמטה והדביקו בעורך ה-Script.</li>
-                                        <li>החליפו את המזהה (ID) בקוד למזהה של תיקיית הקורסים הראשית שלכם בדרייב.</li>
-                                        <li>לחצו על "פריסה" (Deploy) -> "פריסה חדשה", בחרו סוג "אפליקציית אינטרנט" (Web App).</li>
-                                        <li>בהרשאות (Who has access) בחרו "Anyone" (כל אחד) ואשרו.</li>
-                                        <li>העתיקו את "כתובת ה-URL של אפליקציית האינטרנט" שנוצרה והדביקו אותה כאן למטה.</li>
-                                    </ol>
-                                    <div className="relative">
-                                        <div className="absolute top-2 left-2 bg-gray-800 text-xs text-white px-2 py-1 rounded">קוד ל-Apps Script</div>
-                                        <textarea readOnly value={appsScriptCode} className="w-full h-64 bg-gray-900 text-green-400 p-4 rounded-xl font-mono text-sm border-none focus:ring-0" dir="ltr"></textarea>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div className="flex flex-col sm:flex-row gap-4">
-                                    <input 
-                                        type="text" 
-                                        placeholder="הדבק כאן את כתובת ה- Web App URL שיצרת בגוגל" 
-                                        value={scriptUrl} 
-                                        onChange={e => setScriptUrl(e.target.value)}
-                                        className="flex-1 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 text-left" dir="ltr"
-                                    />
-                                    <button onClick={handleDriveSync} disabled={syncLoading} className="bg-brand-secondary hover:bg-[#c15c3c] text-white px-8 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 w-full sm:w-auto shrink-0">
-                                        <Icon name="RefreshCw" className={syncLoading ? "animate-spin" : ""} size={20} />
-                                        {syncLoading ? "מסנכרן..." : "משוך נתונים מהדרייב"}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'youtube' && (
-                            <div className="space-y-4 bg-gray-50 dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-700">
-                                <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2"><Icon name="Youtube" className="text-red-500"/> מזהה ערוץ יוטיוב (Channel ID)</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                    כדי למשוך סרטונים אוטומטית מערוץ היוטיוב, יש להזין את ה- Channel ID (מתחיל לרוב ב- UC). 
-                                </p>
-                                <div className="flex gap-4">
-                                    <input type="text" value={youtubeId} onChange={e=>setYoutubeId(e.target.value)} placeholder="לדוגמה: UCxxxxxxxxxxxxxxxxx" className="flex-1 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2 bg-white dark:bg-gray-800 text-left" dir="ltr" />
-                                    <button onClick={() => {localStorage.setItem('pisga_yt_id', youtubeId); setMessage("הגדרות יוטיוב נשמרו!");}} className="bg-brand-primary text-white px-6 py-2 rounded-xl font-bold">שמור</button>
-                                </div>
-                            </div>
-                        )}
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
             );
@@ -425,7 +403,7 @@ function doGet(e) {
                     setCurrentFolder(item);
                     setSearchQuery("");
                 } else {
-                    if (isSubscribed) { onFileInteract(item); } 
+                    if (isSubscribed || user?.isAdmin) { onFileInteract(item); } 
                     else { setShowPayment(true); }
                 }
             };
@@ -451,7 +429,7 @@ function doGet(e) {
             return (
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden min-h-[600px] flex flex-col relative animate-fade-in max-w-6xl mx-auto">
                     
-                    {!isSubscribed && (
+                    {!isSubscribed && !user?.isAdmin && (
                         <div className="bg-brand-secondary/10 dark:bg-brand-secondary/20 border-b border-brand-secondary/30 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
                                 <Icon name="Lock" className="text-brand-secondary" />
@@ -466,7 +444,7 @@ function doGet(e) {
                     <div className="bg-gray-50 dark:bg-gray-900 p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300 font-medium overflow-x-auto w-full md:w-auto whitespace-nowrap scrollbar-hide">
                             <button onClick={() => {setCurrentFolder(null); setSearchQuery("");}} className="hover:text-brand-primary dark:hover:text-white p-1 flex items-center gap-1">
-                                <Icon name="Home" size={20} /> <span className="font-bold">ספריית הקורסים</span>
+                                <Icon name="FolderOpen" size={20} /> <span className="font-bold">ספריית הקורסים המלאה</span>
                             </button>
                             {currentFolder && (
                                 <React.Fragment>
@@ -502,7 +480,7 @@ function doGet(e) {
                                         </div>
                                     ) : (
                                         <div key={item.id} onClick={() => handleItemClick(item, false)} className="group flex flex-col p-5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-brand-secondary dark:hover:border-brand-secondary hover:shadow-md transition-all cursor-pointer relative overflow-hidden h-full">
-                                            {!isSubscribed && (
+                                            {(!isSubscribed && !user?.isAdmin) && (
                                                 <div className="absolute top-3 left-3 text-brand-secondary opacity-70 bg-white/80 dark:bg-gray-800/80 p-1 rounded-full">
                                                     <Icon name="Lock" size={16} />
                                                 </div>
@@ -523,111 +501,249 @@ function doGet(e) {
         };
 
         // ----------------------------------------------------
-        // Forum Page
+        // Forum Page (Threads & Replies)
         // ----------------------------------------------------
-        const ForumPage = ({ user, setShowAuthModal, posts, setPosts }) => {
-            const [newPostContent, setNewPostContent] = React.useState("");
-            const [isAnonymous, setIsAnonymous] = React.useState(false);
+        const ForumPage = ({ user, setShowAuthModal, topics, setTopics }) => {
+            const [currentTopic, setCurrentTopic] = React.useState(null);
+            
+            // New Topic Form
+            const [newTopicTitle, setNewTopicTitle] = React.useState("");
+            const [newTopicContent, setNewTopicContent] = React.useState("");
+            const [isAnonymousTopic, setIsAnonymousTopic] = React.useState(false);
+            
+            // New Reply Form
+            const [newReplyContent, setNewReplyContent] = React.useState("");
+            const [isAnonymousReply, setIsAnonymousReply] = React.useState(false);
+            
             const [isPublishing, setIsPublishing] = React.useState(false);
 
-            const isAdmin = user && (user.name.includes('משה וולנר') || user.name.includes('מנהל'));
+            const isAdmin = user && user.isAdmin;
 
-            const handlePostSubmit = async (e) => {
+            // -- Create New Topic --
+            const handleCreateTopic = async (e) => {
                 e.preventDefault();
                 if (!user) { setShowAuthModal(true); return; }
-                if (!newPostContent.trim()) return;
+                if (!newTopicTitle.trim() || !newTopicContent.trim()) return;
 
                 setIsPublishing(true);
-
-                const newPost = {
-                    id: Date.now(),
-                    author: isAnonymous ? 'משתמש אנונימי' : user.name,
+                const newTopic = {
+                    id: Date.now().toString(),
+                    title: newTopicTitle,
+                    content: newTopicContent,
+                    author: isAnonymousTopic ? 'משתמש אנונימי' : user.name,
                     realAuthor: user.name,
-                    content: newPostContent,
                     date: new Date().toISOString(),
-                    isAnonymous: isAnonymous,
-                    isAdminPost: isAdmin && !isAnonymous
+                    isAnonymous: isAnonymousTopic,
+                    isAdminPost: isAdmin && !isAnonymousTopic,
+                    replies: []
                 };
 
-                // Sync to Cloud if DB is ready
                 if (window.db) {
                     try {
                         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                        await window.FB.addDoc(window.FB.collection(window.db, 'artifacts', appId, 'public', 'data', 'forum_posts'), newPost);
-                        // Cloud syncs via listener, no need to manually setPosts
+                        await window.FB.addDoc(window.FB.collection(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics'), newTopic);
                     } catch(err) {
-                        console.error("Error adding doc:", err);
                         alert("שגיאה בחיבור לענן. הפוסט יישמר מקומית.");
-                        setPosts([newPost, ...posts]);
+                        setTopics([newTopic, ...topics]);
                     }
                 } else {
-                    setPosts([newPost, ...posts]); // Local fallback
+                    setTopics([newTopic, ...topics]); 
                 }
 
-                setNewPostContent("");
-                setIsAnonymous(false);
+                setNewTopicTitle("");
+                setNewTopicContent("");
+                setIsAnonymousTopic(false);
                 setIsPublishing(false);
             };
 
+            // -- Add Reply to Topic --
+            const handleAddReply = async (e) => {
+                e.preventDefault();
+                if (!user) { setShowAuthModal(true); return; }
+                if (!newReplyContent.trim() || !currentTopic) return;
+
+                setIsPublishing(true);
+                const newReply = {
+                    id: Date.now().toString(),
+                    content: newReplyContent,
+                    author: isAnonymousReply ? 'משתמש אנונימי' : user.name,
+                    realAuthor: user.name,
+                    date: new Date().toISOString(),
+                    isAnonymous: isAnonymousReply,
+                    isAdminPost: isAdmin && !isAnonymousReply
+                };
+
+                // Find latest topic data to append reply
+                const updatedReplies = [...currentTopic.replies, newReply];
+
+                if (window.db && currentTopic.dbId) {
+                    try {
+                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                        const topicRef = window.FB.doc(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics', currentTopic.dbId);
+                        await window.FB.updateDoc(topicRef, { replies: updatedReplies });
+                        // Local state update for immediate feel inside the current view
+                        setCurrentTopic({ ...currentTopic, replies: updatedReplies });
+                    } catch(err) {
+                        alert("שגיאה בהוספת תגובה בענן.");
+                    }
+                } else {
+                    const updatedTopics = topics.map(t => t.id === currentTopic.id ? { ...t, replies: updatedReplies } : t);
+                    setTopics(updatedTopics);
+                    setCurrentTopic({ ...currentTopic, replies: updatedReplies });
+                }
+
+                setNewReplyContent("");
+                setIsAnonymousReply(false);
+                setIsPublishing(false);
+            };
+
+            // Re-sync currentTopic if topics update from cloud
+            React.useEffect(() => {
+                if(currentTopic) {
+                    const updated = topics.find(t => t.id === currentTopic.id);
+                    if(updated) setCurrentTopic(updated);
+                }
+            }, [topics]);
+
+            // VIEW 1: TOPIC LIST
+            if (!currentTopic) {
+                return (
+                    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-12">
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-3 flex items-center justify-center gap-3">
+                                <Icon name="MessageSquare" size={32} className="text-brand-secondary" />
+                                פורום התייעצויות ודיונים
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-400 text-lg">המקום לפתוח נושאים, לשאול שאלות וללמוד יחד.</p>
+                        </div>
+
+                        {/* Create Topic Form */}
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-6 relative">
+                            {!user && (
+                                <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center rounded-2xl">
+                                    <p className="text-lg font-bold text-brand-primary dark:text-white mb-3">יש להתחבר כדי לפתוח דיון</p>
+                                    <button onClick={() => setShowAuthModal(true)} className="bg-brand-primary text-white px-6 py-2 rounded-full font-bold">התחברות</button>
+                                </div>
+                            )}
+                            <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><Icon name="Plus" size={20} className="text-brand-secondary"/> פתיחת נושא חדש לדיון</h3>
+                            <form onSubmit={handleCreateTopic} className="space-y-4">
+                                <input 
+                                    type="text" value={newTopicTitle} onChange={e => setNewTopicTitle(e.target.value)} required
+                                    placeholder="כותרת הנושא (לדוגמה: איך מתמחרים פגישה ראשונה?)"
+                                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white focus:ring-2 focus:ring-brand-primary outline-none font-bold"
+                                />
+                                <textarea 
+                                    value={newTopicContent} onChange={e => setNewTopicContent(e.target.value)} required
+                                    placeholder="פרטו כאן את השאלה, הדילמה או התובנה שלכם..."
+                                    className="w-full h-32 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 focus:ring-2 focus:ring-brand-primary outline-none resize-none text-gray-800 dark:text-white"
+                                ></textarea>
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                        <input type="checkbox" checked={isAnonymousTopic} onChange={e => setIsAnonymousTopic(e.target.checked)} className="w-4 h-4 text-brand-primary rounded" />
+                                        <Icon name="Ghost" size={16} /> פתח נושא בעילום שם
+                                    </label>
+                                    <button type="submit" disabled={isPublishing} className="bg-brand-secondary hover:bg-[#c15c3c] text-white px-8 py-2.5 rounded-full font-bold transition w-full sm:w-auto disabled:opacity-50 flex justify-center items-center gap-2">
+                                        {isPublishing ? <Icon name="RefreshCw" className="animate-spin" size={18} /> : null} פרסם נושא
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Topics List */}
+                        <div className="space-y-4">
+                            <h3 className="font-black text-xl text-brand-primary dark:text-white border-b-2 border-brand-secondary inline-block pb-1">נושאים אחרונים בפורום</h3>
+                            {topics.length === 0 ? <p className="text-gray-500 py-6 text-center">אין נושאים עדיין. תהיו הראשונים!</p> : null}
+                            {topics.map(topic => (
+                                <div key={topic.id} onClick={() => setCurrentTopic(topic)} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:border-brand-primary hover:shadow-md transition-all cursor-pointer flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group">
+                                    <div className="flex-1">
+                                        <h4 className="text-xl font-bold text-gray-800 dark:text-white group-hover:text-brand-primary transition-colors flex items-center gap-2">
+                                            {topic.isAdminPost && <Icon name="ShieldCheck" size={18} className="text-brand-secondary" title="הודעת מערכת" />}
+                                            {topic.title}
+                                        </h4>
+                                        <div className="flex items-center gap-3 text-sm text-gray-500 mt-2">
+                                            <span className="flex items-center gap-1"><Icon name={topic.isAnonymous ? "Ghost" : "User"} size={14} /> {topic.author}</span>
+                                            <span>•</span>
+                                            <span>{formatDate(topic.date)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="bg-brand-primary/10 text-brand-primary dark:bg-gray-700 dark:text-gray-300 px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shrink-0">
+                                        <Icon name="MessageCircle" size={16} /> {topic.replies ? topic.replies.length : 0} תגובות
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            }
+
+            // VIEW 2: TOPIC DETAILS & REPLIES
             return (
-                <div className="max-w-4xl mx-auto space-y-8 animate-fade-in pb-12">
-                    <div className="text-center mb-8">
-                        <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-3 flex items-center justify-center gap-3">
-                            <Icon name="MessageSquare" size={32} className="text-brand-secondary" />
-                            פורום תלמידים
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-400 text-lg">המקום שלכם להתייעץ, לשתף וללמוד אחד מהשני.</p>
+                <div className="max-w-4xl mx-auto space-y-6 animate-fade-in pb-12">
+                    <button onClick={() => setCurrentTopic(null)} className="text-gray-500 hover:text-brand-primary font-bold flex items-center gap-1 transition-colors mb-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm w-max border border-gray-200 dark:border-gray-700">
+                        <Icon name="ChevronRight" size={20} /> חזרה לרשימת הנושאים
+                    </button>
+
+                    {/* Original Post */}
+                    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-md border ${currentTopic.isAdminPost ? 'border-brand-primary/50' : 'border-gray-200 dark:border-gray-700'} p-6 md:p-8`}>
+                        <h2 className="text-2xl font-black text-brand-primary dark:text-white mb-4">{currentTopic.title}</h2>
+                        <div className="flex items-center gap-3 mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${currentTopic.isAdminPost ? 'bg-brand-primary' : currentTopic.isAnonymous ? 'bg-gray-400' : 'bg-brand-secondary'}`}>
+                                {currentTopic.isAdminPost ? <Icon name="Mountain" size={24} /> : currentTopic.isAnonymous ? <Icon name="Ghost" size={24} /> : currentTopic.author.charAt(0)}
+                            </div>
+                            <div>
+                                <div className="font-bold text-gray-800 dark:text-white flex items-center gap-1">
+                                    {currentTopic.author} {currentTopic.isAdminPost && <Icon name="CheckCircle" size={14} className="text-brand-primary" />}
+                                </div>
+                                <div className="text-xs text-gray-500">{formatDate(currentTopic.date)}</div>
+                            </div>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed text-lg">{currentTopic.content}</p>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-6 relative">
+                    {/* Replies List */}
+                    <div className="space-y-4 pl-0 md:pl-10">
+                        <h3 className="font-bold text-lg text-gray-700 dark:text-gray-300 mr-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                            תגובות ({currentTopic.replies ? currentTopic.replies.length : 0})
+                        </h3>
+                        {(!currentTopic.replies || currentTopic.replies.length === 0) && (
+                            <p className="text-gray-500 text-center py-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">אין תגובות עדיין. היו הראשונים להגיב!</p>
+                        )}
+                        {currentTopic.replies && currentTopic.replies.map((reply, idx) => (
+                            <div key={reply.id} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 relative">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="font-bold text-sm text-gray-800 dark:text-white flex items-center gap-1">
+                                        {reply.isAdminPost && <Icon name="ShieldCheck" size={14} className="text-brand-primary" />}
+                                        {reply.author}
+                                    </span>
+                                    <span className="text-xs text-gray-400">• {formatDate(reply.date)}</span>
+                                </div>
+                                <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed">{reply.content}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Add Reply Form */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-brand-primary/20 p-6 mt-8 relative pl-0 md:pl-10">
                         {!user && (
                             <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center rounded-2xl">
-                                <p className="text-lg font-bold text-brand-primary dark:text-white mb-3">יש להתחבר למערכת כדי לכתוב בפורום</p>
-                                <button onClick={() => setShowAuthModal(true)} className="bg-brand-primary text-white px-6 py-2 rounded-full font-bold">התחברות</button>
+                                <button onClick={() => setShowAuthModal(true)} className="bg-brand-primary text-white px-6 py-2 rounded-full font-bold">התחברו כדי להגיב</button>
                             </div>
                         )}
-                        <form onSubmit={handlePostSubmit}>
+                        <form onSubmit={handleAddReply}>
                             <textarea 
-                                value={newPostContent} onChange={e => setNewPostContent(e.target.value)}
-                                placeholder="שתפו את הקהילה בדילמה, הצלחה או שאלה..."
-                                className="w-full h-32 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 focus:ring-2 focus:ring-brand-primary focus:outline-none resize-none text-gray-800 dark:text-gray-100"
+                                value={newReplyContent} onChange={e => setNewReplyContent(e.target.value)} required
+                                placeholder="כתבו תגובה לנושא זה..."
+                                className="w-full h-24 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 focus:ring-2 focus:ring-brand-secondary outline-none resize-none text-gray-800 dark:text-white text-sm"
                             ></textarea>
-                            <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
-                                <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
-                                    <input type="checkbox" checked={isAnonymous} onChange={e => setIsAnonymous(e.target.checked)} className="w-4 h-4 text-brand-primary rounded" />
-                                    <Icon name="Ghost" size={16} /> פרסם כאנונימי
+                            <div className="flex flex-col sm:flex-row items-center justify-between mt-3 gap-3">
+                                <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+                                    <input type="checkbox" checked={isAnonymousReply} onChange={e => setIsAnonymousReply(e.target.checked)} className="rounded" /> פרסם כאנונימי
                                 </label>
-                                <button type="submit" disabled={isPublishing} className="bg-brand-secondary hover:bg-[#c15c3c] text-white px-8 py-2.5 rounded-full font-bold transition w-full sm:w-auto disabled:opacity-50 flex justify-center items-center gap-2">
-                                    {isPublishing ? <Icon name="RefreshCw" className="animate-spin" size={18} /> : null}
-                                    פרסם פוסט
+                                <button type="submit" disabled={isPublishing} className="bg-brand-primary hover:bg-brand-dark text-white px-6 py-2 rounded-full font-bold transition text-sm flex items-center gap-2">
+                                    {isPublishing ? <Icon name="RefreshCw" className="animate-spin" size={16} /> : <Icon name="MessageSquare" size={16}/>} שלח תגובה
                                 </button>
                             </div>
                         </form>
-                    </div>
-
-                    <div className="space-y-4">
-                        {posts.map(post => (
-                            <div key={post.id} className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border p-6 transition-colors ${post.isAdminPost ? 'border-brand-primary/50 bg-brand-light/50 dark:bg-brand-dark/20' : 'border-gray-100 dark:border-gray-700'}`}>
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${post.isAdminPost ? 'bg-brand-primary' : post.isAnonymous ? 'bg-gray-400' : 'bg-brand-secondary'}`}>
-                                            {post.isAdminPost ? <Icon name="Mountain" size={20} /> : post.isAnonymous ? <Icon name="Ghost" size={20} /> : post.author.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1">
-                                                {post.author} 
-                                                {post.isAdminPost && <Icon name="CheckCircle" size={14} className="text-brand-primary" title="צוות הנהלה" />}
-                                            </h4>
-                                            <span className="text-xs text-gray-500">{formatDate(post.date)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">{post.content}</p>
-                            </div>
-                        ))}
-                        {posts.length === 0 && (
-                            <p className="text-center text-gray-500 py-10">אין הודעות עדיין בפורום. תהיו הראשונים לכתוב!</p>
-                        )}
                     </div>
                 </div>
             );
@@ -639,7 +755,6 @@ function doGet(e) {
         const YoutubePage = ({ onFileInteract, ytChannelId }) => {
             const [videos, setVideos] = React.useState([]);
             const [loading, setLoading] = React.useState(true);
-            const [error, setError] = React.useState(null);
 
             React.useEffect(() => {
                 const fetchYouTubeRss = async () => {
@@ -656,8 +771,8 @@ function doGet(e) {
                                 id: `yt_${idx}`, name: item.title, url: item.link, thumbnail: item.thumbnail, date: item.pubDate.split(' ')[0], type: 'youtube'
                             }));
                             setVideos(mappedVideos);
-                        } else { throw new Error("לא הצלחנו למשוך את הסרטונים."); }
-                    } catch (err) { setError(err.message); }
+                        }
+                    } catch (err) { console.log(err); }
                     setLoading(false);
                 };
                 fetchYouTubeRss();
@@ -672,24 +787,22 @@ function doGet(e) {
                     </div>
 
                     {loading ? <div className="text-center py-12"><Icon name="RefreshCw" className="animate-spin mx-auto text-red-500 mb-4" size={32}/> טוען סרטונים...</div> : 
-                     error ? <div className="text-center py-12 text-gray-500">יש להגדיר מזהה ערוץ יוטיוב תקין בממשק המנהל.</div> : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {videos.map(video => (
                                 <div key={video.id} onClick={() => onFileInteract(video)} className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all cursor-pointer group flex flex-col">
-                                    <div className="relative aspect-video overflow-hidden">
-                                        <img src={video.thumbnail} alt={video.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <div className="relative aspect-video overflow-hidden bg-gray-200">
+                                        {video.thumbnail && <img src={video.thumbnail} alt={video.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                             <Icon name="PlayCircle" size={48} className="text-white" />
                                         </div>
                                     </div>
                                     <div className="p-5 flex-1 flex flex-col">
                                         <h3 className="font-bold text-gray-800 dark:text-gray-200 leading-tight mb-2 flex-1" dir="rtl">{video.name}</h3>
-                                        <span className="text-xs text-gray-500">{video.date}</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    )}
+                    }
                 </div>
             );
         };
@@ -730,7 +843,6 @@ function doGet(e) {
             );
         };
 
-
         // ----------------------------------------------------
         // Main App Component
         // ----------------------------------------------------
@@ -738,7 +850,6 @@ function doGet(e) {
             const [showSplash, setShowSplash] = React.useState(true);
             const [isDarkMode, setIsDarkMode] = React.useState(() => localStorage.getItem('darkMode') === 'true');
             
-            // App States
             const [user, setUser] = React.useState(() => {
                 const savedUser = localStorage.getItem('pisga_user');
                 return savedUser ? JSON.parse(savedUser) : null;
@@ -747,9 +858,9 @@ function doGet(e) {
                 const saved = localStorage.getItem('pisga_courses');
                 return saved ? JSON.parse(saved) : INITIAL_COURSES;
             });
-            const [forumPosts, setForumPosts] = React.useState(() => {
-                const saved = localStorage.getItem('pisga_forum_posts');
-                return saved ? JSON.parse(saved) : []; // Cloud fallback defaults to empty array until fetch
+            const [forumTopics, setForumTopics] = React.useState(() => {
+                const saved = localStorage.getItem('pisga_forum_topics');
+                return saved ? JSON.parse(saved) : INITIAL_FORUM_TOPICS;
             });
             const [ytChannelId, setYoutubeId] = React.useState(localStorage.getItem('pisga_yt_id') || "");
             
@@ -762,6 +873,8 @@ function doGet(e) {
             const [showAuthModal, setShowAuthModal] = React.useState(false);
             const [showPaymentModal, setShowPaymentModal] = React.useState(false);
             const [authName, setAuthName] = React.useState('');
+            const [authPass, setAuthPass] = React.useState('');
+            const [showPassField, setShowPassField] = React.useState(false);
 
             // Cloud DB State
             const [fbUser, setFbUser] = React.useState(null);
@@ -769,9 +882,16 @@ function doGet(e) {
             React.useEffect(() => { setTimeout(() => setShowSplash(false), 2000); }, []);
             React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('darkMode', isDarkMode); }, [isDarkMode]);
             React.useEffect(() => { localStorage.setItem('pisga_courses', JSON.stringify(courses)); }, [courses]);
-            
-            // Save local fallback just in case
-            React.useEffect(() => { if (!window.db) localStorage.setItem('pisga_forum_posts', JSON.stringify(forumPosts)); }, [forumPosts]);
+            React.useEffect(() => { if (!window.db) localStorage.setItem('pisga_forum_topics', JSON.stringify(forumTopics)); }, [forumTopics]);
+
+            // Reveal Password Field if Admin Name typed
+            React.useEffect(() => {
+                if(authName.includes('משה וולנר') || authName.includes('מנהל')) {
+                    setShowPassField(true);
+                } else {
+                    setShowPassField(false);
+                }
+            }, [authName]);
 
             // --- Cloud Setup (Firebase / Firestore) ---
             React.useEffect(() => {
@@ -795,40 +915,45 @@ function doGet(e) {
                     
                     const unsubscribe = window.FB.onAuthStateChanged(auth, setFbUser);
                     return () => unsubscribe();
-                } catch(e) {
-                    console.log("Cloud db not configured, falling back to local storage.", e);
-                }
+                } catch(e) { console.log("Cloud db not configured, falling back to local storage.", e); }
             }, []);
 
             // --- Fetch Posts from Cloud ---
             React.useEffect(() => {
                 if (!fbUser || !window.db) return;
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                
-                const q = window.FB.collection(window.db, 'artifacts', appId, 'public', 'data', 'forum_posts');
+                const q = window.FB.collection(window.db, 'artifacts', appId, 'public', 'data', 'forum_topics');
                 
                 const unsubscribe = window.FB.onSnapshot(q, (snapshot) => {
-                    const posts = [];
+                    const topics = [];
                     snapshot.forEach(doc => {
-                        posts.push({ dbId: doc.id, ...doc.data() });
+                        topics.push({ dbId: doc.id, ...doc.data() });
                     });
-                    // Sort descending by date
-                    posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    setForumPosts(posts);
-                }, (error) => {
-                    console.error("Cloud Error: ", error);
-                });
-                
+                    topics.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    setForumTopics(topics);
+                }, (error) => { console.error("Cloud Error: ", error); });
                 return () => unsubscribe();
             }, [fbUser]);
 
             const handleAuthSubmit = (e) => {
                 e.preventDefault();
-                const isAdmin = authName.includes("משה וולנר") || authName.includes("מנהל");
+                let isAdmin = false;
+                
+                // Secure Admin Check
+                if (showPassField) {
+                    if (authPass === ADMIN_PASSWORD) {
+                        isAdmin = true;
+                    } else {
+                        setAlertMessage({title: "שגיאת התחברות", text: "סיסמת מנהל שגויה."});
+                        return;
+                    }
+                }
+
                 const loggedUser = { name: authName || 'משתמש', isSubscribed: isAdmin, isAdmin: isAdmin };
                 localStorage.setItem('pisga_user', JSON.stringify(loggedUser));
                 setUser(loggedUser);
                 setShowAuthModal(false);
+                setAuthPass(''); // clear pass
                 setAlertMessage({title: "התחברת בהצלחה", text: `ברוך הבא, ${loggedUser.name}!`});
             };
 
@@ -858,44 +983,18 @@ function doGet(e) {
 
             const navItems = [
                 { id: 'home', label: 'ראשי', icon: 'Home' },
-                { id: 'explorer', label: 'קורסי המועדון', icon: 'FolderOpen' },
-                { id: 'forum', label: 'פורום תלמידים', icon: 'MessageSquare' },
-                { id: 'youtube', label: 'ספריית וידאו (חינם)', icon: 'Youtube' }
+                { id: 'explorer', label: 'קורסי המועדון (פרו)', icon: 'FolderOpen' },
+                { id: 'forum', label: 'פורום קהילתי', icon: 'MessageSquare' },
+                { id: 'youtube', label: 'תוכן חופשי', icon: 'Youtube' }
             ];
 
             const renderPage = () => {
-                if(currentPage === 'admin' && user?.isAdmin) return <AdminPage courses={courses} setCourses={setCourses} youtubeId={ytChannelId} setYoutubeId={setYoutubeId} forumPosts={forumPosts} setForumPosts={setForumPosts} />;
+                if(currentPage === 'admin' && user?.isAdmin) return <AdminPage forumTopics={forumTopics} setForumTopics={setForumTopics} setMessage={(msg) => setAlertMessage({title: "ניהול פנימי", text: msg})} />;
                 switch(currentPage) {
                     case 'explorer': return <ExplorerPage onFileInteract={setGlobalFile} user={user} setShowPayment={setShowPaymentModal} courses={courses} />;
-                    case 'forum': return <ForumPage user={user} setShowAuthModal={setShowAuthModal} posts={forumPosts} setPosts={setForumPosts} />;
+                    case 'forum': return <ForumPage user={user} setShowAuthModal={setShowAuthModal} topics={forumTopics} setTopics={setForumTopics} />;
                     case 'youtube': return <YoutubePage onFileInteract={setGlobalFile} ytChannelId={ytChannelId} />;
-                    default: 
-                        return (
-                            <div className="animate-fade-in space-y-16 relative max-w-6xl mx-auto">
-                                <div className="bg-gradient-to-br from-brand-primary to-brand-dark rounded-3xl shadow-2xl overflow-hidden relative text-white">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-brand-secondary/20 rounded-full blur-3xl -mr-20 -mt-20"></div>
-                                    <div className="p-8 md:p-16 text-center relative z-10 max-w-4xl mx-auto">
-                                        <Icon name="Mountain" size={64} className="mx-auto mb-6 text-brand-secondary" />
-                                        <h1 className="text-4xl md:text-6xl font-black mb-6 animate-fade-up">ברוכים הבאים לקהילת <span className="text-brand-secondary">"פסגה"</span></h1>
-                                        <h2 className="text-xl md:text-3xl font-bold text-gray-200 mb-8 animate-fade-up">בהובלת משה וולנר <span className="mx-2 opacity-50">|</span> מלווה עסקי למאמנים ומטפלים</h2>
-                                        <p className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed font-medium animate-fade-up max-w-2xl mx-auto">הקמתי את הקהילה כדי לתת בית מקצועי, כלים לצמיחה וגישה ישירה למאגר ידע איכותי.</p>
-                                        <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-up">
-                                            <button onClick={() => setShowPaymentModal(true)} className="bg-brand-secondary hover:bg-[#c15c3c] text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg flex items-center justify-center gap-2"><Icon name="Lock" size={20} /> הצטרפו עכשיו למועדון</button>
-                                            <button onClick={() => navigate('explorer')} className="bg-white/10 hover:bg-white/20 border border-white/30 text-white px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2"><Icon name="FolderOpen" size={20} /> צפייה בקורסים</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
-                                    {[{icon:'Target', title:'מיקוד עסקי', text:'כלים פרקטיים להפיכת הכישרון לעסק משגשג.'}, {icon:'Lightbulb', title:'מומחה יוצר', text:'יציאה מהקליניקה לבמה ובניית מוצרים.'}, {icon:'Users', title:'קהילה תומכת', text:'פורום קהילתי, סביבה מקצועית להתייעצות וצמיחה.'}].map((f,i) => (
-                                        <div key={i} className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 text-center">
-                                            <div className="bg-brand-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-primary dark:text-brand-secondary"><Icon name={f.icon} size={32} /></div>
-                                            <h3 className="text-xl font-bold text-brand-primary dark:text-white mb-2">{f.title}</h3>
-                                            <p className="text-gray-600 dark:text-gray-400">{f.text}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        );
+                    default: return <HomePage navigate={navigate} />;
                 }
             };
 
@@ -905,7 +1004,6 @@ function doGet(e) {
                     {alertMessage && <CustomMessageBox title={alertMessage.title} message={alertMessage.text} onClose={() => setAlertMessage(null)} />}
                     <GlobalFileViewer file={globalFile} onClose={() => setGlobalFile(null)} />
                     
-                    {/* Header */}
                     <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 border-b-4 border-brand-secondary">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="flex justify-between items-center h-20">
@@ -923,7 +1021,7 @@ function doGet(e) {
                                         ))}
                                         {user?.isAdmin && (
                                             <button onClick={() => navigate('admin')} className={`px-4 py-2 rounded-full flex items-center gap-2 font-bold transition-all text-sm ${currentPage === 'admin' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-200'}`}>
-                                                <Icon name="Settings" size={18} /> ממשק מנהל
+                                                <Icon name="Settings" size={18} /> ניהול
                                             </button>
                                         )}
                                     </nav>
@@ -947,29 +1045,35 @@ function doGet(e) {
                             </div>
                         </div>
 
-                        {/* Mobile Menu */}
                         {isMobileMenuOpen && (
                             <div className="lg:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 absolute w-full shadow-2xl pb-4 z-40">
                                 <div className="px-4 pt-4 pb-4 space-y-2">
                                     {navItems.map(item => (
                                         <button key={item.id} onClick={() => navigate(item.id)} className="w-full text-right px-4 py-3 rounded-xl flex items-center gap-3 font-bold text-gray-700 dark:text-gray-200"><Icon name={item.icon} size={20} /> {item.label}</button>
                                     ))}
-                                    {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right px-4 py-3 rounded-xl flex items-center gap-3 font-bold text-brand-primary"><Icon name="Settings" size={20} /> ממשק מנהל</button>}
+                                    {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right px-4 py-3 rounded-xl flex items-center gap-3 font-bold text-brand-primary"><Icon name="Settings" size={20} /> ניהול פורום</button>}
                                 </div>
                             </div>
                         )}
                     </header>
 
-                    {/* Modals */}
                     {showAuthModal && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
                             <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center relative shadow-2xl">
                                 <button onClick={() => setShowAuthModal(false)} className="absolute top-4 left-4 p-2 bg-gray-100 rounded-full"><Icon name="X" size={20} /></button>
                                 <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-primary"><Icon name="User" size={32} /></div>
-                                <h3 className="text-2xl font-bold mb-6">התחברות</h3>
+                                <h3 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">התחברות</h3>
                                 <form onSubmit={handleAuthSubmit} className="space-y-4">
-                                    <input type="text" required value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="הזן שם מלא (למנהל: 'משה וולנר')" className="w-full border rounded-xl px-4 py-3" />
-                                    <button type="submit" className="w-full bg-brand-primary text-white font-bold py-3 rounded-xl">היכנס</button>
+                                    <input type="text" required value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="הזן שם מלא" className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 bg-gray-50 dark:bg-gray-900 focus:border-brand-primary outline-none" />
+                                    
+                                    {showPassField && (
+                                        <div className="animate-fade-in">
+                                            <input type="password" required value={authPass} onChange={e=>setAuthPass(e.target.value)} placeholder="הזן סיסמת מנהל" className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 bg-brand-primary/5 focus:border-brand-primary outline-none" />
+                                            <p className="text-xs text-brand-secondary mt-2 font-bold text-right">דרושה סיסמת מנהל לצורך אימות.</p>
+                                        </div>
+                                    )}
+
+                                    <button type="submit" className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition">היכנס</button>
                                 </form>
                             </div>
                         </div>
@@ -978,23 +1082,20 @@ function doGet(e) {
                     {showPaymentModal && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 overflow-y-auto animate-fade-in">
                             <div className="relative w-full max-w-md my-8">
-                                <button onClick={() => setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 p-2 rounded-full"><Icon name="X" size={24} /></button>
+                                <button onClick={() => setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 hover:bg-white/40 p-2 rounded-full transition"><Icon name="X" size={24} /></button>
                                 <PayPalSubscription onSuccess={handlePaymentSuccess} />
                             </div>
                         </div>
                     )}
 
-                    {/* Main Content */}
-                    <main className="flex-1 w-full pb-16 pt-8 relative z-10 px-4">
+                    <main className="flex-1 w-full pb-16 pt-8 relative z-10">
                         {renderPage()}
                     </main>
 
-                    {/* WhatsApp Float */}
                     <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="whatsapp-float" title="הצטרפו לקבוצת הוואטסאפ">
                         <Icon name="MessageCircle" size={32} />
                     </a>
 
-                    {/* Footer */}
                     <footer className="bg-brand-dark text-white py-10 mt-auto">
                         <div className="max-w-7xl mx-auto px-4 text-center">
                             <h2 className="text-2xl font-black mb-2">קהילת פסגה</h2>
@@ -1006,17 +1107,12 @@ function doGet(e) {
             );
         };
 
-        // Render React only after the Cloud scripts are loaded
         const initReact = () => {
             const root = ReactDOM.createRoot(document.getElementById('root'));
             root.render(<App />);
         };
         
-        if (window.FB) {
-            initReact();
-        } else {
-            window.addEventListener('firebaseReady', initReact);
-        }
+        if (window.FB) { initReact(); } else { window.addEventListener('firebaseReady', initReact); }
     </script>
 </body>
 </html>
