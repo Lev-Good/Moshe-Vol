@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* Custom styles to hide views by default */
         .view-section {
@@ -56,7 +58,7 @@
                         </div>
                         <!-- Logged in state -->
                         <div id="nav-logged-in" class="hidden flex items-center gap-4">
-                            <span class="text-sm font-medium">שלום, תלמיד יקר</span>
+                            <span class="text-sm font-medium" id="user-greeting">שלום, תלמיד יקר</span>
                             <button onclick="handleLogout()" class="text-slate-500 hover:text-red-500" title="התנתק">
                                 <i class="fa-solid fa-right-from-bracket"></i>
                             </button>
@@ -174,23 +176,29 @@
                     </div>
 
                     <form onsubmit="handleLogin(event)" id="login-form" class="space-y-5">
+                        <div id="auth-name-field" class="hidden">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">שם מלא</label>
+                            <input type="text" id="auth-name" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="ישראל ישראלי">
+                        </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">כתובת אימייל</label>
-                            <input type="email" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="your@email.com">
+                            <input type="email" id="auth-email" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="your@email.com">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">סיסמה</label>
-                            <input type="password" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••">
+                            <input type="password" id="auth-password" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••">
                         </div>
 
-                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow-md">
+                        <div id="auth-error-msg" class="text-red-500 text-sm hidden font-medium text-center"></div>
+
+                        <button type="submit" id="auth-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow-md">
                             היכנס למערכת
                         </button>
                     </form>
 
-                    <!-- PayPal Registration Section -->
+                    <!-- Registration Options Section -->
                     <div id="register-section" class="hidden space-y-5">
-                        <p class="text-center text-sm font-medium text-slate-700 mb-4">כדי לקבל גישה לכל הוובינרים, יש להשלים את הרכישה (מנוי) דרך פייפאל.</p>
+                        <p class="text-center text-sm font-medium text-slate-700 mb-4">כדי לקבל גישה לכל הוובינרים, יש להשלים את הרכישה (מנוי) דרך פייפאל. לאחר התשלום תוכל להתחבר.</p>
                         
                         <div class="w-full flex flex-col justify-center gap-4">
                             <!-- Direct PayPal Link instead of Smart Button to prevent iframe errors -->
@@ -199,8 +207,8 @@
                                 לחץ כאן לתשלום ב-PayPal
                             </a>
                             
-                            <button type="button" onclick="handleLogin(event)" class="text-sm text-slate-500 hover:text-blue-600 underline text-center">
-                                * למטרת בדיקה בסביבה זו: לחץ כאן כדי לדמות תשלום מוצלח ולהיכנס
+                            <button type="button" onclick="handleLoginDemoMode(event)" class="text-sm text-slate-500 hover:text-blue-600 underline text-center">
+                                * למטרת בדיקה בסביבה זו: לחץ כאן כדי לדמות התחברות ללא תשלום
                             </button>
                         </div>
                     </div>
@@ -312,7 +320,7 @@
                         </div>
                         <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
                             <button type="button" onclick="showForumList()" class="px-6 py-2 rounded-lg text-slate-600 hover:bg-slate-100 font-medium">ביטול</button>
-                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-bold shadow-sm">פרסם דיון</button>
+                            <button type="submit" id="submit-post-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-bold shadow-sm">פרסם דיון</button>
                         </div>
                     </form>
                 </div>
@@ -362,11 +370,26 @@
         </div>
     </footer>
 
-    <!-- App Logic (Vanilla JS) -->
+    <!-- App Logic (Vanilla JS + Supabase) -->
     <script>
         document.getElementById('current-year').textContent = new Date().getFullYear();
 
-        // --- Mock Data ---
+        // ==========================================
+        // SUPABASE CONFIGURATION - עריכה נדרשת כאן!
+        // ==========================================
+        // כדי להפעיל את המסד האמיתי, הכנס את הנתונים מהפרויקט שלך ב-Supabase.
+        // כל עוד השורות האלו לא מעודכנות, המערכת תעבוד במצב 'הדגמה' (Mock).
+        const SUPABASE_URL = 'הכנס_כאן_את_ה_URL_שלך';
+        const SUPABASE_KEY = 'הכנס_כאן_את_ה_API_KEY_שלך';
+        
+        let supabaseClient = null;
+        if (SUPABASE_URL !== 'הכנס_כאן_את_ה_URL_שלך' && typeof supabase !== 'undefined') {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log("Supabase Client Initialized");
+        }
+        // ==========================================
+
+        // --- Mock Data (Fallback) ---
         const MOCK_CHAPTERS = [
             { id: 101, title: 'וובינר מספר 1 - הדיפלומה הנסתרת', duration: 'וובינר', link: 'https://drive.google.com/file/d/1Vriu7SyPzGt6lYEtU9HZZNmuXq2QYYH7/preview' },
             { id: 102, title: 'וובינר מספר 2 - פרדוקס היעילות', duration: 'וובינר', link: 'https://drive.google.com/file/d/1ryD7kd4GVKf189gJfm7AmpnG2KUhn8Ak/preview' },
@@ -385,30 +408,39 @@
         let forumPosts = [
             { 
                 id: 1, 
-                author: 'ישראל ישראלי', 
+                author_name: 'ישראל ישראלי', 
                 title: 'שאלה לגבי פרק 2 - טכניקות', 
                 content: 'שלום לכולם, לא כל כך הבנתי את ההסבר בדקה ה-15 לגבי היישום של הטכניקה. מישהו יכול לחדד?',
                 replies: [
-                    { id: 101, author: 'מנהל הקורס', content: 'היי ישראל, הכוונה שם היא קודם כל לבסס את היסודות לפני שקופצים לשלב הבא. תצפה שוב בדקה 12, זה מתקשר לשם.' },
-                    { id: 102, author: 'דוד כהן', content: 'גם לי הייתה את אותה הבעיה, תודה על ההסבר!' }
+                    { id: 101, author: 'מנהל הקורס', content: 'היי ישראל, הכוונה שם היא קודם כל לבסס את היסודות לפני שקופצים לשלב הבא.' }
                 ],
-                date: '10/05/2026'
-            },
-            { 
-                id: 2, 
-                author: 'אברהם לוי', 
-                title: 'שיתוף: הפרויקט הראשון שלי!', 
-                content: 'שמח לשתף שאחרי שבועיים בקורס הצלחתי לסיים את הפרויקט הראשון. תודה על התכנים המעולים!',
-                replies: [],
-                date: '12/05/2026'
+                created_at: new Date().toISOString()
             }
         ];
 
         // --- State ---
         let isLoggedIn = false;
+        let currentUser = null;
         let isLoginMode = true; // For Auth form
         let activeVideoId = MOCK_CHAPTERS[0].id;
         let currentPostId = null;
+
+        // --- Initialization ---
+        async function initApp() {
+            renderChapters();
+            renderFreeContent();
+            
+            if (supabaseClient) {
+                // בדיקה אם המשתמש כבר מחובר ממקודם
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    processSuccessfulLogin(session.user, session.user.email);
+                }
+                await fetchForumPostsFromDB();
+            } else {
+                renderForum(); // רנדור של נתוני ההדגמה
+            }
+        }
 
         // --- Navigation ---
         function navigateTo(viewId) {
@@ -417,14 +449,10 @@
                 return;
             }
 
-            // Hide all views
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            
-            // Show target view
             const target = document.getElementById(`view-${viewId}`);
             if (target) target.classList.add('active');
 
-            // Update Nav colors
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 if(btn.dataset.target === viewId) {
                     btn.classList.add('text-blue-600');
@@ -435,13 +463,12 @@
                 }
             });
 
-            // Close mobile menu if open
             document.getElementById('mobile-menu').classList.add('hidden');
             
-            // Reset forum view to list if navigating to forum
             if(viewId === 'forum') {
                 showForumList();
-                renderForum();
+                if (supabaseClient) fetchForumPostsFromDB();
+                else renderForum();
             }
 
             window.scrollTo(0, 0);
@@ -464,27 +491,85 @@
         // --- Authentication ---
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').textContent = isLoginMode ? 'כניסת תלמידים' : 'הרשמה ותשלום';
-            document.getElementById('auth-subtitle').textContent = isLoginMode ? 'הזן את פרטי ההתחברות שלך כדי לגשת לתכנים הסגורים.' : 'רכוש עכשיו מנוי כדי לגשת לכל הוובינרים.';
+            document.getElementById('auth-title').textContent = isLoginMode ? 'כניסת תלמידים' : 'השלמת הרשמה (לאחר תשלום)';
+            document.getElementById('auth-subtitle').textContent = isLoginMode ? 'הזן את אימייל והסיסמה כדי לגשת לתכנים הסגורים.' : 'צור את החשבון שלך כעת.';
             document.getElementById('auth-toggle-text').textContent = isLoginMode ? 'עדיין אין לך חשבון? ' : 'כבר רשום למערכת? ';
             document.getElementById('auth-toggle-btn').textContent = isLoginMode ? 'לחץ כאן להרשמה ותשלום' : 'לחץ כאן להתחברות';
-            
-            const loginForm = document.getElementById('login-form');
+            document.getElementById('auth-error-msg').classList.add('hidden');
+            document.getElementById('auth-submit-btn').textContent = isLoginMode ? 'היכנס למערכת' : 'צור חשבון';
+
+            const nameField = document.getElementById('auth-name-field');
             const registerSection = document.getElementById('register-section');
             if(isLoginMode) {
-                loginForm.classList.remove('hidden');
+                nameField.classList.add('hidden');
                 registerSection.classList.add('hidden');
+                document.getElementById('auth-name').removeAttribute('required');
             } else {
-                loginForm.classList.add('hidden');
+                nameField.classList.remove('hidden');
                 registerSection.classList.remove('hidden');
+                document.getElementById('auth-name').setAttribute('required', 'true');
             }
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
-            isLoggedIn = true;
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const name = document.getElementById('auth-name').value || 'תלמיד יקר';
+            const errorMsg = document.getElementById('auth-error-msg');
+            const submitBtn = document.getElementById('auth-submit-btn');
             
-            // Update UI for logged in state
+            errorMsg.classList.add('hidden');
+
+            if (!supabaseClient) {
+                // === מצב הדגמה (ללא סופאבייס) ===
+                alert("שים לב: האתר במצב הדגמה כי לא הוגדרו מפתחות Supabase. מחבר אותך ללא שמירה בענן...");
+                processSuccessfulLogin({ id: 'mock-id' }, name);
+                return;
+            }
+
+            // === חיבור אמיתי ל-Supabase ===
+            submitBtn.textContent = 'טוען...';
+            submitBtn.disabled = true;
+
+            try {
+                if (isLoginMode) {
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    processSuccessfulLogin(data.user, email);
+                } else {
+                    // הרשמה (Sign Up)
+                    const { data, error } = await supabaseClient.auth.signUp({
+                        email, 
+                        password,
+                        options: { data: { display_name: name } }
+                    });
+                    if (error) throw error;
+                    alert('חשבון נוצר בהצלחה! (ייתכן שנדרש אימות במייל, תלוי בהגדרות ה-Supabase שלך)');
+                    processSuccessfulLogin(data.user, name);
+                }
+            } catch (error) {
+                errorMsg.textContent = 'שגיאה: ' + (error.message.includes('Invalid login') ? 'פרטים שגויים' : error.message);
+                errorMsg.classList.remove('hidden');
+            } finally {
+                submitBtn.textContent = isLoginMode ? 'היכנס למערכת' : 'צור חשבון';
+                submitBtn.disabled = false;
+            }
+        }
+
+        function handleLoginDemoMode(e) {
+            e.preventDefault();
+            const name = document.getElementById('auth-name').value || 'תלמיד יקר (הדגמה)';
+            processSuccessfulLogin({ id: 'demo' }, name);
+        }
+
+        function processSuccessfulLogin(userObj, displayName) {
+            isLoggedIn = true;
+            currentUser = userObj;
+            
+            const nameToDisplay = userObj?.user_metadata?.display_name || displayName || 'תלמיד יקר';
+            document.getElementById('user-greeting').textContent = `שלום, ${nameToDisplay}`;
+            
             document.querySelectorAll('.auth-required').forEach(el => el.classList.remove('hidden'));
             document.querySelectorAll('.auth-hidden').forEach(el => el.classList.add('hidden'));
             
@@ -497,10 +582,14 @@
             navigateTo('paid-courses');
         }
 
-        function handleLogout() {
-            isLoggedIn = false;
+        async function handleLogout() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+            }
             
-            // Update UI for logged out state
+            isLoggedIn = false;
+            currentUser = null;
+            
             document.querySelectorAll('.auth-required').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.auth-hidden').forEach(el => el.classList.remove('hidden'));
             
@@ -577,7 +666,24 @@
             `).join('');
         }
 
-        // --- Forum Logic ---
+        // --- Forum Logic (Supabase + Vanilla) ---
+        
+        async function fetchForumPostsFromDB() {
+            if (!supabaseClient) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('forum_posts')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                if (data) forumPosts = data;
+                renderForum();
+            } catch (err) {
+                console.error("Error fetching posts:", err);
+            }
+        }
+
         function showForumList() {
             document.getElementById('forum-list-container').classList.remove('hidden');
             document.getElementById('forum-form-container').classList.add('hidden');
@@ -593,19 +699,23 @@
 
         function showPostDetails(id) {
             currentPostId = id;
-            const post = forumPosts.find(p => p.id === id);
+            const post = forumPosts.find(p => p.id == id);
+            if(!post) return;
             
+            const dateStr = new Date(post.created_at).toLocaleDateString('he-IL');
+            const repliesArray = post.replies || []; // יכול להיות מערך JSON
+
             document.getElementById('sp-title').textContent = post.title;
-            document.getElementById('sp-author').textContent = post.author;
-            document.getElementById('sp-date').textContent = post.date;
+            document.getElementById('sp-author').textContent = post.author_name || 'אנונימי';
+            document.getElementById('sp-date').textContent = dateStr;
             document.getElementById('sp-content').textContent = post.content;
-            document.getElementById('sp-replies-count').textContent = post.replies.length;
+            document.getElementById('sp-replies-count').textContent = repliesArray.length;
 
             const repliesContainer = document.getElementById('sp-replies-list');
-            if(post.replies.length === 0) {
+            if(repliesArray.length === 0) {
                 repliesContainer.innerHTML = `<div class="text-center text-slate-500 py-6 bg-slate-50 rounded-lg border border-slate-100">אין עדיין תגובות. היה הראשון להגיב!</div>`;
             } else {
-                repliesContainer.innerHTML = post.replies.map(reply => `
+                repliesContainer.innerHTML = repliesArray.map(reply => `
                     <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 flex gap-4">
                        <div class="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 flex-shrink-0">
                          <i class="fa-solid fa-user"></i>
@@ -625,43 +735,71 @@
 
         function renderForum() {
             const list = document.getElementById('forum-posts-list');
+            if (forumPosts.length === 0) {
+                list.innerHTML = '<div class="p-8 text-center text-slate-500">אין עדיין דיונים בפורום.</div>';
+                return;
+            }
+
             list.innerHTML = forumPosts.map((post, index) => {
                 const borderClass = index !== forumPosts.length - 1 ? 'border-b border-slate-100' : '';
+                const dateStr = new Date(post.created_at).toLocaleDateString('he-IL');
+                const repliesCount = post.replies ? post.replies.length : 0;
+
                 return `
-                    <div onclick="showPostDetails(${post.id})" class="p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 cursor-pointer hover:bg-slate-50 transition ${borderClass}">
+                    <div onclick="showPostDetails('${post.id}')" class="p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 cursor-pointer hover:bg-slate-50 transition ${borderClass}">
                         <div>
                             <h3 class="text-lg font-bold text-blue-700 hover:underline mb-1">${post.title}</h3>
                             <div class="flex items-center gap-2 text-sm text-slate-500">
-                                <i class="fa-solid fa-user text-xs"></i> <span>${post.author}</span>
+                                <i class="fa-solid fa-user text-xs"></i> <span>${post.author_name || 'אנונימי'}</span>
                                 <span>•</span>
-                                <span>${post.date}</span>
+                                <span>${dateStr}</span>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 text-slate-500 text-sm bg-slate-100 px-3 py-1 rounded-full self-start sm:self-auto">
                             <i class="fa-regular fa-message"></i>
-                            <span>${post.replies.length} תגובות</span>
+                            <span>${repliesCount} תגובות</span>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        function handleCreatePost(e) {
+        async function handleCreatePost(e) {
             e.preventDefault();
             const titleInput = document.getElementById('new-post-title');
             const contentInput = document.getElementById('new-post-content');
+            const btn = document.getElementById('submit-post-btn');
             
+            const authorName = currentUser?.user_metadata?.display_name || document.getElementById('auth-name').value || 'תלמיד';
+
             const newPost = {
-                id: Date.now(),
-                author: 'תלמיד יקר', // Simplified for demo
                 title: titleInput.value,
                 content: contentInput.value,
-                replies: [],
-                date: new Date().toLocaleDateString('he-IL')
+                author_name: authorName,
+                replies: []
             };
 
-            forumPosts.unshift(newPost); // Add to beginning
-            
+            btn.disabled = true;
+            btn.textContent = 'שומר...';
+
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.from('forum_posts').insert([newPost]).select();
+                    if (error) throw error;
+                    // הצלחה
+                    forumPosts.unshift(data[0]); 
+                } catch (err) {
+                    alert('שגיאה בשמירת הפוסט: ' + err.message);
+                }
+            } else {
+                // מצב הדגמה
+                newPost.id = Date.now();
+                newPost.created_at = new Date().toISOString();
+                forumPosts.unshift(newPost); 
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'פרסם דיון';
             titleInput.value = '';
             contentInput.value = '';
             
@@ -669,27 +807,42 @@
             renderForum();
         }
 
-        function handleAddReply(e) {
+        async function handleAddReply(e) {
             e.preventDefault();
             const replyInput = document.getElementById('new-reply-content');
             const content = replyInput.value;
+            const authorName = currentUser?.user_metadata?.display_name || document.getElementById('auth-name').value || 'תלמיד';
 
-            const post = forumPosts.find(p => p.id === currentPostId);
-            post.replies.push({
-                id: Date.now(),
-                author: 'תלמיד יקר', // Simplified for demo
-                content: content
-            });
+            const postIndex = forumPosts.findIndex(p => p.id == currentPostId);
+            if (postIndex === -1) return;
+            
+            const post = forumPosts[postIndex];
+            const newReplies = [...(post.replies || []), { id: Date.now(), author: authorName, content: content }];
+
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('forum_posts')
+                        .update({ replies: newReplies })
+                        .eq('id', currentPostId);
+                    
+                    if (error) throw error;
+                    post.replies = newReplies; // עדכון הזיכרון המקומי
+                } catch (err) {
+                    alert('שגיאה בהוספת תגובה: ' + err.message);
+                    return;
+                }
+            } else {
+                 post.replies = newReplies;
+            }
 
             replyInput.value = '';
-            showPostDetails(currentPostId); // Re-render the details view
-            renderForum(); // Update list in background for comment count
+            showPostDetails(currentPostId); 
+            renderForum(); 
         }
 
-        // --- Initialization ---
-        renderChapters();
-        renderFreeContent();
-        renderForum();
+        // Start the App
+        initApp();
 
     </script>
 </body>
