@@ -14,7 +14,7 @@ import {
 
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot } from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, updateDoc, arrayUnion, deleteDoc } from 'firebase/firestore';
 
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 const app = initializeApp(firebaseConfig);
@@ -31,6 +31,21 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [forumPosts, setForumPosts] = useState([]);
   const [newPostTitle, setNewPostTitle] = useState('');
+  
+  // New States for finishing the app
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [replyText, setReplyText] = useState('');
+  const [activeLesson, setActiveLesson] = useState(0);
+
+  // Course Data (Mock YouTube Videos)
+  const lessonsData = [
+    { title: 'מבוא והיכרות', videoId: '7X8II6JMrYA' },
+    { title: 'יסודות השיטה', videoId: 'EngW7tHUls8' },
+    { title: 'שלב 1: הבסיס', videoId: 'J---aiyznGQ' },
+    { title: 'שלב 2: התקדמות', videoId: 'tPEE9ZwTmy0' },
+    { title: 'סיכום ומשימות', videoId: 'dQw4w9WgXcQ' }
+  ];
 
   // Firebase Init & Auth
   React.useEffect(() => {
@@ -59,16 +74,19 @@ export default function App() {
     if (!user) {
       setForumPosts([]);
       setIsPremium(false);
+      setIsAdmin(false);
       return;
     }
 
-    // 1. Listen to Premium Status
+    // 1. Listen to Premium Status & Admin Role
     const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
     const unsubscribeProfile = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
         setIsPremium(docSnap.data().isPremium || false);
+        setIsAdmin(docSnap.data().role === 'admin');
       } else {
         setIsPremium(false);
+        setIsAdmin(false);
       }
     }, (err) => console.error("Profile listener error:", err));
 
@@ -126,13 +144,54 @@ export default function App() {
       await addDoc(forumRef, {
         title: newPostTitle,
         author: "תלמיד (אנונימי)",
-        replies: 0,
+        repliesCount: 0,
+        replies: [],
         timestamp: Date.now()
       });
       setNewPostTitle('');
     } catch (err) {
       console.error("Error creating post:", err);
     }
+  };
+
+  // Add Reply to a Post
+  const handleAddReply = async (postId) => {
+    if (!user || !replyText.trim()) return;
+    try {
+      const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'forum_posts', postId);
+      const postToUpdate = forumPosts.find(p => p.id === postId);
+      
+      await updateDoc(postRef, {
+        replies: arrayUnion({
+          text: replyText,
+          author: isAdmin ? "מנהל המערכת" : "תלמיד",
+          timestamp: Date.now()
+        }),
+        repliesCount: (postToUpdate?.repliesCount || 0) + 1
+      });
+      setReplyText('');
+    } catch (err) {
+      console.error("Error adding reply:", err);
+    }
+  };
+
+  // Delete Post (Admin Only)
+  const handleDeletePost = async (postId, e) => {
+    if (e) e.stopPropagation();
+    if (!isAdmin) return;
+    try {
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'forum_posts', postId));
+      if (selectedPost?.id === postId) setSelectedPost(null);
+    } catch (err) {
+      console.error("Error deleting post:", err);
+    }
+  };
+
+  // Secret Toggle for testing Admin mode
+  const toggleAdmin = async () => {
+    if (!user) return;
+    const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
+    await setDoc(profileRef, { role: isAdmin ? 'user' : 'admin' }, { merge: true });
   };
 
   // Navbar Component
@@ -161,7 +220,13 @@ export default function App() {
             
             {isLoggedIn ? (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-300">שלום, תלמיד</span>
+            {isAdmin && <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-bold">מנהל</span>}
+            <span 
+              className="text-sm text-slate-300 cursor-pointer select-none" 
+              onDoubleClick={toggleAdmin} 
+              title="לחיצה כפולה להפיכה למנהל (לצורך בדיקה)">
+              שלום, תלמיד
+            </span>
             <button 
               onClick={handleLogout}
               className="text-sm text-red-400 hover:text-red-300"
@@ -298,16 +363,27 @@ export default function App() {
       <p className="text-slate-600 mb-8">סרטונים נבחרים מתוך ערוץ היוטיוב. ללמידה מעמיקה, מומלץ להירשם לקורס המלא.</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((item) => (
-          <div key={item} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="aspect-video bg-slate-200 relative flex items-center justify-center">
-              <PlayCircle size={48} className="text-slate-400" />
-              <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition cursor-pointer"></div>
+        {[
+          { id: '1', title: 'איך להתחיל נכון', videoId: 'dQw4w9WgXcQ' },
+          { id: '2', title: 'טעות נפוצה שכולם עושים', videoId: 'tPEE9ZwTmy0' },
+          { id: '3', title: 'הסוד להצלחה מהירה', videoId: 'J---aiyznGQ' }
+        ].map((item) => (
+          <div key={item.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="aspect-video bg-slate-200 relative">
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src={`https://www.youtube.com/embed/${item.videoId}`} 
+                title={item.title}
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen>
+              </iframe>
             </div>
             <div className="p-4">
-              <h3 className="font-bold text-lg mb-2">סרטון הדרכה מספר {item}</h3>
+              <h3 className="font-bold text-lg mb-2">{item.title}</h3>
               <p className="text-slate-500 text-sm mb-4">הסבר קצר על מה שנלמד בסרטון זה מתוך ערוץ היוטיוב הרשמי.</p>
-              <button className="text-blue-600 text-sm font-medium hover:underline">צפה ביוטיוב</button>
+              <button onClick={() => navigate('premium')} className="text-amber-600 text-sm font-medium hover:underline">למעבר לקורס המלא</button>
             </div>
           </div>
         ))}
@@ -372,11 +448,14 @@ export default function App() {
         <div className="w-full md:w-80 bg-white rounded-xl shadow-sm border border-slate-200 p-4 overflow-y-auto flex-shrink-0">
           <h3 className="font-bold text-lg mb-4 text-slate-800 border-b pb-2">תוכן הקורס</h3>
           <div className="space-y-2">
-            {['מבוא והיכרות', 'יסודות השיטה', 'שלב 1: הבסיס', 'שלב 2: התקדמות', 'סיכום ומשימות'].map((lesson, idx) => (
-              <button key={idx} className={`w-full text-right p-3 rounded-lg flex items-center justify-between transition ${idx === 0 ? 'bg-amber-50 text-amber-700 font-medium' : 'hover:bg-slate-50 text-slate-600'}`}>
+            {lessonsData.map((lesson, idx) => (
+              <button 
+                key={idx} 
+                onClick={() => setActiveLesson(idx)}
+                className={`w-full text-right p-3 rounded-lg flex items-center justify-between transition ${idx === activeLesson ? 'bg-amber-50 text-amber-700 font-medium' : 'hover:bg-slate-50 text-slate-600'}`}>
                 <div className="flex items-center gap-3">
-                  <PlayCircle size={18} />
-                  <span>{idx + 1}. {lesson}</span>
+                  <PlayCircle size={18} className={idx === activeLesson ? 'text-amber-500' : 'text-slate-400'} />
+                  <span>{idx + 1}. {lesson.title}</span>
                 </div>
               </button>
             ))}
@@ -385,16 +464,21 @@ export default function App() {
 
         {/* Video Player Area */}
         <div className="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-          <div className="aspect-video bg-slate-900 w-full relative flex items-center justify-center">
-             <div className="text-center text-white space-y-4">
-               <PlayCircle size={64} className="mx-auto opacity-50" />
-               <p>אזור ניגון הוידאו של הקורס</p>
-             </div>
+          <div className="aspect-video bg-black w-full relative">
+             <iframe 
+                width="100%" 
+                height="100%" 
+                src={`https://www.youtube.com/embed/${lessonsData[activeLesson].videoId}`} 
+                title={lessonsData[activeLesson].title}
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen>
+              </iframe>
           </div>
           <div className="p-6">
-            <h1 className="text-2xl font-bold mb-2">1. מבוא והיכרות</h1>
+            <h1 className="text-2xl font-bold mb-2">{activeLesson + 1}. {lessonsData[activeLesson].title}</h1>
             <p className="text-slate-600 leading-relaxed">
-              בשיעור זה נכיר את המושגים הבסיסיים ונתחיל להבין את הדרך שנעבור יחד בקורס. מומלץ להוריד את קבצי העזר המצורפים לפני הצפייה.
+              בשיעור זה נעמיק בנושא הנלמד. מומלץ לצפות מתחילתו ועד סופו ולהוריד את קבצי העזר במידה וצורפו.
             </p>
           </div>
         </div>
@@ -414,6 +498,11 @@ export default function App() {
       );
     }
 
+    const currentPost = selectedPost ? forumPosts.find(p => p.id === selectedPost.id) : null;
+    if (selectedPost && !currentPost) {
+       setSelectedPost(null); // Post was deleted
+    }
+
     return (
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
@@ -421,47 +510,117 @@ export default function App() {
             <h1 className="text-3xl font-bold text-slate-900">השולחן העגול</h1>
             <p className="text-slate-500">קהילת התלמידים של משה וול</p>
           </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-8 flex gap-2">
-          <input 
-            type="text" 
-            placeholder="הכנס נושא לדיון חדש..." 
-            value={newPostTitle}
-            onChange={(e) => setNewPostTitle(e.target.value)}
-            className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
-          />
-          <button 
-            onClick={handleCreatePost}
-            className="bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition"
-          >
-            פרסם נושא
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          {forumPosts.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">
-              <MessageCircle size={48} className="mx-auto text-slate-300 mb-4" />
-              <p>אין עדיין דיונים בפורום. תהיה הראשון שפותח דיון!</p>
-            </div>
-          ) : (
-            forumPosts.map((post) => (
-              <div key={post.id} className="bg-white p-5 rounded-xl border border-slate-200 hover:shadow-md transition cursor-pointer flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-lg text-blue-900 mb-1">{post.title}</h3>
-                  <div className="text-sm text-slate-500 flex items-center gap-2">
-                    <User size={14} /> נכתב ע"י: {post.author}
-                  </div>
-                </div>
-                <div className="flex flex-col items-center justify-center bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
-                  <span className="font-bold text-slate-700">{post.replies || 0}</span>
-                  <span className="text-xs text-slate-500">תגובות</span>
-                </div>
-              </div>
-            ))
+          {currentPost && (
+            <button onClick={() => setSelectedPost(null)} className="text-slate-500 hover:text-slate-800 flex items-center gap-2">
+              חזור לרשימת הדיונים &larr;
+            </button>
           )}
         </div>
+
+        {!currentPost ? (
+          <>
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-8 flex gap-2">
+              <input 
+                type="text" 
+                placeholder="הכנס נושא לדיון חדש..." 
+                value={newPostTitle}
+                onChange={(e) => setNewPostTitle(e.target.value)}
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+              />
+              <button 
+                onClick={handleCreatePost}
+                className="bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition"
+              >
+                פרסם נושא
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {forumPosts.length === 0 ? (
+                <div className="text-center py-12 text-slate-500">
+                  <MessageCircle size={48} className="mx-auto text-slate-300 mb-4" />
+                  <p>אין עדיין דיונים בפורום. תהיה הראשון שפותח דיון!</p>
+                </div>
+              ) : (
+                forumPosts.map((post) => (
+                  <div 
+                    key={post.id} 
+                    onClick={() => setSelectedPost(post)}
+                    className="bg-white p-5 rounded-xl border border-slate-200 hover:shadow-md transition cursor-pointer flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg text-blue-900 mb-1">{post.title}</h3>
+                      <div className="text-sm text-slate-500 flex items-center gap-2">
+                        <User size={14} /> נכתב ע"י: {post.author}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col items-center justify-center bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
+                        <span className="font-bold text-slate-700">{post.repliesCount || 0}</span>
+                        <span className="text-xs text-slate-500">תגובות</span>
+                      </div>
+                      {isAdmin && (
+                        <button onClick={(e) => handleDeletePost(post.id, e)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg" title="מחק פוסט">
+                          <X size={20} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+            {/* Active Post Details */}
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-2xl font-bold text-slate-900">{currentPost.title}</h2>
+                {isAdmin && (
+                  <button onClick={(e) => handleDeletePost(currentPost.id, e)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg" title="מחק פוסט">
+                    <X size={20} />
+                  </button>
+                )}
+              </div>
+              <div className="text-sm text-slate-500 flex items-center gap-2 mb-6">
+                <User size={16} /> נכתב ע"י: {currentPost.author} • {new Date(currentPost.timestamp).toLocaleDateString('he-IL')}
+              </div>
+              
+              {/* Replies List */}
+              <h3 className="font-bold text-lg border-b pb-2 mb-4">תגובות ({currentPost.replies?.length || 0})</h3>
+              <div className="space-y-4 mb-6">
+                {(!currentPost.replies || currentPost.replies.length === 0) ? (
+                  <p className="text-slate-500 italic">אין תגובות עדיין. היה הראשון להגיב!</p>
+                ) : (
+                  currentPost.replies.map((reply, idx) => (
+                    <div key={idx} className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                      <div className="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2">
+                        <User size={14}/> {reply.author}
+                      </div>
+                      <p className="text-slate-800">{reply.text}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Add Reply */}
+              <div className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
+                <input 
+                  type="text" 
+                  placeholder="הוסף תגובה..." 
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-slate-50"
+                />
+                <button 
+                  onClick={() => handleAddReply(currentPost.id)}
+                  className="bg-amber-500 text-slate-900 font-medium px-6 py-2 rounded-lg hover:bg-amber-400 transition"
+                >
+                  הגב
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
