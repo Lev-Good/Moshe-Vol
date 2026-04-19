@@ -8,8 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AVzkCndNLYwIWWPkbYTSJh934d8VF-qKy1eyRXLAnyaXK2keXd2qcJ5DFBR2otfGSSNjYvdOa_lh4gla&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
     <style>
         /* Custom styles to hide views by default */
         .view-section {
@@ -172,46 +170,10 @@
                             <i class="fa-solid fa-lock text-blue-600 text-2xl"></i>
                         </div>
                         <h2 id="auth-title" class="text-2xl font-bold text-slate-800">כניסת תלמידים</h2>
-                    <p id="auth-subtitle" class="text-slate-500 mt-2">הזן את פרטי ההתחברות שלך כדי לגשת לתכנים הסגורים.</p>
-                </div>
-
-                <form onsubmit="handleLogin(event)" id="login-form" class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">כתובת אימייל</label>
-                        <input type="email" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="your@email.com">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">סיסמה</label>
-                        <input type="password" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••">
+                        <p id="auth-subtitle" class="text-slate-500 mt-2">הזן את פרטי ההתחברות שלך כדי לגשת לתכנים הסגורים.</p>
                     </div>
 
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow-md">
-                        היכנס למערכת
-                    </button>
-                </form>
-
-                <!-- PayPal Registration Section -->
-                <div id="register-section" class="hidden space-y-5">
-                    <p class="text-center text-sm font-medium text-slate-700 mb-4">כדי לקבל גישה לכל הוובינרים, יש להשלים את הרכישה (מנוי) דרך פייפאל.</p>
-                    <div id="paypal-button-container-P-2H242596WM328212DNHQMPHI" class="w-full flex justify-center"></div>
-                    <div class="text-center mt-4">
-                        <a href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-2H242596WM328212DNHQMPHI" target="_blank" class="text-sm text-blue-600 hover:underline">לחץ כאן למעבר ישיר לעמוד התשלום</a>
-                    </div>
-                </div>
-
-                <div class="mt-6 text-center text-sm text-slate-600 border-t border-slate-100 pt-6">
-                    <span id="auth-toggle-text">עדיין אין לך חשבון? </span>
-                    <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-blue-600 font-bold hover:underline">לחץ כאן להרשמה ותשלום</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-                    <form onsubmit="handleLogin(event)" class="space-y-5">
-                        <div id="auth-name-field" class="hidden">
-                            <label class="block text-sm font-medium text-slate-700 mb-1">שם מלא</label>
-                            <input type="text" id="auth-name" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="ישראל ישראלי">
-                        </div>
+                    <form onsubmit="handleLogin(event)" id="login-form" class="space-y-5">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">כתובת אימייל</label>
                             <input type="email" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="your@email.com">
@@ -221,14 +183,31 @@
                             <input type="password" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••">
                         </div>
 
-                        <button type="submit" id="auth-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow-md">
+                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow-md">
                             היכנס למערכת
                         </button>
                     </form>
 
+                    <!-- PayPal Registration Section -->
+                    <div id="register-section" class="hidden space-y-5">
+                        <p class="text-center text-sm font-medium text-slate-700 mb-4">כדי לקבל גישה לכל הוובינרים, יש להשלים את הרכישה (מנוי) דרך פייפאל.</p>
+                        
+                        <div class="w-full flex flex-col justify-center gap-4">
+                            <!-- Direct PayPal Link instead of Smart Button to prevent iframe errors -->
+                            <a href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-2H242596WM328212DNHQMPHI" target="_blank" class="w-full bg-[#FFC439] hover:bg-[#F2BA36] text-slate-800 font-bold py-3 px-4 rounded-full flex items-center justify-center gap-2 transition shadow-md text-lg">
+                                <i class="fa-brands fa-paypal text-[#003087] text-xl"></i>
+                                לחץ כאן לתשלום ב-PayPal
+                            </a>
+                            
+                            <button type="button" onclick="handleLogin(event)" class="text-sm text-slate-500 hover:text-blue-600 underline text-center">
+                                * למטרת בדיקה בסביבה זו: לחץ כאן כדי לדמות תשלום מוצלח ולהיכנס
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="mt-6 text-center text-sm text-slate-600 border-t border-slate-100 pt-6">
                         <span id="auth-toggle-text">עדיין אין לך חשבון? </span>
-                        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-blue-600 font-bold hover:underline">לחץ כאן להרשמה</button>
+                        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-blue-600 font-bold hover:underline">לחץ כאן להרשמה ותשלום</button>
                     </div>
                 </div>
             </div>
@@ -254,12 +233,12 @@
                     </div>
 
                     <!-- Main Video Area -->
-                <div class="w-full lg:w-2/3 xl:w-3/4">
-                    <div class="bg-black aspect-video rounded-xl shadow-lg relative flex items-center justify-center overflow-hidden mb-6">
-                        <iframe id="video-iframe" class="absolute inset-0 w-full h-full" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                    </div>
-                    
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="w-full lg:w-2/3 xl:w-3/4">
+                        <div class="bg-black aspect-video rounded-xl shadow-lg relative flex items-center justify-center overflow-hidden mb-6">
+                            <iframe id="video-iframe" class="absolute inset-0 w-full h-full" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                             <h2 id="video-info-title" class="text-2xl font-bold text-slate-800 mb-2">פרק 1: מבוא ומושגי יסוד</h2>
                             <p class="text-slate-600">
                                 ברוכים הבאים לשיעור. כאן יופיע תיאור מפורט של השיעור הנוכחי, קישורים לקבצי עזר, סיכומים וכל חומר רלוונטי אחר שהתלמיד יצטרך בזמן הצפייה.
@@ -276,25 +255,19 @@
         </div>
 
         <!-- ================= FREE CONTENT VIEW ================= -->
-    <div id="view-free-content" class="view-section">
-        <div class="max-w-7xl mx-auto px-4 py-12">
-            <div class="text-center mb-12 max-w-2xl mx-auto">
-                <h1 class="text-4xl font-bold text-slate-800 mb-4">תכנים פתוחים בחינם</h1>
-                <p class="text-lg text-slate-600 mb-8">
-                    טעימה קטנה מהתכנים המעולים שלנו. צפו בסרטונים הנבחרים ישירות מערוץ היוטיוב שלנו, 
-                    ואם תרצו לקחת את זה לשלב הבא - הקורס המלא מחכה לכם!
-                </p>
-                <a href="https://www.youtube.com/@moshevol8942" target="_blank" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold text-xl transition shadow-lg">
-                    <i class="fa-brands fa-youtube text-2xl"></i>
-                    מעבר לערוץ היוטיוב הרשמי
-                </a>
-            </div>
-
-            <div id="free-videos-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Free videos injected via JS -->
-            </div>
-        </div>
-    </div>
+        <div id="view-free-content" class="view-section">
+            <div class="max-w-7xl mx-auto px-4 py-12">
+                <div class="text-center mb-12 max-w-2xl mx-auto">
+                    <h1 class="text-4xl font-bold text-slate-800 mb-4">תכנים פתוחים בחינם</h1>
+                    <p class="text-lg text-slate-600 mb-8">
+                        טעימה קטנה מהתכנים המעולים שלנו. צפו בסרטונים הנבחרים ישירות מערוץ היוטיוב שלנו, 
+                        ואם תרצו לקחת את זה לשלב הבא - הקורס המלא מחכה לכם!
+                    </p>
+                    <a href="https://www.youtube.com/@moshevol8942" target="_blank" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold text-xl transition shadow-lg">
+                        <i class="fa-brands fa-youtube text-2xl"></i>
+                        מעבר לערוץ היוטיוב הרשמי
+                    </a>
+                </div>
 
                 <div id="free-videos-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- Free videos injected via JS -->
@@ -394,22 +367,22 @@
         document.getElementById('current-year').textContent = new Date().getFullYear();
 
         // --- Mock Data ---
-    const MOCK_CHAPTERS = [
-        { id: 101, title: 'וובינר מספר 1 - הדיפלומה הנסתרת', duration: 'וובינר', link: 'https://drive.google.com/file/d/1Vriu7SyPzGt6lYEtU9HZZNmuXq2QYYH7/preview' },
-        { id: 102, title: 'וובינר מספר 2 - פרדוקס היעילות', duration: 'וובינר', link: 'https://drive.google.com/file/d/1ryD7kd4GVKf189gJfm7AmpnG2KUhn8Ak/preview' },
-        { id: 103, title: 'וובינר מספר 3 - מנישה למוצר', duration: 'וובינר', link: 'https://drive.google.com/file/d/1trpWtzIf9HtP82rJ7zoaYtvK77nsHuoJ/preview' },
-        { id: 104, title: 'וובינר מספר 4 - בניית הקפסולה', duration: 'וובינר', link: 'https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/preview' },
-        { id: 105, title: 'וובינר מספר 5 - שימוש בAI ומילון הכאב', duration: 'וובינר', link: 'https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/preview' },
-        { id: 106, title: 'וובינר מספר 6 - זיהוי וחסמי שיווק', duration: 'וובינר', link: 'https://drive.google.com/file/d/1ocgx7J3lP-o7hLfg2dtdMmvtltbe2d-9/preview' }
-    ];
+        const MOCK_CHAPTERS = [
+            { id: 101, title: 'וובינר מספר 1 - הדיפלומה הנסתרת', duration: 'וובינר', link: 'https://drive.google.com/file/d/1Vriu7SyPzGt6lYEtU9HZZNmuXq2QYYH7/preview' },
+            { id: 102, title: 'וובינר מספר 2 - פרדוקס היעילות', duration: 'וובינר', link: 'https://drive.google.com/file/d/1ryD7kd4GVKf189gJfm7AmpnG2KUhn8Ak/preview' },
+            { id: 103, title: 'וובינר מספר 3 - מנישה למוצר', duration: 'וובינר', link: 'https://drive.google.com/file/d/1trpWtzIf9HtP82rJ7zoaYtvK77nsHuoJ/preview' },
+            { id: 104, title: 'וובינר מספר 4 - בניית הקפסולה', duration: 'וובינר', link: 'https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/preview' },
+            { id: 105, title: 'וובינר מספר 5 - שימוש בAI ומילון הכאב', duration: 'וובינר', link: 'https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/preview' },
+            { id: 106, title: 'וובינר מספר 6 - זיהוי וחסמי שיווק', duration: 'וובינר', link: 'https://drive.google.com/file/d/1ocgx7J3lP-o7hLfg2dtdMmvtltbe2d-9/preview' }
+        ];
 
-    const MOCK_FREE_VIDEOS = [
-        { id: 1, title: 'הדרכות שיווק ומכירות', thumbnail: 'https://placehold.co/600x400/dc2626/ffffff?text=YouTube+Video+1' },
-        { id: 2, title: 'פיתוח עסקי מעשי', thumbnail: 'https://placehold.co/600x400/dc2626/ffffff?text=YouTube+Video+2' },
-        { id: 3, title: 'כלי AI ויעילות', thumbnail: 'https://placehold.co/600x400/dc2626/ffffff?text=YouTube+Video+3' }
-    ];
+        const MOCK_FREE_VIDEOS = [
+            { id: 1, title: 'הדרכות שיווק ומכירות', thumbnail: 'https://placehold.co/600x400/dc2626/ffffff?text=YouTube+Video+1' },
+            { id: 2, title: 'פיתוח עסקי מעשי', thumbnail: 'https://placehold.co/600x400/dc2626/ffffff?text=YouTube+Video+2' },
+            { id: 3, title: 'כלי AI ויעילות', thumbnail: 'https://placehold.co/600x400/dc2626/ffffff?text=YouTube+Video+3' }
+        ];
 
-    let forumPosts = [
+        let forumPosts = [
             { 
                 id: 1, 
                 author: 'ישראל ישראלי', 
@@ -489,25 +462,25 @@
         }
 
         // --- Authentication ---
-    function toggleAuthMode() {
-        isLoginMode = !isLoginMode;
-        document.getElementById('auth-title').textContent = isLoginMode ? 'כניסת תלמידים' : 'הרשמה ותשלום';
-        document.getElementById('auth-subtitle').textContent = isLoginMode ? 'הזן את פרטי ההתחברות שלך כדי לגשת לתכנים הסגורים.' : 'רכוש עכשיו מנוי כדי לגשת לכל הוובינרים.';
-        document.getElementById('auth-toggle-text').textContent = isLoginMode ? 'עדיין אין לך חשבון? ' : 'כבר רשום למערכת? ';
-        document.getElementById('auth-toggle-btn').textContent = isLoginMode ? 'לחץ כאן להרשמה ותשלום' : 'לחץ כאן להתחברות';
-        
-        const loginForm = document.getElementById('login-form');
-        const registerSection = document.getElementById('register-section');
-        if(isLoginMode) {
-            loginForm.classList.remove('hidden');
-            registerSection.classList.add('hidden');
-        } else {
-            loginForm.classList.add('hidden');
-            registerSection.classList.remove('hidden');
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').textContent = isLoginMode ? 'כניסת תלמידים' : 'הרשמה ותשלום';
+            document.getElementById('auth-subtitle').textContent = isLoginMode ? 'הזן את פרטי ההתחברות שלך כדי לגשת לתכנים הסגורים.' : 'רכוש עכשיו מנוי כדי לגשת לכל הוובינרים.';
+            document.getElementById('auth-toggle-text').textContent = isLoginMode ? 'עדיין אין לך חשבון? ' : 'כבר רשום למערכת? ';
+            document.getElementById('auth-toggle-btn').textContent = isLoginMode ? 'לחץ כאן להרשמה ותשלום' : 'לחץ כאן להתחברות';
+            
+            const loginForm = document.getElementById('login-form');
+            const registerSection = document.getElementById('register-section');
+            if(isLoginMode) {
+                loginForm.classList.remove('hidden');
+                registerSection.classList.add('hidden');
+            } else {
+                loginForm.classList.add('hidden');
+                registerSection.classList.remove('hidden');
+            }
         }
-    }
 
-    function handleLogin(e) {
+        function handleLogin(e) {
             e.preventDefault();
             isLoggedIn = true;
             
@@ -567,44 +540,44 @@
         }
 
         function selectVideo(id) {
-        activeVideoId = id;
-        const chapter = MOCK_CHAPTERS.find(c => c.id === id);
-        
-        const iframe = document.getElementById('video-iframe');
-        if(chapter.link) {
-            iframe.src = chapter.link;
+            activeVideoId = id;
+            const chapter = MOCK_CHAPTERS.find(c => c.id === id);
+            
+            const iframe = document.getElementById('video-iframe');
+            if(chapter.link) {
+                iframe.src = chapter.link;
+            }
+
+            document.getElementById('video-info-title').textContent = chapter.title;
+            renderChapters(); // Re-render to update active styling
         }
 
-        document.getElementById('video-info-title').textContent = chapter.title;
-        renderChapters(); // Re-render to update active styling
-    }
-
-    // --- Render Free Content ---
-    function renderFreeContent() {
-        const grid = document.getElementById('free-videos-grid');
-        grid.innerHTML = MOCK_FREE_VIDEOS.map(video => `
-            <div class="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden flex flex-col">
-                <div class="aspect-video relative cursor-pointer group">
-                    <img src="${video.thumbnail}" alt="${video.title}" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition">
-                        <i class="fa-brands fa-youtube text-white text-5xl opacity-80 group-hover:opacity-100 group-hover:scale-110 transition"></i>
+        // --- Render Free Content ---
+        function renderFreeContent() {
+            const grid = document.getElementById('free-videos-grid');
+            grid.innerHTML = MOCK_FREE_VIDEOS.map(video => `
+                <div class="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden flex flex-col">
+                    <div class="aspect-video relative cursor-pointer group">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition">
+                            <i class="fa-brands fa-youtube text-white text-5xl opacity-80 group-hover:opacity-100 group-hover:scale-110 transition"></i>
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4">${video.title}</h3>
+                        <p class="text-slate-600 text-sm mb-6 flex-grow">
+                            כנסו עכשיו לערוץ היוטיוב הרשמי כדי לצפות בהדרכות מלאות וטיפים בחינם.
+                        </p>
+                        <a href="https://www.youtube.com/@moshevol8942" target="_blank" class="w-full bg-red-50 text-red-700 font-bold py-3 rounded-lg border border-red-200 hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-2">
+                            צפה בערוץ היוטיוב
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">${video.title}</h3>
-                    <p class="text-slate-600 text-sm mb-6 flex-grow">
-                        כנסו עכשיו לערוץ היוטיוב הרשמי כדי לצפות בהדרכות מלאות וטיפים בחינם.
-                    </p>
-                    <a href="https://www.youtube.com/@moshevol8942" target="_blank" class="w-full bg-red-50 text-red-700 font-bold py-3 rounded-lg border border-red-200 hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-2">
-                        צפה בערוץ היוטיוב
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </a>
-                </div>
-            </div>
-        `).join('');
-    }
+            `).join('');
+        }
 
-    // --- Forum Logic ---
+        // --- Forum Logic ---
         function showForumList() {
             document.getElementById('forum-list-container').classList.remove('hidden');
             document.getElementById('forum-form-container').classList.add('hidden');
@@ -680,7 +653,7 @@
             
             const newPost = {
                 id: Date.now(),
-                author: document.getElementById('auth-name').value || 'תלמיד יקר',
+                author: 'תלמיד יקר', // Simplified for demo
                 title: titleInput.value,
                 content: contentInput.value,
                 replies: [],
@@ -704,7 +677,7 @@
             const post = forumPosts.find(p => p.id === currentPostId);
             post.replies.push({
                 id: Date.now(),
-                author: document.getElementById('auth-name').value || 'תלמיד יקר',
+                author: 'תלמיד יקר', // Simplified for demo
                 content: content
             });
 
@@ -714,33 +687,10 @@
         }
 
         // --- Initialization ---
-    renderChapters();
-    renderFreeContent();
-    renderForum();
+        renderChapters();
+        renderFreeContent();
+        renderForum();
 
-    // Render PayPal Button
-    if (typeof paypal !== 'undefined') {
-        paypal.Buttons({
-            style: {
-                shape: 'rect',
-                color: 'gold',
-                layout: 'vertical',
-                label: 'subscribe'
-            },
-            createSubscription: function(data, actions) {
-                return actions.subscription.create({
-                    /* Creates the subscription */
-                    plan_id: 'P-2H242596WM328212DNHQMPHI'
-                });
-            },
-            onApprove: function(data, actions) {
-                alert('תודה רבה! המנוי אושר בהצלחה. מספר אישור: ' + data.subscriptionID); 
-                // פעולת התחברות אוטומטית כהדגמה לאחר תשלום מוצלח
-                handleLogin({preventDefault: () => {}}); 
-            }
-        }).render('#paypal-button-container-P-2H242596WM328212DNHQMPHI');
-    }
-
-</script>
+    </script>
 </body>
 </html>
