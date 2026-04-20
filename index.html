@@ -33,7 +33,6 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
         body { transition: background-color 0.3s ease, color 0.3s ease, font-size 0.3s ease; }
@@ -111,23 +110,14 @@
         // ----------------------------------------------------
         // Configuration & Constants
         // ----------------------------------------------------
-        const ADMIN_PASSWORD = "פסגה2024"; 
         const WHATSAPP_LINK = "https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws";
-        const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@moshevol8942";
-
-        const CSV_URLS = {
-            ARTICLES: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT6OmRPxlNhfecg0vfv-jgnWAgHk9C2NcsLwutzb64KGnisPymHTR02K6LXJBU3fuz15nq9dQTdq3uE/pub?gid=1100608744&single=true&output=csv",
-            SCHEDULE: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT6OmRPxlNhfecg0vfv-jgnWAgHk9C2NcsLwutzb64KGnisPymHTR02K6LXJBU3fuz15nq9dQTdq3uE/pub?gid=1693315274&single=true&output=csv"
-        };
 
         const { 
-            Home, Folder, FolderOpen, FileText, FileVideo, FileAudio, Headphones,
-            Search, ChevronLeft, ChevronRight, Menu, X, BookOpen, Info, Clock, Calendar,
-            PlayCircle, ExternalLink, ShieldCheck, TrendingUp, History,
-            Mountain, User, LogOut, Lock, MessageCircle, RefreshCw,
-            MessageSquare, Trash2, Ghost, Youtube, CheckCircle, ArrowUp,
-            CreditCard, Target, Lightbulb, Settings, Plus, Crown, Unlock,
-            Accessibility, ZoomIn, ZoomOut, Underline, Type, Quote, Mail
+            Home, FileText, FileVideo, ChevronLeft, ChevronRight, Menu, X, Info,
+            PlayCircle, ExternalLink, ShieldCheck, TrendingUp, Mountain, User, 
+            LogOut, Lock, MessageCircle, RefreshCw, MessageSquare, Trash2, Ghost, 
+            Youtube, CheckCircle, ArrowUp, CreditCard, Settings, Plus, Crown, Unlock,
+            Accessibility, ZoomIn, ZoomOut, Underline, Type, Quote, Mail, BookOpen, Link
         } = lucide;
 
         const Icon = ({ name, size = 24, className = "" }) => {
@@ -147,69 +137,14 @@
             return <span ref={spanRef} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} />;
         };
 
-        const useCSVData = (url, mapRowFn, cacheKey) => {
-            const [data, setData] = React.useState(() => {
-                try { const cached = localStorage.getItem(cacheKey); return cached ? JSON.parse(cached) : []; } 
-                catch(e) { return []; }
-            });
-            const [loading, setLoading] = React.useState(data.length === 0);
-            const [error, setError] = React.useState(null);
-
-            React.useEffect(() => {
-                if (!window.Papa) return;
-                window.Papa.parse(url, {
-                    download: true, header: true, skipEmptyLines: true,
-                    complete: (results) => {
-                        try {
-                            const mapped = results.data.map(mapRowFn).filter(Boolean);
-                            setData(mapped);
-                            localStorage.setItem(cacheKey, JSON.stringify(mapped));
-                            setLoading(false);
-                        } catch (err) { setError(err.message); setLoading(false); }
-                    },
-                    error: (err) => { setError(err.message); setLoading(false); }
-                });
-            }, [url, cacheKey]);
-
-            return { data, loading, error };
-        };
-
-        const mapScheduleRow = (row, index) => {
-            const vals = Object.values(row);
-            const getVal = (keywords, fallbackIndex) => {
-                const foundKey = Object.keys(row).find(k => keywords.some(keyword => k.toLowerCase().includes(keyword)));
-                return foundKey ? row[foundKey] : vals[fallbackIndex];
-            };
-            return {
-                id: index, title: getVal(['כותרת', 'שם', 'נושא', 'title'], 0) || 'ללא כותרת',
-                date: getVal(['תאריך', 'date'], 1) || '', time: getVal(['שעה', 'זמן', 'time'], 2) || '',
-                description: getVal(['תיאור', 'פירוט', 'desc'], 3) || ''
-            };
-        };
-
-        const mapArticleRow = (row, index) => {
-            const vals = Object.values(row);
-            const getVal = (keywords, fallbackIndex) => {
-                const foundKey = Object.keys(row).find(k => keywords.some(keyword => k.toLowerCase().includes(keyword)));
-                return foundKey ? row[foundKey] : vals[fallbackIndex];
-            };
-            return {
-                id: index, title: getVal(['כותרת', 'שם', 'title'], 0) || 'ללא כותרת',
-                summary: getVal(['תקציר', 'תיאור', 'summary', 'תוכן'], 1) || '',
-                date: getVal(['תאריך', 'date'], 2) || '', url: getVal(['קישור', 'url', 'link'], 3) || '#'
-            };
-        };
-
         const INITIAL_COURSES = [
             {
-                id: "course_webinars", name: "סדרת הוובינרים המלאה", isFolder: true,
+                id: "course_webinars", name: "סדרת הוובינרים המלאה",
                 lessons: [
                     { id: "w1", name: "וובינר 1 - הדיפלומה הנסתרת", url: "https://drive.google.com/file/d/1Vriu7SyPzGt6lYEtU9HZZNmuXq2QYYH7/view", type: "video" },
                     { id: "w2", name: "וובינר 2 - פרדוקס היעילות", url: "https://drive.google.com/file/d/1ryD7kd4GVKf189gJfm7AmpnG2KUhn8Ak/view", type: "video" },
                     { id: "w3", name: "וובינר 3 - מנישה למוצר", url: "https://drive.google.com/file/d/1trpWtzIf9HtP82rJ7zoaYtvK77nsHuoJ/view", type: "video" },
-                    { id: "w4", name: "וובינר 4 - בניית הקפסולה", url: "https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/view", type: "video" },
-                    { id: "w5", name: "וובינר 5 - שימוש בAI ומילון הכאב", url: "https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/view", type: "video" },
-                    { id: "w6", name: "וובינר 6 - זיהוי וחסמי שיווק", url: "https://drive.google.com/file/d/1ocgx7J3lP-o7hLfg2dtdMmvtltbe2d-9/view", type: "video" }
+                    { id: "w4", name: "וובינר 4 - בניית הקפסולה", url: "https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/view", type: "video" }
                 ]
             }
         ];
@@ -229,33 +164,6 @@
                 <Icon name="Mountain" size={80} className="text-brand-primary mb-4 animate-pulse-soft" />
                 <h1 className="text-4xl font-black text-brand-primary">פסגה</h1>
                 <p className="text-brand-secondary font-bold">הבית העסקי למאמנים ומטפלים</p>
-            </div>
-        );
-
-        const DynamicLoader = ({ texts = ["טוען נתונים...", "מסנכרן מידע...", "מכין את התוכן...", "עוד רגע קט..."] }) => {
-            const [idx, setIdx] = React.useState(0);
-            React.useEffect(() => {
-                const interval = setInterval(() => setIdx(i => (i + 1) % texts.length), 2000);
-                return () => clearInterval(interval);
-            }, [texts.length]);
-
-            return (
-                <div className="flex flex-col items-center justify-center h-64 w-full animate-fade-in">
-                    <div className="relative w-16 h-16 flex items-center justify-center mb-6">
-                        <div className="absolute inset-0 border-4 border-brand-primary/20 rounded-full"></div>
-                        <div className="absolute inset-0 border-4 border-brand-secondary rounded-full border-t-transparent animate-spin"></div>
-                        <Icon name="RefreshCw" size={24} className="text-brand-primary" />
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-400 font-bold text-lg animate-pulse">{texts[idx]}</p>
-                </div>
-            );
-        };
-
-        const ErrorMsg = ({msg}) => (
-            <div className="flex flex-col items-center justify-center h-64 w-full text-red-500 animate-fade-in">
-                <Icon name="Info" size={48} className="mb-4 opacity-50" />
-                <p className="font-bold text-lg">שגיאה בטעינת הנתונים</p>
-                <p className="text-sm opacity-80">{msg}</p>
             </div>
         );
 
@@ -351,7 +259,7 @@
                     <h2 className="text-xl font-medium text-gray-600 dark:text-gray-400">הבית העסקי למאמנים ומטפלים בהובלת משה וולנר</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div onClick={() => navigate('explorer')} className="bg-gradient-to-br from-brand-primary to-brand-dark rounded-[2.5rem] p-10 text-white shadow-2xl hover:shadow-xl transition-all cursor-pointer group flex flex-col justify-between h-full transform hover:-translate-y-2">
+                    <div onClick={() => navigate('courses')} className="bg-gradient-to-br from-brand-primary to-brand-dark rounded-[2.5rem] p-10 text-white shadow-2xl hover:shadow-xl transition-all cursor-pointer group flex flex-col justify-between h-full transform hover:-translate-y-2">
                         <div className="flex flex-col items-center text-center">
                             <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-secondary transition-colors">
                                 <Icon name="Crown" size={40} className="text-brand-secondary group-hover:text-white" />
@@ -378,7 +286,7 @@
         );
 
         const AboutPage = () => (
-            <div className="max-w-4xl mx-auto space-y-12 pb-12 animate-fade-in">
+            <div className="max-w-4xl mx-auto space-y-12 pb-12 animate-fade-in px-4">
                 <div className="bg-white dark:bg-gray-800 rounded-[3rem] p-8 md:p-16 shadow-xl border border-gray-100 dark:border-gray-700 relative overflow-hidden text-center md:text-right flex flex-col md:flex-row gap-10 items-center">
                     <div className="absolute top-0 left-0 w-32 h-32 bg-brand-secondary/10 rounded-br-full"></div>
                     <div className="absolute bottom-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-tl-full"></div>
@@ -409,138 +317,102 @@
             </div>
         );
 
-        const ExplorerPage = ({ onFileInteract, user, setShowPayment, courses }) => {
-            const [currentFolder, setCurrentFolder] = React.useState(null); 
+        // ----------------------------------------------------
+        // Courses Page (Beautiful VOD style, no explorer)
+        // ----------------------------------------------------
+        const CoursesPage = ({ courses, user, onPlay, setShowPayment }) => {
+            const [selectedCourse, setSelectedCourse] = React.useState(null);
             const isSubscribed = user && user.isSubscribed;
-            const handleItemClick = (item, isCourseFolder) => {
-                if (isCourseFolder) { setCurrentFolder(item); } 
-                else { if (isSubscribed || user?.isAdmin) { onFileInteract(item); } else { setShowPayment(true); } }
+
+            const handleLessonClick = (lesson) => {
+                if (isSubscribed || user?.isAdmin) { onPlay(lesson); }
+                else { setShowPayment(true); }
             };
-            const items = currentFolder ? currentFolder.lessons : courses;
-            return (
-                <div className="max-w-6xl mx-auto p-4 min-h-[600px] flex flex-col">
-                    {!isSubscribed && !user?.isAdmin && (
-                        <div className="bg-brand-secondary/10 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 border border-brand-secondary/30">
-                            <span className="font-bold">צפייה בשיעורים דורשת מנוי פעיל במועדון.</span>
-                            <button onClick={() => setShowPayment(true)} className="bg-brand-secondary text-white px-6 py-2 rounded-xl text-sm font-bold shadow-md">פתיחת הגישה לקורסים</button>
-                        </div>
-                    )}
-                    <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-t-xl border-b flex items-center gap-2">
-                        <button onClick={() => setCurrentFolder(null)} className="font-bold text-brand-primary flex items-center gap-1"><Icon name="Home" size={18}/> ספרייה</button>
-                        {currentFolder && <><Icon name="ChevronLeft" size={16} /><span className="font-bold">{currentFolder.name}</span></>}
-                    </div>
-                    <div className="p-6 bg-white dark:bg-gray-800 rounded-b-xl border flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {items.map(item => (
-                            item.isFolder ? (
-                                <div key={item.id} onClick={() => handleItemClick(item, true)} className="flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border hover:border-brand-primary cursor-pointer transition">
-                                    <Icon name="Folder" className="text-brand-primary mb-4" size={56} />
-                                    <span className="font-black text-center">{item.name}</span>
-                                </div>
-                            ) : (
-                                <div key={item.id} onClick={() => handleItemClick(item, false)} className="p-5 bg-white dark:bg-gray-700 rounded-2xl border hover:shadow-md cursor-pointer relative flex flex-col h-full">
-                                    {(!isSubscribed && !user?.isAdmin) && <Icon name="Lock" size={16} className="absolute top-3 left-3 text-brand-secondary" />}
-                                    <Icon name={item.type === 'pdf' ? "FileText" : "PlayCircle"} size={24} className="mb-4 text-brand-primary" />
-                                    <span className="font-bold text-sm leading-tight flex-1">{item.name}</span>
-                                </div>
-                            )
-                        ))}
-                    </div>
-                </div>
-            );
-        };
 
-        const SchedulePage = () => {
-            const { data, loading, error } = useCSVData(CSV_URLS.SCHEDULE, mapScheduleRow, 'pisga_csv_schedule');
-            return (
-                <div className="space-y-6 animate-fade-in px-4">
-                    <div className="text-center mb-10">
-                        <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-3">לוח זמנים והדרכות</h2>
-                        <p className="text-gray-600 dark:text-gray-400">התעדכנו בשידורים החיים, הוובינרים והסדנאות הקרובות שלנו.</p>
-                    </div>
-                    <div className="grid gap-4 max-w-4xl mx-auto">
-                        {loading ? <DynamicLoader texts={["טוען לוח זמנים..."]} /> : data.length === 0 ? <p className="text-center text-gray-500">אין אירועים כרגע.</p> : data.map(item => (
-                            <div key={item.id} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row items-start md:items-center gap-6 hover:border-brand-secondary transition-colors">
-                                <div className="bg-brand-primary/10 text-brand-primary dark:text-brand-secondary rounded-xl p-4 flex flex-col items-center justify-center min-w-[100px] shrink-0">
-                                    <Icon name="Calendar" size={24} className="mb-1" />
-                                    <span className="font-bold">{item.date}</span>
-                                </div>
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 text-brand-secondary font-medium mb-1">
-                                        <Icon name="Clock" size={16} /> <span>בשעה {item.time}</span>
+            if (selectedCourse) {
+                return (
+                    <div className="max-w-5xl mx-auto p-4 animate-fade-in pb-12">
+                        <button onClick={() => setSelectedCourse(null)} className="mb-6 flex items-center gap-2 font-bold text-gray-500 hover:text-brand-primary transition bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 w-max">
+                            <Icon name="ChevronRight" /> חזרה לכל הקורסים
+                        </button>
+                        
+                        <div className="bg-white dark:bg-gray-800 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                            <div className="bg-gradient-to-r from-brand-primary to-brand-dark p-10 md:p-14 text-white relative">
+                                <Icon name="BookOpen" size={120} className="absolute left-10 top-1/2 -translate-y-1/2 opacity-10" />
+                                <h2 className="text-3xl md:text-5xl font-black mb-3 relative z-10 leading-tight">{selectedCourse.name}</h2>
+                                <p className="text-brand-light/80 text-lg font-bold flex items-center gap-2 relative z-10">
+                                    <Icon name="FileVideo" size={20} /> {selectedCourse.lessons.length} שיעורים בקורס זה
+                                </p>
+                            </div>
+                            
+                            <div className="p-6 md:p-10 bg-gray-50 dark:bg-gray-900 min-h-[400px]">
+                                {(!isSubscribed && !user?.isAdmin) && (
+                                    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 mb-8 border border-brand-secondary/30 shadow-sm relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-2 h-full bg-brand-secondary"></div>
+                                        <div className="flex items-center gap-4 z-10">
+                                            <div className="w-14 h-14 bg-brand-secondary/10 rounded-full flex items-center justify-center text-brand-secondary shrink-0"><Icon name="Lock" size={28} /></div>
+                                            <div>
+                                                <h4 className="font-black text-xl text-gray-800 dark:text-white">הקורס נעול לצפייה</h4>
+                                                <p className="text-gray-500 text-sm mt-1">דרוש מנוי מועדון פעיל כדי לפתוח את השיעורים.</p>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => setShowPayment(true)} className="bg-brand-secondary hover:bg-[#c15c3c] text-white px-8 py-3.5 rounded-xl font-bold shadow-md transition-all w-full sm:w-auto shrink-0 z-10">
+                                            פתיחת הגישה לקורסים
+                                        </button>
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{item.title}</h3>
-                                    <p className="text-gray-600 dark:text-gray-400">{item.description}</p>
+                                )}
+                                
+                                <div className="space-y-3">
+                                    {selectedCourse.lessons.map((lesson, idx) => (
+                                        <div key={lesson.id || idx} onClick={() => handleLessonClick(lesson)} className="group flex items-center p-4 md:p-5 bg-white dark:bg-gray-800 rounded-2xl hover:shadow-md transition-all cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-brand-primary/50 relative overflow-hidden">
+                                            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center shrink-0 ml-5 text-brand-primary dark:text-brand-secondary group-hover:bg-brand-primary group-hover:text-white transition-colors">
+                                                <Icon name="PlayCircle" size={24} />
+                                            </div>
+                                            <div className="flex-1">
+                                                <h4 className="font-bold text-lg text-gray-800 dark:text-gray-200 group-hover:text-brand-primary dark:group-hover:text-brand-secondary transition-colors" dir="rtl">{lesson.name}</h4>
+                                            </div>
+                                            {(!isSubscribed && !user?.isAdmin) ? (
+                                                <Icon name="Lock" size={20} className="text-gray-400 mr-4" />
+                                            ) : (
+                                                <div className="w-8 h-8 rounded-full bg-brand-primary/5 flex items-center justify-center text-brand-primary opacity-0 group-hover:opacity-100 transition-opacity mr-4">
+                                                    <Icon name="ChevronLeft" size={20} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        ))}
+                        </div>
                     </div>
-                </div>
-            );
-        };
-
-        const ArticlesPage = () => {
-            const { data, loading, error } = useCSVData(CSV_URLS.ARTICLES, mapArticleRow, 'pisga_csv_articles');
-            return (
-                <div className="space-y-8 animate-fade-in px-4">
-                    <div className="text-center mb-10">
-                        <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-3">מאמרים וכלים עסקיים</h2>
-                        <p className="text-gray-600 dark:text-gray-400">ידע מקצועי וערכי להעמקת הפעילות העסקית בקליניקה שלכם.</p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {loading ? <DynamicLoader texts={["טוען מאמרים..."]} /> : data.length === 0 ? <p className="text-center text-gray-500 col-span-full">אין מאמרים כרגע.</p> : data.map(article => (
-                            <div key={article.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
-                                <div className="h-2 bg-brand-secondary w-full"></div>
-                                <div className="p-6 flex-1 flex flex-col">
-                                    <span className="text-xs text-gray-400 dark:text-gray-500 mb-2 block">{article.date}</span>
-                                    <h3 className="text-xl font-bold text-brand-primary dark:text-white mb-3">{article.title}</h3>
-                                    <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1 text-sm leading-relaxed">{article.summary}</p>
-                                    <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-brand-secondary font-bold flex items-center gap-1 hover:text-brand-primary dark:hover:text-white transition-colors mt-auto w-max">
-                                        קראו עוד <Icon name="ChevronLeft" size={16} />
-                                    </a>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        const HistoryPage = ({ user, localHistory, onFileInteract }) => {
-            if (!user) return (
-                <div className="text-center py-16 animate-fade-in">
-                    <Icon name="Lock" size={48} className="mx-auto mb-4 text-gray-400" />
-                    <h2 className="text-2xl font-bold mb-2">אזור אישי</h2>
-                    <p className="text-gray-500">יש להתחבר כדי לצפות בהיסטוריית הצפייה שלך.</p>
-                </div>
-            );
+                );
+            }
 
             return (
-                <div className="max-w-4xl mx-auto space-y-6 animate-fade-in relative px-4">
-                    <div className="text-center mb-10">
-                        <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-2 flex justify-center items-center gap-2">
-                            <Icon name="History" size={32} className="text-brand-secondary" /> היסטוריית צפייה
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-400">כל הקורסים והסרטונים שפתחת נשמרים כאן לגישה מהירה.</p>
+                <div className="max-w-6xl mx-auto p-4 animate-fade-in pb-12">
+                    <div className="text-center mb-12">
+                        <h2 className="text-4xl font-black text-brand-primary dark:text-white mb-4">ספריית הקורסים</h2>
+                        <p className="text-xl text-gray-600 dark:text-gray-400">הידע המקצועי המלא שיקדם את העסק שלכם, מחובר ומסונכרן אוטומטית.</p>
                     </div>
-
-                    {(!localHistory || localHistory.length === 0) ? (
-                        <div className="text-center py-16 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                            <Icon name="History" size={48} className="mx-auto mb-3 opacity-50" />
-                            עדיין לא צפית בשיעורים.
+                    
+                    {courses.length === 0 ? (
+                        <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                            <Icon name="BookOpen" size={64} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                            <p className="text-gray-500 font-bold text-lg">אין קורסים זמינים כרגע.</p>
                         </div>
                     ) : (
-                        <div className="grid gap-4">
-                            {localHistory.map((item, idx) => (
-                                <div key={idx} onClick={() => onFileInteract(item)} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between hover:border-brand-primary dark:hover:border-brand-secondary transition cursor-pointer group">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 bg-brand-primary/10 dark:bg-brand-primary/20 rounded-full flex items-center justify-center group-hover:scale-105 transition-transform">
-                                            <Icon name={item.type === 'audio' ? 'Headphones' : item.type === 'video' || item.type === 'youtube' ? 'FileVideo' : 'FileText'} size={24} className="text-brand-primary dark:text-brand-secondary" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {courses.map(course => (
+                                <div key={course.id} onClick={() => setSelectedCourse(course)} className="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                                    <div className="h-48 bg-gradient-to-br from-brand-primary/10 to-brand-primary/30 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center relative overflow-hidden">
+                                        <Icon name="BookOpen" size={80} className="text-brand-primary/20 dark:text-gray-600 group-hover:scale-110 transition-transform duration-500" />
+                                    </div>
+                                    <div className="p-8 relative flex-1 flex flex-col">
+                                        <div className="w-14 h-14 bg-brand-secondary text-white rounded-full flex items-center justify-center absolute -top-7 right-8 shadow-lg group-hover:bg-brand-primary transition-colors">
+                                            <Icon name="PlayCircle" size={28} />
                                         </div>
-                                        <div>
-                                            <h4 className="font-bold text-gray-800 dark:text-gray-200 text-lg leading-tight">{item.name}</h4>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
-                                                <Icon name="Clock" size={12} /> נצפה לאחרונה: {item.lastWatched || "היום"}
-                                            </p>
+                                        <h3 className="text-2xl font-black text-gray-800 dark:text-white mb-3 mt-2 pr-16 leading-tight">{course.name}</h3>
+                                        <div className="mt-auto pt-6 flex items-center gap-2 text-gray-500 font-bold text-sm">
+                                            <span className="bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full flex items-center gap-1.5"><Icon name="FileVideo" size={16} /> {course.lessons?.length || 0} שיעורים</span>
                                         </div>
                                     </div>
                                 </div>
@@ -592,6 +464,8 @@
         };
 
         const AdminPage = ({ forumTopics, setForumTopics, setMessage }) => {
+            const [scriptUrl, setScriptUrl] = React.useState(() => localStorage.getItem('pisga_drive_script') || "");
+
             const handleDeleteTopic = async (topic) => {
                 if(!confirm("מחיקת נושא זה תסיר אותו לצמיתות מהענן. להמשיך?")) return;
                 try {
@@ -601,27 +475,54 @@
                 } catch (e) { setMessage("שגיאה במחיקה: " + e.message); }
             };
 
+            const handleSaveScript = (e) => {
+                e.preventDefault();
+                localStorage.setItem('pisga_drive_script', scriptUrl);
+                setMessage("קישור הסנכרון לדרייב נשמר בהצלחה! רענן את האתר כדי לראות את הקורסים מתעדכנים.");
+            };
+
             return (
                 <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12 px-4">
+                    
+                    {/* Drive Sync Settings */}
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-brand-secondary/30 mb-8">
+                        <div className="flex items-center gap-4 mb-6">
+                            <Icon name="Link" size={32} className="text-brand-secondary" />
+                            <div>
+                                <h2 className="text-2xl font-black text-gray-800 dark:text-white">הגדרות סנכרון ל-Google Drive</h2>
+                                <p className="text-gray-500 text-sm mt-1">כאן מגדירים את החיבור האוטומטי לתיקיות הקורסים בדרייב.</p>
+                            </div>
+                        </div>
+                        <form onSubmit={handleSaveScript} className="flex flex-col md:flex-row gap-4">
+                            <input 
+                                type="url" value={scriptUrl} onChange={e => setScriptUrl(e.target.value)} 
+                                placeholder="הדבק כאן את הקישור ל-Google Apps Script שלך..." 
+                                className="flex-1 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-brand-secondary text-left" dir="ltr" 
+                            />
+                            <button type="submit" className="bg-brand-secondary text-white font-bold py-3 px-8 rounded-xl hover:bg-[#c15c3c] transition-colors">שמור קישור וסנכרן</button>
+                        </form>
+                    </div>
+
+                    {/* Forum Management */}
                     <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-brand-primary/20">
                         <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
                             <div className="flex items-center gap-4">
-                                <Icon name="Settings" size={32} className="text-brand-secondary" />
+                                <Icon name="Settings" size={32} className="text-brand-primary" />
                                 <h2 className="text-3xl font-black text-brand-primary dark:text-white">ניהול פורום</h2>
                             </div>
                             <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">מחובר לענן חי</span>
                         </div>
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {forumTopics.map(topic => (
                                 <div key={topic.id} className="border border-gray-200 rounded-xl p-4 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
                                     <div>
                                         <h3 className="font-bold text-lg">{topic.title}</h3>
                                         <p className="text-sm text-gray-500">מחבר: {topic.realAuthor} | תגובות: {topic.replies?.length || 0}</p>
                                     </div>
-                                    <button onClick={() => handleDeleteTopic(topic)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition"><Icon name="Trash2" /></button>
+                                    <button onClick={() => handleDeleteTopic(topic)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition" title="מחק נושא"><Icon name="Trash2" /></button>
                                 </div>
                             ))}
-                            {forumTopics.length === 0 && <p className="text-center text-gray-500">אין פוסטים כרגע.</p>}
+                            {forumTopics.length === 0 && <p className="text-center text-gray-500 py-10">אין פוסטים כרגע.</p>}
                         </div>
                     </div>
                 </div>
@@ -753,7 +654,6 @@
             const [showSplash, setShowSplash] = React.useState(true);
             const [user, setUser] = React.useState(() => JSON.parse(localStorage.getItem('pisga_user')) || null);
             const [courses, setCourses] = React.useState(INITIAL_COURSES);
-            const [localHistory, setLocalHistory] = React.useState(() => JSON.parse(localStorage.getItem('pisga_history')) || []);
             const [forumTopics, setForumTopics] = React.useState([]);
             const [currentPage, setCurrentPage] = React.useState('home');
             const [globalFile, setGlobalFile] = React.useState(null);
@@ -766,11 +666,11 @@
 
             // REAL AUTH STATE
             const [showAuthModal, setShowAuthModal] = React.useState(false);
+            const [showPaymentModal, setShowPaymentModal] = React.useState(false);
             const [authMode, setAuthMode] = React.useState('login');
             const [authEmail, setAuthEmail] = React.useState('');
             const [authPassword, setAuthPassword] = React.useState('');
             const [authName, setAuthName] = React.useState('');
-            const [authPassAdmin, setAuthPassAdmin] = React.useState('');
             const [authError, setAuthError] = React.useState('');
             const [authLoading, setAuthLoading] = React.useState(false);
 
@@ -778,11 +678,24 @@
             React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('darkMode', isDarkMode); }, [isDarkMode]);
             React.useEffect(() => { const h = () => setShowBackToTop(window.scrollY > 300); window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h); }, []);
 
-            // Firebase Live Data
+            // Firebase Live Data & Drive Sync
             React.useEffect(() => {
+                // 1. Fetch from Google Drive Script (if URL is set by Admin)
+                const driveScriptUrl = localStorage.getItem('pisga_drive_script');
+                if (driveScriptUrl) {
+                    fetch(driveScriptUrl)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data && Array.isArray(data) && data.length > 0) {
+                                setCourses(data); // Overrides INITIAL_COURSES with live Drive data
+                            }
+                        })
+                        .catch(e => console.log("Drive Sync Error:", e));
+                }
+
                 if (!window.FB) return;
                 
-                // Keep anonymous connection active if no user logged in
+                // 2. Keep anonymous connection active if no user logged in
                 const unsubscribeAuth = window.FB.onAuthStateChanged(window.FB.auth, (fbUser) => {
                     if (!fbUser) window.FB.signInAnonymously(window.FB.auth).catch(e => console.log(e));
                 });
@@ -798,17 +711,6 @@
                 return () => { unsubscribeAuth(); unsubForum(); };
             }, []);
 
-            const saveToHistoryAndOpen = (item) => {
-                setGlobalFile(item);
-                if (!user) return;
-                const d = new Date();
-                const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-                const newItem = { name: item.name, type: item.type, url: item.url, lastWatched: dateStr };
-                const newHistory = [newItem, ...localHistory.filter(h => h.name !== item.name)].slice(0, 50); 
-                setLocalHistory(newHistory);
-                localStorage.setItem('pisga_history', JSON.stringify(newHistory));
-            };
-
             // REAL FIREBASE AUTHENTICATION LOGIC
             const handleAuth = async (e) => {
                 e.preventDefault();
@@ -821,23 +723,12 @@
                     return;
                 }
 
-                let isAdmin = false;
-                // Shortcut Admin logic
-                if (authName.includes("משה וולנר") || authName.includes("מנהל") || authEmail === "moshe@pisga.com") {
-                    if (authPassAdmin === ADMIN_PASSWORD) {
-                        isAdmin = true;
-                    } else {
-                        setAuthError("סיסמת מנהל שגויה");
-                        setAuthLoading(false);
-                        return;
-                    }
-                }
-
                 try {
                     if (authMode === 'register') {
                         const userCredential = await window.FB.createUserWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
                         await window.FB.updateProfile(userCredential.user, { displayName: authName });
                         
+                        const isAdmin = (authEmail.toLowerCase() === 'zwolner@gmail.com');
                         const newUser = { name: authName, email: authEmail, isSubscribed: isAdmin, isAdmin: isAdmin, uid: userCredential.user.uid };
                         localStorage.setItem('pisga_user', JSON.stringify(newUser));
                         setUser(newUser);
@@ -848,6 +739,7 @@
                         const userCredential = await window.FB.signInWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
                         const displayName = userCredential.user.displayName || 'משתמש';
                         
+                        const isAdmin = (authEmail.toLowerCase() === 'zwolner@gmail.com');
                         const loggedUser = { name: displayName, email: authEmail, isSubscribed: isAdmin, isAdmin: isAdmin, uid: userCredential.user.uid };
                         localStorage.setItem('pisga_user', JSON.stringify(loggedUser));
                         setUser(loggedUser);
@@ -868,7 +760,6 @@
                 }
                 
                 setAuthLoading(false);
-                setAuthPassAdmin('');
             };
 
             const navigate = (id) => { window.location.hash = id; setCurrentPage(id); setIsMobileMenuOpen(false); };
@@ -884,13 +775,11 @@
             const toggleHighlightLinks = () => document.body.classList.toggle('a11y-highlight-links');
             const resetA11y = () => { document.body.style.fontSize = ''; document.body.classList.remove('a11y-readable-font', 'a11y-highlight-links'); setShowA11y(false); };
 
+            // Reduced Nav Items (Removed Schedule, Articles, History)
             const navItems = [
                 {id:'home', l:'ראשי', i:'Home'},
-                {id:'explorer', l:'קורסים', i:'FolderOpen'},
+                {id:'courses', l:'קורסים', i:'PlayCircle'}, // Replaced explorer
                 {id:'forum', l:'פורום', i:'MessageSquare'},
-                {id:'schedule', l:'לו"ז', i:'Calendar'},
-                {id:'articles', l:'מאמרים', i:'BookOpen'},
-                {id:'history', l:'היסטוריה', i:'History'},
                 {id:'youtube', l:'חינם', i:'Youtube'},
                 {id:'about', l:'אודות', i:'Info'}
             ];
@@ -967,13 +856,6 @@
                                             <input type="password" required value={authPassword} onChange={e => setAuthPassword(e.target.value)} placeholder="לפחות 6 תווים" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-2 focus:border-brand-primary outline-none text-left" dir="ltr" />
                                         </div>
                                     )}
-
-                                    {/* Admin secret shortcut */}
-                                    {authMode === 'login' && (authEmail === 'moshe@pisga.com' || authEmail.includes('admin')) && (
-                                        <div className="animate-fade-in">
-                                            <input type="password" value={authPassAdmin} onChange={e=>setAuthPassAdmin(e.target.value)} placeholder="קוד מנהל סודי (לא חובה)" className="w-full border border-brand-secondary/50 bg-brand-secondary/10 dark:bg-brand-secondary/20 text-gray-800 dark:text-white rounded-xl px-4 py-2 outline-none mt-2" />
-                                        </div>
-                                    )}
                                     
                                     {authError && <div className="text-red-600 bg-red-50 dark:bg-red-900/30 p-2 rounded-lg text-sm text-center font-bold">{authError}</div>}
 
@@ -992,6 +874,15 @@
                                         <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="text-brand-secondary font-bold">חזור למסך ההתחברות</button>
                                     )}
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showPaymentModal && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 animate-fade-in overflow-y-auto">
+                            <div className="relative w-full max-w-md my-8">
+                                <button onClick={()=>setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 p-2 rounded-full"><Icon name="X" size={24}/></button>
+                                <PayPalSubscription onSuccess={(id)=>{ const u={...user, isSubscribed:true}; setUser(u); localStorage.setItem('pisga_user', JSON.stringify(u)); setShowPaymentModal(false); setAlertMsg({t:"תודה",m:"המנוי הופעל בהצלחה!"}) }} />
                             </div>
                         </div>
                     )}
@@ -1016,14 +907,11 @@
                     )}
 
                     <main className="flex-1 pb-20 pt-8">
-                        {currentPage==='admin' && user?.isAdmin ? <AdminPage forumTopics={forumTopics} setForumTopics={setForumTopics} setMessage={(m)=>setAlertMsg({t:"ניהול",m})} /> : 
-                         currentPage==='explorer' ? <ExplorerPage courses={courses} user={user} onFileInteract={saveToHistoryAndOpen} setShowPayment={setShowPaymentModal} /> : 
+                        {currentPage==='admin' && user?.isAdmin ? <AdminPage forumTopics={forumTopics} setForumTopics={setForumTopics} setMessage={(m)=>setAlertMsg({t:"מערכת",m})} /> : 
+                         currentPage==='courses' ? <CoursesPage courses={courses} user={user} onPlay={setGlobalFile} setShowPayment={setShowPaymentModal} /> : 
                          currentPage==='forum' ? <ForumPage topics={forumTopics} user={user} setShowAuthModal={setShowAuthModal} /> : 
-                         currentPage==='schedule' ? <SchedulePage /> :
-                         currentPage==='articles' ? <ArticlesPage /> :
                          currentPage==='about' ? <AboutPage /> :
-                         currentPage==='history' ? <HistoryPage user={user} localHistory={localHistory} onFileInteract={saveToHistoryAndOpen} /> :
-                         currentPage==='youtube' ? <YoutubePage onFileInteract={saveToHistoryAndOpen} /> : 
+                         currentPage==='youtube' ? <YoutubePage onFileInteract={setGlobalFile} /> : 
                          <HomePage navigate={navigate} />}
                     </main>
 
