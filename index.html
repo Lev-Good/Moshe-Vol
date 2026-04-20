@@ -57,7 +57,6 @@
         @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         
-        /* WhatsApp Button */
         .whatsapp-float {
             position: fixed; width: 60px; height: 60px; bottom: 20px; left: 20px;
             background-color: #25d366; color: #FFF; border-radius: 50px;
@@ -66,7 +65,6 @@
         }
         .whatsapp-float:hover { transform: scale(1.1); background-color: #128C7E; }
 
-        /* Marquee Styles */
         .marquee-wrapper {
             display: flex; overflow: hidden; user-select: none; gap: 1.5rem;
             -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
@@ -79,7 +77,6 @@
         .marquee-wrapper:hover .marquee-content { animation-play-state: paused; }
         @keyframes scroll-rtl { from { transform: translateX(0); } to { transform: translateX(100%); } }
 
-        /* A11y Styles */
         .a11y-readable-font * { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.5px !important; }
         .a11y-highlight-links a, .a11y-highlight-links button { text-decoration: underline !important; font-weight: 800 !important; }
     </style>
@@ -90,24 +87,23 @@
     <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-const firebaseConfig = {
-  apiKey: "AIzaSyDuQR6wgh64bRHC4cj34HcaTwJbEN040ew",
-  authDomain: "pisga-d3773.firebaseapp.com",
-  projectId: "pisga-d3773",
-  storageBucket: "pisga-d3773.firebasestorage.app",
-  messagingSenderId: "160680335558",
-  appId: "1:160680335558:web:237838b6db44b602a6dfc7",
-  measurementId: "G-H2XJ4XHHKJ"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuQR6wgh64bRHC4cj34HcaTwJbEN040ew",
+            authDomain: "pisga-d3773.firebaseapp.com",
+            projectId: "pisga-d3773",
+            storageBucket: "pisga-d3773.firebasestorage.app",
+            messagingSenderId: "160680335558",
+            appId: "1:160680335558:web:237838b6db44b602a6dfc7"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        window.FB = { auth, db, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, signInAnonymously, onAuthStateChanged };
+        window.FB = { auth, db, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile };
         window.dispatchEvent(new Event('firebaseReady'));
     </script>
 
@@ -131,7 +127,7 @@ const firebaseConfig = {
             Mountain, User, LogOut, Lock, MessageCircle, RefreshCw,
             MessageSquare, Trash2, Ghost, Youtube, CheckCircle, ArrowUp,
             CreditCard, Target, Lightbulb, Settings, Plus, Crown, Unlock,
-            Accessibility, ZoomIn, ZoomOut, Underline, Type, Quote
+            Accessibility, ZoomIn, ZoomOut, Underline, Type, Quote, Mail
         } = lucide;
 
         const Icon = ({ name, size = 24, className = "" }) => {
@@ -151,9 +147,6 @@ const firebaseConfig = {
             return <span ref={spanRef} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} />;
         };
 
-        // ----------------------------------------------------
-        // Hooks & CSV Parsers
-        // ----------------------------------------------------
         const useCSVData = (url, mapRowFn, cacheKey) => {
             const [data, setData] = React.useState(() => {
                 try { const cached = localStorage.getItem(cacheKey); return cached ? JSON.parse(cached) : []; } 
@@ -207,9 +200,6 @@ const firebaseConfig = {
             };
         };
 
-        // ----------------------------------------------------
-        // Initial Data Fallback
-        // ----------------------------------------------------
         const INITIAL_COURSES = [
             {
                 id: "course_webinars", name: "סדרת הוובינרים המלאה", isFolder: true,
@@ -224,9 +214,6 @@ const firebaseConfig = {
             }
         ];
 
-        // ----------------------------------------------------
-        // UI Helpers & Components
-        // ----------------------------------------------------
         const CustomMessageBox = ({ message, title="הודעת מערכת", onClose }) => (
             <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl border border-brand-primary/20">
@@ -245,28 +232,38 @@ const firebaseConfig = {
             </div>
         );
 
-        const DynamicLoader = ({ texts = ["טוען נתונים...", "מסנכרן מידע...", "מכין את התוכן..."] }) => {
+        const DynamicLoader = ({ texts = ["טוען נתונים...", "מסנכרן מידע...", "מכין את התוכן...", "עוד רגע קט..."] }) => {
             const [idx, setIdx] = React.useState(0);
             React.useEffect(() => {
                 const interval = setInterval(() => setIdx(i => (i + 1) % texts.length), 2000);
                 return () => clearInterval(interval);
             }, [texts.length]);
+
             return (
                 <div className="flex flex-col items-center justify-center h-64 w-full animate-fade-in">
-                    <Icon name="RefreshCw" size={32} className="text-brand-primary animate-spin mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 font-bold animate-pulse">{texts[idx]}</p>
+                    <div className="relative w-16 h-16 flex items-center justify-center mb-6">
+                        <div className="absolute inset-0 border-4 border-brand-primary/20 rounded-full"></div>
+                        <div className="absolute inset-0 border-4 border-brand-secondary rounded-full border-t-transparent animate-spin"></div>
+                        <Icon name="RefreshCw" size={24} className="text-brand-primary" />
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 font-bold text-lg animate-pulse">{texts[idx]}</p>
                 </div>
             );
         };
+
+        const ErrorMsg = ({msg}) => (
+            <div className="flex flex-col items-center justify-center h-64 w-full text-red-500 animate-fade-in">
+                <Icon name="Info" size={48} className="mb-4 opacity-50" />
+                <p className="font-bold text-lg">שגיאה בטעינת הנתונים</p>
+                <p className="text-sm opacity-80">{msg}</p>
+            </div>
+        );
 
         const formatDate = (isoString) => {
             const d = new Date(isoString);
             return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         };
 
-        // ----------------------------------------------------
-        // PayPal Payment Component
-        // ----------------------------------------------------
         const PayPalSubscription = ({ onSuccess }) => {
             React.useEffect(() => {
                 if (!document.getElementById("paypal-sdk")) {
@@ -318,7 +315,7 @@ const firebaseConfig = {
             return (
                 <div className="mt-16 bg-white dark:bg-gray-800 rounded-3xl p-8 border border-brand-secondary/20 shadow-sm overflow-hidden relative">
                     <div className="text-center mb-8">
-                        <h3 className="text-2xl font-black text-brand-primary dark:text-brand-secondary flex items-center justify-center gap-3">
+                        <h3 className="text-2xl font-extrabold text-brand-primary dark:text-brand-secondary flex items-center justify-center gap-3">
                             <Icon name="TrendingUp" className="text-brand-secondary" size={32} /> ההצלחות של חברי הקהילה
                         </h3>
                     </div>
@@ -346,9 +343,6 @@ const firebaseConfig = {
             );
         };
 
-        // ----------------------------------------------------
-        // Main Pages
-        // ----------------------------------------------------
         const HomePage = ({ navigate }) => (
             <div className="animate-fade-in space-y-12 max-w-5xl mx-auto mt-4 px-4">
                 <div className="text-center mb-10">
@@ -390,22 +384,12 @@ const firebaseConfig = {
                     <div className="absolute bottom-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-tl-full"></div>
 
                     <div className="flex-1 relative z-10 space-y-6">
-                        <h1 className="text-4xl md:text-5xl font-black text-brand-primary dark:text-white leading-tight">
-                            הייתי שם.
-                        </h1>
+                        <h1 className="text-4xl md:text-5xl font-black text-brand-primary dark:text-white leading-tight">הייתי שם.</h1>
                         <div className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed space-y-4 font-medium">
-                            <p>
-                                הייתי הנער שחיפש כיוון. הייתי זה שהלך לאיבוד בין השבילים כי לא היה מי שיאיר את הדרך. היום אני יודע שאתם הייתם שם - המטפלים, המאמנים, אנשי הלב והמקצוע. הייתם שם, אבל לא ראיתי אתכם. המותג שלי, והספר הזה, נולדו כדי להיות הגשר.
-                            </p>
-                            <p className="text-brand-secondary font-bold text-2xl pt-2">
-                                להפוך את המטפלים ה"נסתרים" לכתובת גלויה וברורה.
-                            </p>
-                            <p>
-                                קהילת פסגה, ממש כמו הספר שלי "מומחה שכיר, מומחה יוצר", היא לא עוד מדריך שיווקי. היא המדריך שלך להפוך את הכישרון והנתינה שלך למפעל חיים משגשג.
-                            </p>
-                            <p>
-                                כאן תלמדו איך לצאת מהקליניקה הסגורה אל קדמת הבמה, איך לבנות מוצרים שיגיעו לכל בית שזקוק להם, ואיך לייצר ביטחון כלכלי שיאפשר לכם להמשיך לתת.
-                            </p>
+                            <p>הייתי הנער שחיפש כיוון. הייתי זה שהלך לאיבוד בין השבילים כי לא היה מי שיאיר את הדרך. היום אני יודע שאתם הייתם שם - המטפלים, המאמנים, אנשי הלב והמקצוע. הייתם שם, אבל לא ראיתי אתכם. המותג שלי, והספר הזה, נולדו כדי להיות הגשר.</p>
+                            <p className="text-brand-secondary font-bold text-2xl pt-2">להפוך את המטפלים ה"נסתרים" לכתובת גלויה וברורה.</p>
+                            <p>קהילת פסגה, ממש כמו הספר שלי "מומחה שכיר, מומחה יוצר", היא לא עוד מדריך שיווקי. היא המדריך שלך להפוך את הכישרון והנתינה שלך למפעל חיים משגשג.</p>
+                            <p>כאן תלמדו איך לצאת מהקליניקה הסגורה אל קדמת הבמה, איך לבנות מוצרים שיגיעו לכל בית שזקוק להם, ואיך לייצר ביטחון כלכלי שיאפשר לכם להמשיך לתת.</p>
                         </div>
                         <div className="pt-6 border-t border-gray-200 dark:border-gray-700 inline-block text-center w-full md:text-right">
                             <h3 className="text-2xl font-black text-brand-primary dark:text-white">משה וולנר,</h3>
@@ -425,43 +409,42 @@ const firebaseConfig = {
             </div>
         );
 
-        const HistoryPage = ({ localHistory, onFileInteract }) => {
+        const ExplorerPage = ({ onFileInteract, user, setShowPayment, courses }) => {
+            const [currentFolder, setCurrentFolder] = React.useState(null); 
+            const isSubscribed = user && user.isSubscribed;
+            const handleItemClick = (item, isCourseFolder) => {
+                if (isCourseFolder) { setCurrentFolder(item); } 
+                else { if (isSubscribed || user?.isAdmin) { onFileInteract(item); } else { setShowPayment(true); } }
+            };
+            const items = currentFolder ? currentFolder.lessons : courses;
             return (
-                <div className="max-w-4xl mx-auto space-y-6 animate-fade-in relative px-4">
-                    <div className="text-center mb-10">
-                        <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-2 flex justify-center items-center gap-2">
-                            <Icon name="History" size={32} className="text-brand-secondary" /> היסטוריית צפייה
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-400">כל הקורסים והסרטונים שפתחת נשמרים כאן לגישה מהירה.</p>
-                    </div>
-
-                    {(!localHistory || localHistory.length === 0) ? (
-                        <div className="text-center py-16 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                            <Icon name="History" size={48} className="mx-auto mb-3 opacity-50" />
-                            עדיין לא צפית בשיעורים.
-                        </div>
-                    ) : (
-                        <div className="grid gap-4">
-                            {localHistory.map((item, idx) => (
-                                <div key={idx} onClick={() => onFileInteract(item)} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between hover:border-brand-primary dark:hover:border-brand-secondary transition cursor-pointer group">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 bg-brand-primary/10 dark:bg-brand-primary/20 rounded-full flex items-center justify-center group-hover:scale-105 transition-transform">
-                                            <Icon name={item.type === 'audio' ? 'Headphones' : item.type === 'video' || item.type === 'youtube' ? 'FileVideo' : 'FileText'} size={24} className="text-brand-primary dark:text-brand-secondary" />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-gray-800 dark:text-gray-200 text-lg leading-tight">{item.name}</h4>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
-                                                <Icon name="Clock" size={12} /> נצפה לאחרונה: {item.lastWatched || "היום"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button className="mt-4 md:mt-0 bg-brand-light dark:bg-gray-700 text-brand-primary dark:text-white font-bold py-2.5 px-6 rounded-xl text-sm transition flex items-center justify-center gap-2 group-hover:bg-brand-primary group-hover:text-white">
-                                        המשך צפייה <Icon name="PlayCircle" size={16} />
-                                    </button>
-                                </div>
-                            ))}
+                <div className="max-w-6xl mx-auto p-4 min-h-[600px] flex flex-col">
+                    {!isSubscribed && !user?.isAdmin && (
+                        <div className="bg-brand-secondary/10 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 border border-brand-secondary/30">
+                            <span className="font-bold">צפייה בשיעורים דורשת מנוי פעיל במועדון.</span>
+                            <button onClick={() => setShowPayment(true)} className="bg-brand-secondary text-white px-6 py-2 rounded-xl text-sm font-bold shadow-md">פתיחת הגישה לקורסים</button>
                         </div>
                     )}
+                    <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-t-xl border-b flex items-center gap-2">
+                        <button onClick={() => setCurrentFolder(null)} className="font-bold text-brand-primary flex items-center gap-1"><Icon name="Home" size={18}/> ספרייה</button>
+                        {currentFolder && <><Icon name="ChevronLeft" size={16} /><span className="font-bold">{currentFolder.name}</span></>}
+                    </div>
+                    <div className="p-6 bg-white dark:bg-gray-800 rounded-b-xl border flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {items.map(item => (
+                            item.isFolder ? (
+                                <div key={item.id} onClick={() => handleItemClick(item, true)} className="flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border hover:border-brand-primary cursor-pointer transition">
+                                    <Icon name="Folder" className="text-brand-primary mb-4" size={56} />
+                                    <span className="font-black text-center">{item.name}</span>
+                                </div>
+                            ) : (
+                                <div key={item.id} onClick={() => handleItemClick(item, false)} className="p-5 bg-white dark:bg-gray-700 rounded-2xl border hover:shadow-md cursor-pointer relative flex flex-col h-full">
+                                    {(!isSubscribed && !user?.isAdmin) && <Icon name="Lock" size={16} className="absolute top-3 left-3 text-brand-secondary" />}
+                                    <Icon name={item.type === 'pdf' ? "FileText" : "PlayCircle"} size={24} className="mb-4 text-brand-primary" />
+                                    <span className="font-bold text-sm leading-tight flex-1">{item.name}</span>
+                                </div>
+                            )
+                        ))}
+                    </div>
                 </div>
             );
         };
@@ -522,172 +505,48 @@ const firebaseConfig = {
             );
         };
 
-        const AdminPage = ({ forumTopics, setForumTopics, setMessage }) => {
-            const handleDeleteTopic = async (topic) => {
-                if(!confirm("מחיקת נושא זה תסיר אותו לצמיתות מהענן. להמשיך?")) return;
-                try {
-                    await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'pisga_forum', topic.id));
-                    setMessage("הנושא נמחק בהצלחה.");
-                } catch (e) { setMessage("שגיאה במחיקה: " + e.message); }
-            };
+        const HistoryPage = ({ user, localHistory, onFileInteract }) => {
+            if (!user) return (
+                <div className="text-center py-16 animate-fade-in">
+                    <Icon name="Lock" size={48} className="mx-auto mb-4 text-gray-400" />
+                    <h2 className="text-2xl font-bold mb-2">אזור אישי</h2>
+                    <p className="text-gray-500">יש להתחבר כדי לצפות בהיסטוריית הצפייה שלך.</p>
+                </div>
+            );
 
             return (
-                <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12 px-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-brand-primary/20">
-                        <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
-                            <div className="flex items-center gap-4">
-                                <Icon name="Settings" size={32} className="text-brand-secondary" />
-                                <h2 className="text-3xl font-black text-brand-primary dark:text-white">ניהול פורום</h2>
-                            </div>
-                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">מחובר לענן חי</span>
+                <div className="max-w-4xl mx-auto space-y-6 animate-fade-in relative px-4">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-2 flex justify-center items-center gap-2">
+                            <Icon name="History" size={32} className="text-brand-secondary" /> היסטוריית צפייה
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400">כל הקורסים והסרטונים שפתחת נשמרים כאן לגישה מהירה.</p>
+                    </div>
+
+                    {(!localHistory || localHistory.length === 0) ? (
+                        <div className="text-center py-16 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                            <Icon name="History" size={48} className="mx-auto mb-3 opacity-50" />
+                            עדיין לא צפית בשיעורים.
                         </div>
-                        <div className="space-y-6">
-                            {forumTopics.map(topic => (
-                                <div key={topic.id} className="border border-gray-200 rounded-xl p-4 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
-                                    <div>
-                                        <h3 className="font-bold text-lg">{topic.title}</h3>
-                                        <p className="text-sm text-gray-500">מחבר: {topic.realAuthor} | תגובות: {topic.replies?.length || 0}</p>
+                    ) : (
+                        <div className="grid gap-4">
+                            {localHistory.map((item, idx) => (
+                                <div key={idx} onClick={() => onFileInteract(item)} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between hover:border-brand-primary dark:hover:border-brand-secondary transition cursor-pointer group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-14 h-14 bg-brand-primary/10 dark:bg-brand-primary/20 rounded-full flex items-center justify-center group-hover:scale-105 transition-transform">
+                                            <Icon name={item.type === 'audio' ? 'Headphones' : item.type === 'video' || item.type === 'youtube' ? 'FileVideo' : 'FileText'} size={24} className="text-brand-primary dark:text-brand-secondary" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-800 dark:text-gray-200 text-lg leading-tight">{item.name}</h4>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
+                                                <Icon name="Clock" size={12} /> נצפה לאחרונה: {item.lastWatched || "היום"}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <button onClick={() => handleDeleteTopic(topic)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition"><Icon name="Trash2" /></button>
                                 </div>
                             ))}
-                            {forumTopics.length === 0 && <p className="text-center text-gray-500">אין פוסטים כרגע.</p>}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const ForumPage = ({ user, setShowAuthModal, topics }) => {
-            const [currentTopic, setCurrentTopic] = React.useState(null);
-            const [newTitle, setNewTitle] = React.useState("");
-            const [newContent, setNewContent] = React.useState("");
-            const [newReply, setNewReply] = React.useState("");
-            const [isAnon, setIsAnon] = React.useState(false);
-            const [loading, setLoading] = React.useState(false);
-
-            const handleCreate = async (e) => {
-                e.preventDefault();
-                if(!user) return setShowAuthModal(true);
-                setLoading(true);
-                try {
-                    await window.FB.addDoc(window.FB.collection(window.FB.db, 'pisga_forum'), {
-                        title: newTitle, content: newContent, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
-                        date: new Date().toISOString(), isAnonymous: isAnon, replies: [], isAdminPost: user.isAdmin
-                    });
-                    setNewTitle(""); setNewContent("");
-                } catch(e) { alert("שגיאה בענן"); }
-                setLoading(false);
-            };
-
-            const handleReply = async (e) => {
-                e.preventDefault();
-                if(!user) return setShowAuthModal(true);
-                setLoading(true);
-                const updatedReplies = [...(currentTopic.replies || []), {
-                    id: Date.now().toString(), content: newReply, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
-                    date: new Date().toISOString(), isAnonymous: isAnon
-                }];
-                try {
-                    await window.FB.updateDoc(window.FB.doc(window.FB.db, 'pisga_forum', currentTopic.id), { replies: updatedReplies });
-                    setNewReply("");
-                } catch(e) { alert("שגיאה בענן"); }
-                setLoading(false);
-            };
-
-            if (currentTopic) {
-                const topicData = topics.find(t => t.id === currentTopic.id) || currentTopic;
-                return (
-                    <div className="max-w-4xl mx-auto p-4 animate-fade-in">
-                        <button onClick={() => setCurrentTopic(null)} className="mb-4 flex items-center gap-2 font-bold text-gray-500"><Icon name="ChevronRight" /> חזרה</button>
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border-b-4 border-brand-primary mb-6">
-                            <h2 className="text-2xl font-black text-brand-primary mb-2">{topicData.title}</h2>
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{topicData.content}</p>
-                            <div className="mt-4 text-xs text-gray-500">פורסם ע"י {topicData.author} בתאריך {formatDate(topicData.date)}</div>
-                        </div>
-                        <div className="space-y-4 mb-8">
-                            {topicData.replies?.map(r => (
-                                <div key={r.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-100">
-                                    <p className="text-gray-800 dark:text-white">{r.content}</p>
-                                    <div className="mt-2 text-[10px] text-gray-400">{r.author} • {formatDate(r.date)}</div>
-                                </div>
-                            ))}
-                        </div>
-                        <form onSubmit={handleReply} className="space-y-2">
-                            <textarea value={newReply} onChange={e=>setNewReply(e.target.value)} required placeholder="הגב לנושא..." className="w-full p-4 rounded-xl border focus:ring-2 focus:ring-brand-primary outline-none"></textarea>
-                            <div className="flex justify-between items-center">
-                                <label className="text-sm"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} /> הגב בעילום שם</label>
-                                <button type="submit" disabled={loading} className="bg-brand-primary text-white px-6 py-2 rounded-xl font-bold">שלח תגובה</button>
-                            </div>
-                        </form>
-                    </div>
-                );
-            }
-
-            return (
-                <div className="max-w-5xl mx-auto p-4 space-y-8 animate-fade-in">
-                    <div className="text-center">
-                        <h2 className="text-3xl font-black text-brand-primary">פורום המועדון</h2>
-                        <p className="text-gray-500">דיונים, התייעצויות וצמיחה קהילתית בזמן אמת.</p>
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
-                        <form onSubmit={handleCreate} className="space-y-4">
-                            <input type="text" value={newTitle} onChange={e=>setNewTitle(e.target.value)} required placeholder="כותרת הנושא..." className="w-full p-3 rounded-xl border font-bold" />
-                            <textarea value={newContent} onChange={e=>setNewContent(e.target.value)} required placeholder="פרטו כאן את השאלה או הדילמה..." className="w-full p-3 rounded-xl border h-24"></textarea>
-                            <div className="flex justify-between items-center">
-                                <label className="text-sm"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} /> פרסם בעילום שם</label>
-                                <button type="submit" disabled={loading} className="bg-brand-secondary text-white px-8 py-2 rounded-xl font-bold">פתח נושא לדיון</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div className="space-y-4">
-                        {topics.map(t => (
-                            <div key={t.id} onClick={() => setCurrentTopic(t)} className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:border-brand-primary transition">
-                                <h4 className="text-xl font-bold flex items-center gap-2">{t.isAdminPost && <Icon name="ShieldCheck" className="text-brand-secondary" />} {t.title}</h4>
-                                <div className="text-xs text-gray-400 mt-2">{t.author} • {t.replies?.length || 0} תגובות</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        const ExplorerPage = ({ onFileInteract, user, setShowPayment, courses }) => {
-            const [currentFolder, setCurrentFolder] = React.useState(null); 
-            const isSubscribed = user && user.isSubscribed;
-            const handleItemClick = (item, isCourseFolder) => {
-                if (isCourseFolder) { setCurrentFolder(item); } 
-                else { if (isSubscribed || user?.isAdmin) { onFileInteract(item); } else { setShowPayment(true); } }
-            };
-            const items = currentFolder ? currentFolder.lessons : courses;
-            return (
-                <div className="max-w-6xl mx-auto p-4 min-h-[600px] flex flex-col">
-                    {!isSubscribed && !user?.isAdmin && (
-                        <div className="bg-brand-secondary/10 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 border border-brand-secondary/30">
-                            <span className="font-bold">צפייה בשיעורים דורשת מנוי פעיל במועדון.</span>
-                            <button onClick={() => setShowPayment(true)} className="bg-brand-secondary text-white px-6 py-2 rounded-xl text-sm font-bold shadow-md">פתיחת הגישה לקורסים</button>
                         </div>
                     )}
-                    <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-t-xl border-b flex items-center gap-2">
-                        <button onClick={() => setCurrentFolder(null)} className="font-bold text-brand-primary flex items-center gap-1"><Icon name="Home" size={18}/> ספרייה</button>
-                        {currentFolder && <><Icon name="ChevronLeft" size={16} /><span className="font-bold">{currentFolder.name}</span></>}
-                    </div>
-                    <div className="p-6 bg-white dark:bg-gray-800 rounded-b-xl border flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {items.map(item => (
-                            item.isFolder ? (
-                                <div key={item.id} onClick={() => handleItemClick(item, true)} className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-2xl border hover:border-brand-primary cursor-pointer transition">
-                                    <Icon name="Folder" className="text-brand-primary mb-4" size={56} />
-                                    <span className="font-black text-center">{item.name}</span>
-                                </div>
-                            ) : (
-                                <div key={item.id} onClick={() => handleItemClick(item, false)} className="p-5 bg-white dark:bg-gray-700 rounded-2xl border hover:shadow-md cursor-pointer relative flex flex-col h-full">
-                                    {(!isSubscribed && !user?.isAdmin) && <Icon name="Lock" size={16} className="absolute top-3 left-3 text-brand-secondary" />}
-                                    <Icon name={item.type === 'pdf' ? "FileText" : "PlayCircle"} size={24} className="mb-4 text-brand-primary" />
-                                    <span className="font-bold text-sm leading-tight flex-1">{item.name}</span>
-                                </div>
-                            )
-                        ))}
-                    </div>
                 </div>
             );
         };
@@ -732,6 +591,139 @@ const firebaseConfig = {
             );
         };
 
+        const AdminPage = ({ forumTopics, setForumTopics, setMessage }) => {
+            const handleDeleteTopic = async (topic) => {
+                if(!confirm("מחיקת נושא זה תסיר אותו לצמיתות מהענן. להמשיך?")) return;
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.id));
+                    setMessage("הנושא נמחק בהצלחה.");
+                } catch (e) { setMessage("שגיאה במחיקה: " + e.message); }
+            };
+
+            return (
+                <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12 px-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-brand-primary/20">
+                        <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+                            <div className="flex items-center gap-4">
+                                <Icon name="Settings" size={32} className="text-brand-secondary" />
+                                <h2 className="text-3xl font-black text-brand-primary dark:text-white">ניהול פורום</h2>
+                            </div>
+                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">מחובר לענן חי</span>
+                        </div>
+                        <div className="space-y-6">
+                            {forumTopics.map(topic => (
+                                <div key={topic.id} className="border border-gray-200 rounded-xl p-4 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
+                                    <div>
+                                        <h3 className="font-bold text-lg">{topic.title}</h3>
+                                        <p className="text-sm text-gray-500">מחבר: {topic.realAuthor} | תגובות: {topic.replies?.length || 0}</p>
+                                    </div>
+                                    <button onClick={() => handleDeleteTopic(topic)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition"><Icon name="Trash2" /></button>
+                                </div>
+                            ))}
+                            {forumTopics.length === 0 && <p className="text-center text-gray-500">אין פוסטים כרגע.</p>}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ForumPage = ({ user, setShowAuthModal, topics }) => {
+            const [currentTopic, setCurrentTopic] = React.useState(null);
+            const [newTitle, setNewTitle] = React.useState("");
+            const [newContent, setNewContent] = React.useState("");
+            const [newReply, setNewReply] = React.useState("");
+            const [isAnon, setIsAnon] = React.useState(false);
+            const [loading, setLoading] = React.useState(false);
+
+            const handleCreate = async (e) => {
+                e.preventDefault();
+                if(!user) return setShowAuthModal(true);
+                setLoading(true);
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    await window.FB.addDoc(window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics'), {
+                        title: newTitle, content: newContent, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
+                        date: new Date().toISOString(), isAnonymous: isAnon, replies: [], isAdminPost: user.isAdmin
+                    });
+                    setNewTitle(""); setNewContent("");
+                } catch(e) { alert("שגיאה בענן"); }
+                setLoading(false);
+            };
+
+            const handleReply = async (e) => {
+                e.preventDefault();
+                if(!user) return setShowAuthModal(true);
+                setLoading(true);
+                const updatedReplies = [...(currentTopic.replies || []), {
+                    id: Date.now().toString(), content: newReply, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
+                    date: new Date().toISOString(), isAnonymous: isAnon
+                }];
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    await window.FB.updateDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics', currentTopic.id), { replies: updatedReplies });
+                    setNewReply("");
+                } catch(e) { alert("שגיאה בענן"); }
+                setLoading(false);
+            };
+
+            if (currentTopic) {
+                const topicData = topics.find(t => t.id === currentTopic.id) || currentTopic;
+                return (
+                    <div className="max-w-4xl mx-auto p-4 animate-fade-in">
+                        <button onClick={() => setCurrentTopic(null)} className="mb-4 flex items-center gap-2 font-bold text-gray-500"><Icon name="ChevronRight" /> חזרה</button>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border-b-4 border-brand-primary mb-6">
+                            <h2 className="text-2xl font-black text-brand-primary mb-2">{topicData.title}</h2>
+                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{topicData.content}</p>
+                            <div className="mt-4 text-xs text-gray-500">פורסם ע"י {topicData.author} בתאריך {formatDate(topicData.date)}</div>
+                        </div>
+                        <div className="space-y-4 mb-8">
+                            {topicData.replies?.map(r => (
+                                <div key={r.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-100">
+                                    <p className="text-gray-800 dark:text-white">{r.content}</p>
+                                    <div className="mt-2 text-[10px] text-gray-400">{r.author} • {formatDate(r.date)}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <form onSubmit={handleReply} className="space-y-2">
+                            <textarea value={newReply} onChange={e=>setNewReply(e.target.value)} required placeholder="הגב לנושא..." className="w-full p-4 rounded-xl border focus:ring-2 focus:ring-brand-primary outline-none text-gray-800 bg-gray-50 dark:bg-gray-900 dark:text-white"></textarea>
+                            <div className="flex justify-between items-center">
+                                <label className="text-sm"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} /> הגב בעילום שם</label>
+                                <button type="submit" disabled={loading} className="bg-brand-primary text-white px-6 py-2 rounded-xl font-bold">שלח תגובה</button>
+                            </div>
+                        </form>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-5xl mx-auto p-4 space-y-8 animate-fade-in">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-black text-brand-primary dark:text-white">פורום המועדון</h2>
+                        <p className="text-gray-500">דיונים, התייעצויות וצמיחה קהילתית בזמן אמת.</p>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-100 dark:border-gray-700">
+                        <form onSubmit={handleCreate} className="space-y-4">
+                            <input type="text" value={newTitle} onChange={e=>setNewTitle(e.target.value)} required placeholder="כותרת הנושא..." className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 font-bold outline-none text-gray-800 dark:text-white" />
+                            <textarea value={newContent} onChange={e=>setNewContent(e.target.value)} required placeholder="פרטו כאן את השאלה או הדילמה..." className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 h-24 outline-none text-gray-800 dark:text-white"></textarea>
+                            <div className="flex justify-between items-center">
+                                <label className="text-sm text-gray-600 dark:text-gray-300"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} className="ml-1" /> פרסם בעילום שם</label>
+                                <button type="submit" disabled={loading} className="bg-brand-secondary text-white px-8 py-2 rounded-xl font-bold">פתח נושא לדיון</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div className="space-y-4">
+                        {topics.map(t => (
+                            <div key={t.id} onClick={() => setCurrentTopic(t)} className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-brand-primary transition">
+                                <h4 className="text-xl font-bold flex items-center gap-2 text-gray-800 dark:text-white">{t.isAdminPost && <Icon name="ShieldCheck" className="text-brand-secondary" />} {t.title}</h4>
+                                <div className="text-xs text-gray-400 mt-2">{t.author} • {t.replies?.length || 0} תגובות</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
         const GlobalFileViewer = ({ file, onClose }) => {
             if (!file) return null;
             const getUrl = (f) => {
@@ -760,48 +752,50 @@ const firebaseConfig = {
         const App = () => {
             const [showSplash, setShowSplash] = React.useState(true);
             const [user, setUser] = React.useState(() => JSON.parse(localStorage.getItem('pisga_user')) || null);
+            const [courses, setCourses] = React.useState(INITIAL_COURSES);
             const [localHistory, setLocalHistory] = React.useState(() => JSON.parse(localStorage.getItem('pisga_history')) || []);
-            const [courses, setCourses] = React.useState(() => JSON.parse(localStorage.getItem('pisga_courses')) || INITIAL_COURSES);
             const [forumTopics, setForumTopics] = React.useState([]);
             const [currentPage, setCurrentPage] = React.useState('home');
             const [globalFile, setGlobalFile] = React.useState(null);
             const [alertMsg, setAlertMsg] = React.useState(null);
             
+            const [isDarkMode, setIsDarkMode] = React.useState(() => localStorage.getItem('darkMode') === 'true');
+            const [showA11y, setShowA11y] = React.useState(false);
             const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
             const [showBackToTop, setShowBackToTop] = React.useState(false);
-            const [showA11y, setShowA11y] = React.useState(false);
-            const [isDarkMode, setIsDarkMode] = React.useState(() => localStorage.getItem('darkMode') === 'true');
 
+            // REAL AUTH STATE
             const [showAuthModal, setShowAuthModal] = React.useState(false);
-            const [showPaymentModal, setShowPaymentModal] = React.useState(false);
+            const [authMode, setAuthMode] = React.useState('login');
+            const [authEmail, setAuthEmail] = React.useState('');
+            const [authPassword, setAuthPassword] = React.useState('');
             const [authName, setAuthName] = React.useState('');
-            const [authPass, setAuthPass] = React.useState('');
+            const [authPassAdmin, setAuthPassAdmin] = React.useState('');
+            const [authError, setAuthError] = React.useState('');
+            const [authLoading, setAuthLoading] = React.useState(false);
 
             React.useEffect(() => { setTimeout(() => setShowSplash(false), 2000); }, []);
-            
-            React.useEffect(() => {
-                document.documentElement.classList.toggle('dark', isDarkMode);
-                localStorage.setItem('darkMode', isDarkMode);
-            }, [isDarkMode]);
+            React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('darkMode', isDarkMode); }, [isDarkMode]);
+            React.useEffect(() => { const h = () => setShowBackToTop(window.scrollY > 300); window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h); }, []);
 
-            React.useEffect(() => {
-                const handleScroll = () => setShowBackToTop(window.scrollY > 300);
-                window.addEventListener('scroll', handleScroll);
-                return () => window.removeEventListener('scroll', handleScroll);
-            }, []);
-
+            // Firebase Live Data
             React.useEffect(() => {
                 if (!window.FB) return;
-                const unsubscribe = window.FB.onAuthStateChanged(window.FB.auth, (fbUser) => {
-                    if (fbUser && !user) window.FB.signInAnonymously(window.FB.auth);
+                
+                // Keep anonymous connection active if no user logged in
+                const unsubscribeAuth = window.FB.onAuthStateChanged(window.FB.auth, (fbUser) => {
+                    if (!fbUser) window.FB.signInAnonymously(window.FB.auth).catch(e => console.log(e));
                 });
-                const q = window.FB.query(window.FB.collection(window.FB.db, 'pisga_forum'));
+
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const q = window.FB.query(window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics'));
                 const unsubForum = window.FB.onSnapshot(q, (snapshot) => {
                     const list = [];
                     snapshot.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
                     setForumTopics(list.sort((a,b) => new Date(b.date) - new Date(a.date)));
-                });
-                return () => { unsubscribe(); unsubForum(); };
+                }, (error) => console.log(error));
+                
+                return () => { unsubscribeAuth(); unsubForum(); };
             }, []);
 
             const saveToHistoryAndOpen = (item) => {
@@ -809,20 +803,72 @@ const firebaseConfig = {
                 if (!user) return;
                 const d = new Date();
                 const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-                
                 const newItem = { name: item.name, type: item.type, url: item.url, lastWatched: dateStr };
                 const newHistory = [newItem, ...localHistory.filter(h => h.name !== item.name)].slice(0, 50); 
                 setLocalHistory(newHistory);
                 localStorage.setItem('pisga_history', JSON.stringify(newHistory));
             };
 
-            const handleAuth = (e) => {
+            // REAL FIREBASE AUTHENTICATION LOGIC
+            const handleAuth = async (e) => {
                 e.preventDefault();
-                const isAdmin = authName.includes("משה וולנר") || authName.includes("מנהל");
-                if (isAdmin && authPass !== ADMIN_PASSWORD) return setAlertMsg({t: "שגיאה", m: "סיסמת מנהל שגויה"});
-                const newUser = { name: authName, isSubscribed: isAdmin, isAdmin };
-                localStorage.setItem('pisga_user', JSON.stringify(newUser));
-                setUser(newUser); setShowAuthModal(false); setAuthPass('');
+                setAuthError('');
+                setAuthLoading(true);
+
+                if (!window.FB) {
+                    setAuthError("אין חיבור לשרת (חסרים מפתחות Firebase).");
+                    setAuthLoading(false);
+                    return;
+                }
+
+                let isAdmin = false;
+                // Shortcut Admin logic
+                if (authName.includes("משה וולנר") || authName.includes("מנהל") || authEmail === "moshe@pisga.com") {
+                    if (authPassAdmin === ADMIN_PASSWORD) {
+                        isAdmin = true;
+                    } else {
+                        setAuthError("סיסמת מנהל שגויה");
+                        setAuthLoading(false);
+                        return;
+                    }
+                }
+
+                try {
+                    if (authMode === 'register') {
+                        const userCredential = await window.FB.createUserWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
+                        await window.FB.updateProfile(userCredential.user, { displayName: authName });
+                        
+                        const newUser = { name: authName, email: authEmail, isSubscribed: isAdmin, isAdmin: isAdmin, uid: userCredential.user.uid };
+                        localStorage.setItem('pisga_user', JSON.stringify(newUser));
+                        setUser(newUser);
+                        setShowAuthModal(false);
+                        setAlertMsg({t: "ברוכים הבאים!", m: "החשבון נוצר בהצלחה."});
+
+                    } else if (authMode === 'login') {
+                        const userCredential = await window.FB.signInWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
+                        const displayName = userCredential.user.displayName || 'משתמש';
+                        
+                        const loggedUser = { name: displayName, email: authEmail, isSubscribed: isAdmin, isAdmin: isAdmin, uid: userCredential.user.uid };
+                        localStorage.setItem('pisga_user', JSON.stringify(loggedUser));
+                        setUser(loggedUser);
+                        setShowAuthModal(false);
+                        setAlertMsg({t: "התחברת בהצלחה", m: `ברוך שובך, ${displayName}!`});
+
+                    } else if (authMode === 'forgot_password') {
+                        await window.FB.sendPasswordResetEmail(window.FB.auth, authEmail);
+                        setAlertMsg({t: "נשלח מייל", m: "קישור לאיפוס סיסמה נשלח לכתובת המייל שלך."});
+                        setAuthMode('login');
+                    }
+                } catch (error) {
+                    console.error("Auth Error:", error);
+                    if (error.code === 'auth/email-already-in-use') setAuthError("כתובת המייל כבר קיימת במערכת.");
+                    else if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') setAuthError("אימייל או סיסמה שגויים.");
+                    else if (error.code === 'auth/weak-password') setAuthError("הסיסמה חלשה מדי (לפחות 6 תווים).");
+                    else setAuthError("שגיאה בתהליך. אנא נסה שוב.");
+                }
+                
+                setAuthLoading(false);
+                setAuthPassAdmin('');
             };
 
             const navigate = (id) => { window.location.hash = id; setCurrentPage(id); setIsMobileMenuOpen(false); };
@@ -870,7 +916,7 @@ const firebaseConfig = {
                                 {user?.isAdmin && <button onClick={()=>navigate('admin')} className="px-3 py-2 rounded-full font-bold text-sm bg-gray-800 text-white flex items-center gap-1.5"><Icon name="Settings" size={16}/> ניהול</button>}
                             </nav>
                             <div className="flex items-center gap-2 sm:gap-4">
-                                {!user ? <button onClick={()=>setShowAuthModal(true)} className="text-sm font-bold text-brand-primary border border-brand-primary/30 px-3 sm:px-4 py-1.5 rounded-full hover:bg-brand-primary hover:text-white transition">התחברות</button> : 
+                                {!user ? <button onClick={()=>{setAuthMode('login'); setShowAuthModal(true); setAuthError('');}} className="text-sm font-bold text-brand-primary border border-brand-primary/30 px-3 sm:px-4 py-1.5 rounded-full hover:bg-brand-primary hover:text-white transition">התחברות</button> : 
                                 <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 p-1.5 px-3 rounded-full border border-gray-200 dark:border-gray-700">
                                     <span className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate max-w-[80px]">{user.name}</span>
                                     <button onClick={()=>{localStorage.removeItem('pisga_user');setUser(null);navigate('home')}} className="text-gray-400 hover:text-red-500"><Icon name="LogOut" size={16}/></button>
@@ -897,24 +943,55 @@ const firebaseConfig = {
 
                     {showAuthModal && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 animate-fade-in">
-                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center relative shadow-2xl">
-                                <button onClick={()=>setShowAuthModal(false)} className="absolute top-4 left-4 p-2 bg-gray-100 dark:bg-gray-700 rounded-full"><Icon name="X" size={20}/></button>
-                                <Icon name="User" size={32} className="mx-auto mb-4 text-brand-primary dark:text-brand-secondary" />
-                                <h3 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">התחברות</h3>
-                                <form onSubmit={handleAuth} className="space-y-4">
-                                    <input type="text" required value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="שם מלא" className="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-3 outline-none" />
-                                    {(authName.includes("משה וולנר") || authName.includes("מנהל")) && <input type="password" required value={authPass} onChange={e=>setAuthPass(e.target.value)} placeholder="סיסמת מנהל" className="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-3 outline-none" />}
-                                    <button type="submit" className="w-full bg-brand-primary text-white font-bold py-3 rounded-xl">היכנס</button>
-                                </form>
-                            </div>
-                        </div>
-                    )}
+                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center relative shadow-2xl border border-gray-200 dark:border-gray-700">
+                                <button onClick={() => setShowAuthModal(false)} className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition"><Icon name="X" size={20} /></button>
+                                <Icon name={authMode === 'forgot_password' ? 'Mail' : 'User'} size={32} className="mx-auto mb-4 text-brand-primary dark:text-brand-secondary" />
+                                <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">{authMode === 'login' ? 'התחברות' : authMode === 'register' ? 'הרשמה' : 'איפוס סיסמה'}</h3>
+                                
+                                <form onSubmit={handleAuth} className="space-y-4 text-right animate-fade-in mt-6">
+                                    {authMode === 'register' && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">שם מלא</label>
+                                            <input type="text" required value={authName} onChange={e => setAuthName(e.target.value)} placeholder="לדוגמה: משה כהן" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-2 focus:border-brand-primary outline-none" />
+                                        </div>
+                                    )}
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">כתובת מייל</label>
+                                        <input type="email" required value={authEmail} onChange={e => setAuthEmail(e.target.value)} placeholder="name@example.com" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-2 focus:border-brand-primary outline-none text-left" dir="ltr" />
+                                    </div>
+                                    
+                                    {authMode !== 'forgot_password' && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">סיסמה</label>
+                                            <input type="password" required value={authPassword} onChange={e => setAuthPassword(e.target.value)} placeholder="לפחות 6 תווים" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-2 focus:border-brand-primary outline-none text-left" dir="ltr" />
+                                        </div>
+                                    )}
 
-                    {showPaymentModal && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 animate-fade-in overflow-y-auto">
-                            <div className="relative w-full max-w-md my-8">
-                                <button onClick={()=>setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 p-2 rounded-full"><Icon name="X" size={24}/></button>
-                                <PayPalSubscription onSuccess={(id)=>{ const u={...user, isSubscribed:true}; setUser(u); localStorage.setItem('pisga_user', JSON.stringify(u)); setShowPaymentModal(false); setAlertMsg({t:"תודה",m:"המנוי הופעל בהצלחה!"}) }} />
+                                    {/* Admin secret shortcut */}
+                                    {authMode === 'login' && (authEmail === 'moshe@pisga.com' || authEmail.includes('admin')) && (
+                                        <div className="animate-fade-in">
+                                            <input type="password" value={authPassAdmin} onChange={e=>setAuthPassAdmin(e.target.value)} placeholder="קוד מנהל סודי (לא חובה)" className="w-full border border-brand-secondary/50 bg-brand-secondary/10 dark:bg-brand-secondary/20 text-gray-800 dark:text-white rounded-xl px-4 py-2 outline-none mt-2" />
+                                        </div>
+                                    )}
+                                    
+                                    {authError && <div className="text-red-600 bg-red-50 dark:bg-red-900/30 p-2 rounded-lg text-sm text-center font-bold">{authError}</div>}
+
+                                    <button type="submit" disabled={authLoading} className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition shadow mt-2 disabled:opacity-80 flex justify-center items-center gap-2">
+                                        {authLoading ? <Icon name="RefreshCw" className="animate-spin" size={20} /> : authMode === 'login' ? 'היכנס למערכת' : authMode === 'register' ? 'צור חשבון' : 'שלח קישור לאיפוס'}
+                                    </button>
+                                </form>
+
+                                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2 text-sm">
+                                    {authMode === 'login' ? (
+                                        <React.Fragment>
+                                            <button onClick={() => { setAuthMode('register'); setAuthError(''); }} className="text-brand-secondary font-bold">אין לך חשבון? הרשמה</button>
+                                            <button onClick={() => { setAuthMode('forgot_password'); setAuthError(''); }} className="text-gray-500">שכחת סיסמה?</button>
+                                        </React.Fragment>
+                                    ) : (
+                                        <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="text-brand-secondary font-bold">חזור למסך ההתחברות</button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -927,12 +1004,12 @@ const firebaseConfig = {
                                     <h3 className="font-bold text-brand-primary dark:text-white flex items-center gap-2">נגישות <Icon name="Accessibility" size={20} className="text-brand-secondary" /></h3>
                                 </div>
                                 <div className="space-y-2.5">
-                                    <button onClick={() => changeFontSize(2)} className="w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">הגדל טקסט <Icon name="ZoomIn" size={16} /></button>
-                                    <button onClick={() => changeFontSize(-2)} className="w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">הקטן טקסט <Icon name="ZoomOut" size={16} /></button>
-                                    <button onClick={toggleHighlightLinks} className="w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">הדגשת קישורים <Icon name="Underline" size={16} /></button>
-                                    <button onClick={toggleReadableFont} className="w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">גופן קריא <Icon name="Type" size={16} /></button>
+                                    <button onClick={() => changeFontSize(2)} className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">הגדל טקסט <Icon name="ZoomIn" size={16} /></button>
+                                    <button onClick={() => changeFontSize(-2)} className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">הקטן טקסט <Icon name="ZoomOut" size={16} /></button>
+                                    <button onClick={toggleHighlightLinks} className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">הדגשת קישורים <Icon name="Underline" size={16} /></button>
+                                    <button onClick={toggleReadableFont} className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">גופן קריא <Icon name="Type" size={16} /></button>
                                     <div className="w-full h-px bg-gray-200 dark:bg-gray-700 my-2"></div>
-                                    <button onClick={resetA11y} className="w-full bg-red-50 dark:bg-red-900/30 text-red-600 px-4 py-2.5 rounded-xl text-sm font-bold flex justify-between items-center">איפוס הגדרות <Icon name="RefreshCw" size={16} /></button>
+                                    <button onClick={resetA11y} className="w-full bg-red-50 dark:bg-red-900/30 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50 px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">איפוס הגדרות <Icon name="RefreshCw" size={16} /></button>
                                 </div>
                             </div>
                         </div>
@@ -945,7 +1022,7 @@ const firebaseConfig = {
                          currentPage==='schedule' ? <SchedulePage /> :
                          currentPage==='articles' ? <ArticlesPage /> :
                          currentPage==='about' ? <AboutPage /> :
-                         currentPage==='history' ? <HistoryPage localHistory={localHistory} onFileInteract={saveToHistoryAndOpen} /> :
+                         currentPage==='history' ? <HistoryPage user={user} localHistory={localHistory} onFileInteract={saveToHistoryAndOpen} /> :
                          currentPage==='youtube' ? <YoutubePage onFileInteract={saveToHistoryAndOpen} /> : 
                          <HomePage navigate={navigate} />}
                     </main>
@@ -957,7 +1034,7 @@ const firebaseConfig = {
                         <Icon name="ArrowUp" size={24} />
                     </button>
 
-                    <a href={WHATSAPP_LINK} target="_blank" className="whatsapp-float"><Icon name="MessageCircle" size={32}/></a>
+                    <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="whatsapp-float"><Icon name="MessageCircle" size={32}/></a>
                     
                     <footer className="bg-brand-dark dark:bg-gray-900 text-white py-10 transition-colors border-t-4 border-brand-secondary relative z-10">
                         <div className="max-w-7xl mx-auto px-4 text-center">
