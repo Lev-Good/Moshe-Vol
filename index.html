@@ -64,27 +64,14 @@
         }
         .whatsapp-float:hover { transform: scale(1.1); background-color: #128C7E; }
 
-        /* Vertical Marquee Styles */
-        @keyframes scroll-vertical {
-            from { transform: translateY(0); }
-            to { transform: translateY(-50%); }
-        }
+        @keyframes scroll-vertical { from { transform: translateY(0); } to { transform: translateY(-50%); } }
         .marquee-container-vertical {
-            overflow: hidden;
-            position: relative;
-            height: 450px;
+            overflow: hidden; position: absolute; inset: 0; top: 80px; bottom: 20px;
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
             mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
         }
-        .marquee-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            animation: scroll-vertical 30s linear infinite;
-        }
-        .marquee-container-vertical:hover .marquee-vertical {
-            animation-play-state: paused;
-        }
+        .marquee-vertical { display: flex; flex-direction: column; gap: 1rem; animation: scroll-vertical 25s linear infinite; }
+        .marquee-container-vertical:hover .marquee-vertical { animation-play-state: paused; }
 
         .a11y-readable-font * { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.5px !important; }
         .a11y-highlight-links a, .a11y-highlight-links button { text-decoration: underline !important; font-weight: 800 !important; }
@@ -93,11 +80,10 @@
 <body className="antialiased">
     <div id="root"></div>
 
-    <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyDuQR6wgh64bRHC4cj34HcaTwJbEN040ew",
@@ -112,25 +98,20 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        window.FB = { auth, db, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile };
+        window.FB = { auth, db, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile };
         window.dispatchEvent(new Event('firebaseReady'));
     </script>
 
     <script type="text/babel">
-        // ----------------------------------------------------
-        // Configuration & Constants
-        // ----------------------------------------------------
         const WHATSAPP_LINK = "https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws";
-        
-        // >>> הדבק כאן את קישור גוגל סקריפט שלך (לסנכרון דרייב) <<<
-        const DRIVE_SCRIPT_URL = "הכנס_כאן_את_הקישור_שלך_מגוגל_סקריפט";
+        const DRIVE_SCRIPT_URL = ""; // הכנס כאן את הקישור לסנכרון דרייב במידת הצורך
 
         const { 
-            Home, FileText, FileVideo, ChevronLeft, ChevronRight, Menu, X, Info,
-            PlayCircle, ExternalLink, ShieldCheck, TrendingUp, Mountain, User, 
+            Home, FileVideo, ChevronLeft, ChevronRight, Menu, X, Info,
+            PlayCircle, ExternalLink, ShieldCheck, Mountain, User, 
             LogOut, Lock, MessageCircle, RefreshCw, MessageSquare, Trash2, Ghost, 
             Youtube, CheckCircle, ArrowUp, CreditCard, Settings, Plus, Crown, Unlock,
-            Accessibility, ZoomIn, ZoomOut, Underline, Type, Quote, Mail, BookOpen, Link, Star
+            Accessibility, ZoomIn, ZoomOut, Underline, Type, Quote, Mail, BookOpen, Star, UserPlus
         } = lucide;
 
         const Icon = ({ name, size = 24, className = "" }) => {
@@ -167,7 +148,7 @@
                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl border border-brand-primary/20">
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{title}</h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{message}</p>
-                    <button onClick={onClose} className="w-full bg-brand-primary text-white px-6 py-3 rounded-xl font-bold transition">סגור</button>
+                    <button onClick={onClose} className="w-full bg-brand-primary hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition">סגור</button>
                 </div>
             </div>
         );
@@ -232,27 +213,20 @@
                 { text: "ממליץ בחום לכל מאמן או מטפל שרוצה לקחת את העסק לשלב הבא ולהצליח.", author: "יועץ זוגי" },
                 { text: "סוף סוף מישהו שמבין את האתגרים שלנו כמטפלים ונותן פתרונות תכל'ס.", author: "משתתפת בקורס" }
             ];
-            
-            // Doubling for infinite scroll
             const allFeedbacks = [...feedbacks, ...feedbacks];
-
             return (
-                <div className="bg-gradient-to-b from-white to-brand-light dark:from-gray-800 dark:to-gray-900 rounded-[2.5rem] p-6 border border-brand-secondary/20 shadow-xl h-full flex flex-col relative overflow-hidden">
+                <div className="bg-gradient-to-b from-white to-brand-light dark:from-gray-800 dark:to-gray-900 rounded-[2.5rem] p-6 border border-brand-secondary/20 shadow-xl h-full min-h-[420px] flex flex-col relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
-                    <div className="text-center mb-6 relative z-10">
-                        <div className="w-16 h-16 bg-brand-secondary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <Icon name="Star" className="text-brand-secondary" size={28} />
-                        </div>
+                    <div className="text-center mb-4 relative z-10 shrink-0">
+                        <Icon name="Star" className="text-brand-secondary mx-auto mb-2" size={28} />
                         <h3 className="text-xl font-black text-brand-primary dark:text-white">הצלחות בקהילה</h3>
-                        <p className="text-gray-500 text-sm mt-1">מה אומרים עלינו</p>
                     </div>
-                    
-                    <div className="marquee-container-vertical flex-1 relative z-10">
-                        <div className="marquee-vertical">
+                    <div className="marquee-container-vertical flex-1">
+                        <div className="marquee-vertical px-2">
                             {allFeedbacks.map((item, i) => (
-                                <div key={i} className="bg-white dark:bg-gray-800 p-5 rounded-2xl border-r-4 border-brand-secondary shadow-sm relative shrink-0">
-                                    <Icon name="Quote" className="text-brand-primary/10 dark:text-gray-600 absolute top-3 left-3" size={24} />
-                                    <p className="text-gray-700 dark:text-gray-300 text-sm italic relative z-10 mb-4 font-medium leading-relaxed">"{item.text}"</p>
+                                <div key={i} className="bg-white dark:bg-gray-800 p-5 rounded-2xl border-r-4 border-brand-secondary shadow-sm shrink-0">
+                                    <Icon name="Quote" className="text-brand-primary/10 dark:text-gray-600 absolute top-3 left-3" size={20} />
+                                    <p className="text-gray-700 dark:text-gray-300 text-sm italic mb-3 relative z-10 leading-relaxed font-medium">"{item.text}"</p>
                                     <span className="text-xs font-extrabold text-brand-primary dark:text-brand-secondary block">- {item.author}</span>
                                 </div>
                             ))}
@@ -263,95 +237,104 @@
         };
 
         const HomePage = ({ navigate }) => (
-            <div className="max-w-7xl mx-auto px-4 mt-8 pb-12">
-                <div className="text-center mb-14 animate-fade-up" style={{animationDelay: '0.1s'}}>
-                    <Icon name="Mountain" size={72} className="mx-auto mb-5 text-brand-secondary drop-shadow-md" />
-                    <h1 className="text-5xl md:text-6xl font-black text-brand-primary dark:text-white tracking-tight mb-3">ברוכים הבאים לקהילת פסגה</h1>
-                    <h2 className="text-2xl font-medium text-gray-600 dark:text-gray-400">הבית העסקי למאמנים ומטפלים בהובלת משה וולנר</h2>
+            <div className="max-w-7xl mx-auto px-4 mt-8 pb-12 animate-fade-in">
+                <div className="text-center mb-10 animate-fade-up">
+                    <Icon name="Mountain" size={64} className="mx-auto mb-4 text-brand-secondary" />
+                    <h1 className="text-4xl md:text-5xl font-black text-brand-primary dark:text-white tracking-tight mb-2">ברוכים הבאים לקהילת פסגה</h1>
+                    <h2 className="text-xl font-medium text-gray-600 dark:text-gray-400">בהובלת משה וולנר</h2>
+                </div>
+
+                {/* WhatsApp Highlight Box */}
+                <div className="max-w-4xl mx-auto mb-10 animate-fade-up" style={{animationDelay: '0.1s'}}>
+                    <a href={WHATSAPP_LINK} target="_blank" className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 border-2 border-green-500 p-5 rounded-2xl shadow-lg hover:scale-[1.02] transition-transform group">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center animate-bounce shrink-0">
+                                <Icon name="MessageCircle" size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-black text-green-700 dark:text-green-400">הצטרפו לקבוצת הוואטסאפ השקטה!</h3>
+                                <p className="text-gray-600 dark:text-gray-300 font-medium">עדכונים, כלים ותוכן מקצועי ישירות לנייד שלכם.</p>
+                            </div>
+                        </div>
+                        <div className="hidden md:flex items-center gap-2 font-black text-green-600 group-hover:translate-x-[-5px] transition-transform shrink-0">
+                            להצטרפות עכשיו <Icon name="ChevronLeft" />
+                        </div>
+                    </a>
                 </div>
                 
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Main Action Cards (Takes more space) */}
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div onClick={() => navigate('courses')} className="bg-gradient-to-br from-brand-primary to-brand-dark rounded-[2.5rem] p-10 text-white shadow-2xl hover:shadow-[0_20px_40px_rgba(23,67,83,0.3)] transition-all cursor-pointer group flex flex-col justify-between h-full transform hover:-translate-y-2 animate-fade-up" style={{animationDelay: '0.2s'}}>
-                            <div className="flex flex-col items-center text-center">
-                                <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/20 group-hover:bg-brand-secondary transition-colors duration-500">
-                                    <Icon name="Crown" size={40} className="text-brand-secondary group-hover:text-white" />
+                <div className="flex flex-col lg:flex-row gap-8 items-stretch">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div onClick={() => navigate('courses')} className="bg-gradient-to-br from-brand-primary to-brand-dark rounded-[2.5rem] p-8 text-white shadow-xl hover:shadow-[0_20px_40px_rgba(23,67,83,0.3)] transition-all cursor-pointer group flex flex-col justify-between h-full min-h-[420px] transform hover:-translate-y-2 animate-fade-up" style={{animationDelay: '0.2s'}}>
+                            <div className="text-center">
+                                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/20 group-hover:bg-brand-secondary transition-colors duration-500">
+                                    <Icon name="Crown" size={32} className="text-brand-secondary group-hover:text-white" />
                                 </div>
                                 <h3 className="text-3xl font-black mb-3">כניסת Pro</h3>
-                                <p className="text-gray-300 mb-8 leading-relaxed">גישה מלאה לכל קורסי הפרימיום, הכלים המקצועיים והשתתפות בקהילה.</p>
+                                <p className="text-gray-300 text-base leading-relaxed">גישה מלאה לכל קורסי הפרימיום המקצועיים, הכלים והשתתפות בקהילה.</p>
                             </div>
-                            <button className="bg-brand-secondary hover:bg-[#c15c3c] text-white py-4 rounded-xl font-bold text-lg shadow-lg group-hover:scale-105 transition-transform">כניסת חברי מועדון</button>
+                            <button className="bg-brand-secondary hover:bg-[#c15c3c] text-white py-4 rounded-xl font-bold text-lg shadow-lg group-hover:scale-105 transition-transform mt-auto">כניסת חברי מועדון</button>
                         </div>
                         
-                        <div onClick={() => navigate('youtube')} className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-[2.5rem] p-10 text-brand-primary dark:text-white shadow-xl hover:border-brand-secondary/50 transition-all cursor-pointer group flex flex-col justify-between h-full transform hover:-translate-y-2 animate-fade-up" style={{animationDelay: '0.3s'}}>
-                            <div className="flex flex-col items-center text-center">
-                                <div className="w-20 h-20 bg-gray-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center mb-6 border border-gray-200 dark:border-gray-600 group-hover:bg-red-500 transition-colors duration-500">
-                                    <Icon name="Unlock" size={40} className="text-gray-400 group-hover:text-white" />
+                        <div onClick={() => navigate('youtube')} className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-[2.5rem] p-8 text-brand-primary dark:text-white shadow-xl hover:border-brand-secondary/50 transition-all cursor-pointer group flex flex-col justify-between h-full min-h-[420px] transform hover:-translate-y-2 animate-fade-up" style={{animationDelay: '0.3s'}}>
+                            <div className="text-center">
+                                <div className="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-gray-200 dark:border-gray-600 group-hover:bg-red-500 transition-colors duration-500">
+                                    <Icon name="Unlock" size={32} className="text-gray-400 group-hover:text-white" />
                                 </div>
-                                <h3 className="text-3xl font-black mb-3">כניסה פתוחה</h3>
-                                <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">צפייה חופשית במבחר הדרכות, וובינרים ותכנים נבחרים מיוטיוב.</p>
+                                <h3 className="text-3xl font-black mb-3 text-brand-primary dark:text-white">כניסה פתוחה</h3>
+                                <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">צפייה חופשית בוובינרים, הדרכות ותכנים נבחרים מערוץ היוטיוב.</p>
                             </div>
-                            <button className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-brand-primary dark:text-white py-4 rounded-xl font-bold text-lg group-hover:bg-red-500 group-hover:text-white transition-colors">צפו בחינם</button>
+                            <button className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-brand-primary dark:text-white py-4 rounded-xl font-bold text-lg group-hover:bg-red-500 group-hover:text-white transition-colors mt-auto">צפו בחינם</button>
                         </div>
                     </div>
 
-                    {/* Sidebar Testimonials */}
-                    <div className="lg:w-[22rem] w-full animate-fade-up" style={{animationDelay: '0.4s'}}>
+                    <div className="lg:w-[320px] w-full h-full animate-fade-up" style={{animationDelay: '0.4s'}}>
                         <TestimonialsSidebar />
                     </div>
                 </div>
-            </div>
-        );
 
-        const AboutPage = () => (
-            <div className="max-w-4xl mx-auto space-y-12 pb-12 animate-fade-in px-4">
-                <div className="bg-white dark:bg-gray-800 rounded-[3rem] p-8 md:p-16 shadow-xl border border-gray-100 dark:border-gray-700 relative overflow-hidden text-center md:text-right flex flex-col md:flex-row gap-10 items-center">
-                    <div className="absolute top-0 left-0 w-32 h-32 bg-brand-secondary/10 rounded-br-full"></div>
-                    <div className="absolute bottom-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-tl-full"></div>
-
-                    <div className="flex-1 relative z-10 space-y-6">
-                        <h1 className="text-4xl md:text-5xl font-black text-brand-primary dark:text-white leading-tight">הייתי שם.</h1>
-                        <div className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed space-y-4 font-medium">
-                            <p>הייתי הנער שחיפש כיוון. הייתי זה שהלך לאיבוד בין השבילים כי לא היה מי שיאיר את הדרך. היום אני יודע שאתם הייתם שם - המטפלים, המאמנים, אנשי הלב והמקצוע. הייתם שם, אבל לא ראיתי אתכם. המותג שלי, והספר הזה, נולדו כדי להיות הגשר.</p>
-                            <p className="text-brand-secondary font-bold text-2xl pt-2">להפוך את המטפלים ה"נסתרים" לכתובת גלויה וברורה.</p>
-                            <p>קהילת פסגה, ממש כמו הספר שלי "מומחה שכיר, מומחה יוצר", היא לא עוד מדריך שיווקי. היא המדריך שלך להפוך את הכישרון והנתינה שלך למפעל חיים משגשג.</p>
-                            <p>כאן תלמדו איך לצאת מהקליניקה הסגורה אל קדמת הבמה, איך לבנות מוצרים שיגיעו לכל בית שזקוק להם, ואיך לייצר ביטחון כלכלי שיאפשר לכם להמשיך לתת.</p>
+                {/* Integrated About Content */}
+                <div className="mt-20 pt-16 border-t border-gray-200 dark:border-gray-700 animate-fade-up" style={{animationDelay: '0.5s'}}>
+                   <div className="bg-white dark:bg-gray-800 rounded-[3rem] p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-10 items-center text-right">
+                        <div className="flex-1 space-y-6">
+                            <h2 className="text-4xl font-black text-brand-primary dark:text-white">הייתי שם.</h2>
+                            <div className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed space-y-4">
+                                <p>הייתי הנער שחיפש כיוון. הייתי זה שהלך לאיבוד בין השבילים כי לא היה מי שיאיר את הדרך. היום אני יודע שאתם הייתם שם - המטפלים, המאמנים, אנשי הלב והמקצוע. הייתם שם, אבל לא ראיתי אתכם.</p>
+                                <p className="text-brand-secondary font-bold text-xl">להפוך את המטפלים ה"נסתרים" לכתובת גלויה וברורה.</p>
+                                <p>קהילת פסגה היא לא עוד מדריך שיווקי. היא המדריך שלך להפוך את הכישרון והנתינה שלך למפעל חיים משגשג.</p>
+                            </div>
+                            <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
+                                <h3 className="text-xl font-black text-brand-primary dark:text-white">משה וולנר, מלווה עסקי</h3>
+                            </div>
                         </div>
-                        <div className="pt-6 border-t border-gray-200 dark:border-gray-700 inline-block text-center w-full md:text-right">
-                            <h3 className="text-2xl font-black text-brand-primary dark:text-white">משה וולנר,</h3>
-                            <p className="text-brand-secondary font-bold">מלווה עסקי למטפלים ומאמנים</p>
+                        <div className="shrink-0 hidden md:block">
+                            <div className="w-40 h-56 bg-gradient-to-br from-brand-primary to-brand-dark rounded-xl shadow-2xl flex flex-col items-center justify-center p-6 text-white text-center transform rotate-3">
+                                <Icon name="Mountain" size={40} className="text-brand-secondary mb-4" />
+                                <h2 className="font-black text-xl leading-none mb-2">מומחה<br/>שכיר</h2>
+                                <div className="w-full h-px bg-white/30 my-2"></div>
+                                <h2 className="font-black text-xl leading-none text-brand-secondary">מומחה<br/>יוצר</h2>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div className="shrink-0 relative z-10 hidden md:block">
-                        <div className="w-48 h-64 bg-gradient-to-br from-brand-primary to-brand-dark rounded-xl shadow-2xl flex flex-col items-center justify-center p-6 text-white text-center transform rotate-3">
-                            <Icon name="Mountain" size={48} className="text-brand-secondary mb-4" />
-                            <h2 className="font-black text-2xl leading-none mb-2">מומחה<br/>שכיר</h2>
-                            <div className="w-full h-px bg-white/30 my-2"></div>
-                            <h2 className="font-black text-2xl leading-none text-brand-secondary">מומחה<br/>יוצר</h2>
-                        </div>
-                    </div>
+                   </div>
                 </div>
             </div>
         );
 
-        const CoursesPage = ({ courses, user, onPlay, setShowPayment }) => {
+        const CoursesPage = ({ courses, user, onPlay, setShowPayment, setShowAuthModal }) => {
             const [selectedCourse, setSelectedCourse] = React.useState(null);
             const isSubscribed = user && user.isSubscribed;
 
             const handleLessonClick = (lesson) => {
-                if (isSubscribed || user?.isAdmin) { onPlay(lesson); }
-                else { setShowPayment(true); }
+                if (isSubscribed || user?.isAdmin) onPlay(lesson);
+                else if (!user) setShowAuthModal(true);
+                else setShowPayment(true);
             };
 
             if (selectedCourse) {
                 return (
                     <div className="max-w-5xl mx-auto p-4 animate-fade-in pb-12">
                         <button onClick={() => setSelectedCourse(null)} className="mb-6 flex items-center gap-2 font-bold text-gray-500 hover:text-brand-primary transition bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 w-max">
-                            <Icon name="ChevronRight" /> חזרה לכל הקורסים
+                            <Icon name="ChevronRight" /> חזרה
                         </button>
-                        
                         <div className="bg-white dark:bg-gray-800 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
                             <div className="bg-gradient-to-r from-brand-primary to-brand-dark p-10 md:p-14 text-white relative">
                                 <Icon name="BookOpen" size={120} className="absolute left-10 top-1/2 -translate-y-1/2 opacity-10" />
@@ -360,8 +343,7 @@
                                     <Icon name="FileVideo" size={20} /> {selectedCourse.lessons.length} שיעורים בקורס זה
                                 </p>
                             </div>
-                            
-                            <div className="p-6 md:p-10 bg-gray-50 dark:bg-gray-900 min-h-[400px]">
+                            <div className="p-6 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-[300px]">
                                 {(!isSubscribed && !user?.isAdmin) && (
                                     <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 mb-8 border border-brand-secondary/30 shadow-sm relative overflow-hidden">
                                         <div className="absolute top-0 right-0 w-2 h-full bg-brand-secondary"></div>
@@ -369,28 +351,27 @@
                                             <div className="w-14 h-14 bg-brand-secondary/10 rounded-full flex items-center justify-center text-brand-secondary shrink-0"><Icon name="Lock" size={28} /></div>
                                             <div>
                                                 <h4 className="font-black text-xl text-gray-800 dark:text-white">הקורס נעול לצפייה</h4>
-                                                <p className="text-gray-500 text-sm mt-1">דרוש מנוי מועדון פעיל כדי לפתוח את השיעורים.</p>
+                                                <p className="text-gray-500 text-sm mt-1">
+                                                    {!user ? "דרושה התחברות לחשבון לפני רכישת מנוי." : "דרוש מנוי מועדון פעיל כדי לפתוח את השיעורים."}
+                                                </p>
                                             </div>
                                         </div>
-                                        <button onClick={() => setShowPayment(true)} className="bg-brand-secondary hover:bg-[#c15c3c] text-white px-8 py-3.5 rounded-xl font-bold shadow-md transition-all w-full sm:w-auto shrink-0 z-10">
-                                            פתיחת הגישה לקורסים
+                                        <button onClick={() => { if(!user) setShowAuthModal(true); else setShowPayment(true); }} className="bg-brand-secondary hover:bg-[#c15c3c] text-white px-8 py-3.5 rounded-xl font-bold shadow-md transition-all w-full sm:w-auto shrink-0 z-10">
+                                            {!user ? 'התחברות לרכישה' : 'לרכישת גישה'}
                                         </button>
                                     </div>
                                 )}
-                                
                                 <div className="space-y-3">
                                     {selectedCourse.lessons.map((lesson, idx) => (
-                                        <div key={lesson.id || idx} onClick={() => handleLessonClick(lesson)} className="group flex items-center p-4 md:p-5 bg-white dark:bg-gray-800 rounded-2xl hover:shadow-md transition-all cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-brand-primary/50 relative overflow-hidden">
-                                            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center shrink-0 ml-5 text-brand-primary dark:text-brand-secondary group-hover:bg-brand-primary group-hover:text-white transition-colors">
+                                        <div key={idx} onClick={() => handleLessonClick(lesson)} className="group flex items-center p-4 bg-white dark:bg-gray-800 rounded-2xl hover:shadow-md transition-all cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-brand-primary/50">
+                                            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center shrink-0 ml-4 text-brand-primary dark:text-brand-secondary group-hover:bg-brand-primary group-hover:text-white transition-colors">
                                                 <Icon name="PlayCircle" size={24} />
                                             </div>
-                                            <div className="flex-1">
-                                                <h4 className="font-bold text-lg text-gray-800 dark:text-gray-200 group-hover:text-brand-primary dark:group-hover:text-brand-secondary transition-colors" dir="rtl">{lesson.name}</h4>
-                                            </div>
+                                            <span className="font-bold text-lg flex-1 text-gray-800 dark:text-gray-200 group-hover:text-brand-primary dark:group-hover:text-brand-secondary transition-colors" dir="rtl">{lesson.name}</span>
                                             {(!isSubscribed && !user?.isAdmin) ? (
-                                                <Icon name="Lock" size={20} className="text-gray-400 mr-4" />
+                                                <Icon name="Lock" size={20} className="text-gray-400 mr-4 shrink-0" />
                                             ) : (
-                                                <div className="w-8 h-8 rounded-full bg-brand-primary/5 flex items-center justify-center text-brand-primary opacity-0 group-hover:opacity-100 transition-opacity mr-4">
+                                                <div className="w-8 h-8 rounded-full bg-brand-primary/5 flex items-center justify-center text-brand-primary opacity-0 group-hover:opacity-100 transition-opacity mr-4 shrink-0">
                                                     <Icon name="ChevronLeft" size={20} />
                                                 </div>
                                             )}
@@ -404,7 +385,7 @@
             }
 
             return (
-                <div className="max-w-6xl mx-auto p-4 animate-fade-in pb-12">
+                <div className="max-w-6xl mx-auto p-4 pb-12 animate-fade-in">
                     <div className="text-center mb-12">
                         <h2 className="text-4xl font-black text-brand-primary dark:text-white mb-4">ספריית הקורסים</h2>
                         <p className="text-xl text-gray-600 dark:text-gray-400">הידע המקצועי המלא שיקדם את העסק שלכם, מחובר ומסונכרן אוטומטית.</p>
@@ -439,6 +420,125 @@
             );
         };
 
+        const ForumPage = ({ user, setShowAuthModal, topics }) => {
+            const [currentTopic, setCurrentTopic] = React.useState(null);
+            const [isFormOpen, setIsFormOpen] = React.useState(false);
+            const [newTitle, setNewTitle] = React.useState("");
+            const [newContent, setNewContent] = React.useState("");
+            const [isAnon, setIsAnon] = React.useState(false);
+            const [newReply, setNewReply] = React.useState("");
+            const [loading, setLoading] = React.useState(false);
+
+            const handleCreate = async (e) => {
+                e.preventDefault();
+                if(!user) return setShowAuthModal(true);
+                setLoading(true);
+                try {
+                    await window.FB.addDoc(window.FB.collection(window.FB.db, 'pisga_forum'), {
+                        title: newTitle, content: newContent, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
+                        date: new Date().toISOString(), isAnonymous: isAnon, replies: [], isAdminPost: user.isAdmin
+                    });
+                    setNewTitle(""); setNewContent(""); setIsFormOpen(false);
+                } catch(e) { alert("שגיאה בענן"); }
+                setLoading(false);
+            };
+
+            const handleReply = async (e) => {
+                e.preventDefault();
+                if(!user) return setShowAuthModal(true);
+                setLoading(true);
+                const updatedReplies = [...(currentTopic.replies || []), {
+                    id: Date.now().toString(), content: newReply, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
+                    date: new Date().toISOString(), isAnonymous: isAnon
+                }];
+                try {
+                    await window.FB.updateDoc(window.FB.doc(window.FB.db, 'pisga_forum', currentTopic.id), { replies: updatedReplies });
+                    setNewReply("");
+                } catch(e) { alert("שגיאה בענן"); }
+                setLoading(false);
+            };
+
+            if (currentTopic) {
+                const t = topics.find(topic => topic.id === currentTopic.id) || currentTopic;
+                return (
+                    <div className="max-w-4xl mx-auto p-4 animate-fade-in pb-12">
+                        <button onClick={() => setCurrentTopic(null)} className="mb-6 flex items-center gap-2 font-bold text-gray-500 hover:text-brand-primary transition bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 w-max"><Icon name="ChevronRight" /> חזרה</button>
+                        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-md border-b-4 border-brand-primary mb-8">
+                            <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-4">{t.title}</h2>
+                            <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">{t.content}</p>
+                            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-400 flex items-center gap-2">
+                                <Icon name={t.isAdminPost ? "ShieldCheck" : "User"} size={16} className={t.isAdminPost ? "text-brand-secondary" : ""} /> 
+                                פורסם ע"י {t.author} בתאריך {formatDate(t.date)}
+                            </div>
+                        </div>
+                        <div className="space-y-4 mb-10">
+                            {t.replies?.map(r => (
+                                <div key={r.id} className="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                    <p className="text-gray-800 dark:text-gray-200 leading-relaxed">{r.content}</p>
+                                    <div className="mt-3 text-xs text-gray-400 flex items-center gap-1"><Icon name="MessageCircle" size={12} /> {r.author} • {formatDate(r.date)}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <form onSubmit={handleReply} className="space-y-3 bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700">
+                            <h3 className="font-bold text-gray-800 dark:text-white mb-2">הוספת תגובה:</h3>
+                            <textarea value={newReply} onChange={e=>setNewReply(e.target.value)} required placeholder="כתוב תגובה..." className="w-full p-4 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-secondary resize-none h-24"></textarea>
+                            <div className="flex justify-between items-center pt-2">
+                                <label className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} className="rounded" /> הגב בעילום שם</label>
+                                <button type="submit" disabled={loading} className="bg-brand-primary hover:bg-brand-dark text-white px-8 py-2.5 rounded-xl font-bold transition-colors">שלח תגובה</button>
+                            </div>
+                        </form>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-5xl mx-auto p-4 space-y-8 pb-12 animate-fade-in">
+                    <div className="text-center mb-10">
+                        <h2 className="text-4xl font-black text-brand-primary dark:text-white mb-3">הקהילה שלנו</h2>
+                        <p className="text-xl text-gray-500">דיונים, התייעצויות וצמיחה קהילתית בזמן אמת.</p>
+                    </div>
+
+                    {!isFormOpen ? (
+                        <button onClick={() => setIsFormOpen(true)} className="w-full bg-white dark:bg-gray-800 p-6 rounded-2xl border-2 border-dashed border-brand-primary/50 text-brand-primary dark:text-brand-secondary font-black text-xl hover:bg-brand-primary/5 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-3">
+                            <Icon name="Plus" /> כתיבת נושא חדש בקהילה
+                        </button>
+                    ) : (
+                        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg border border-brand-primary/20 animate-fade-in relative">
+                             <button onClick={() => setIsFormOpen(false)} className="absolute top-6 left-6 text-gray-400 hover:text-red-500 transition-colors"><Icon name="X" /></button>
+                             <h3 className="font-black text-2xl text-brand-primary dark:text-white mb-6">נושא חדש</h3>
+                             <form onSubmit={handleCreate} className="space-y-4">
+                                <input type="text" value={newTitle} onChange={e=>setNewTitle(e.target.value)} required placeholder="כותרת הנושא (לדוגמה: איך לשווק קליניקה בווטסאפ?)" className="w-full p-4 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-bold outline-none text-gray-800 dark:text-white focus:border-brand-primary" />
+                                <textarea value={newContent} onChange={e=>setNewContent(e.target.value)} required placeholder="פרטו כאן את השאלה או הדילמה שלכם בפירוט..." className="w-full p-4 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 h-32 outline-none text-gray-800 dark:text-white focus:border-brand-primary resize-none"></textarea>
+                                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
+                                    <label className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} className="rounded" /> פרסם בעילום שם</label>
+                                    <button type="submit" disabled={loading} className="bg-brand-secondary hover:bg-[#c15c3c] text-white w-full sm:w-auto px-10 py-3 rounded-xl font-bold transition-colors">פרסם בקהילה</button>
+                                </div>
+                            </form>
+                        </div>
+                    )}
+
+                    <div className="space-y-4 mt-8">
+                        {topics.map(t => (
+                            <div key={t.id} onClick={() => setCurrentTopic(t)} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-brand-primary transition-colors flex justify-between items-center group">
+                                <div>
+                                    <h4 className="text-xl font-bold flex items-center gap-2 text-gray-800 dark:text-white group-hover:text-brand-primary dark:group-hover:text-brand-secondary transition-colors">
+                                        {t.isAdminPost && <Icon name="ShieldCheck" className="text-brand-secondary" />} {t.title}
+                                    </h4>
+                                    <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+                                        <Icon name={t.isAnonymous ? "Ghost" : "User"} size={14} /> {t.author} <span className="opacity-50">•</span> <Icon name="MessageCircle" size={14} /> {t.replies?.length || 0} תגובות
+                                    </div>
+                                </div>
+                                <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 group-hover:bg-brand-primary/10 group-hover:text-brand-primary transition-colors shrink-0">
+                                    <Icon name="ChevronLeft" />
+                                </div>
+                            </div>
+                        ))}
+                        {topics.length === 0 && <p className="text-center text-gray-500 py-10 font-bold">אין נושאים כרגע. היו הראשונים לפתוח דיון!</p>}
+                    </div>
+                </div>
+            );
+        };
+
         const YoutubePage = ({ onFileInteract }) => {
             const [videos, setVideos] = React.useState([]);
             const [loading, setLoading] = React.useState(true);
@@ -456,21 +556,26 @@
                 fetchYT();
             }, []);
             return (
-                <div className="max-w-6xl mx-auto p-4 space-y-8 animate-fade-in">
-                    <div className="text-center p-8 bg-red-50 dark:bg-red-900/10 rounded-3xl border border-red-100">
-                        <Icon name="Youtube" size={48} className="text-red-600 mx-auto mb-4" />
-                        <h2 className="text-3xl font-black">ספריית התוכן הפתוח</h2>
-                        <p className="text-gray-500">מבחר הדרכות ישירות מהיוטיוב, פתוחות לכולם בחינם.</p>
+                <div className="max-w-6xl mx-auto p-4 space-y-8 animate-fade-in pb-12">
+                    <div className="text-center p-10 md:p-14 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-gray-800 rounded-[3rem] border border-red-200 dark:border-red-900/30 relative overflow-hidden">
+                        <Icon name="Youtube" size={120} className="absolute -left-10 top-1/2 -translate-y-1/2 text-red-500/10 dark:text-red-500/5" />
+                        <Icon name="Youtube" size={56} className="text-red-600 mx-auto mb-4 relative z-10" />
+                        <h2 className="text-4xl font-black text-gray-900 dark:text-white mb-4 relative z-10">ספריית התוכן הפתוח</h2>
+                        <p className="text-xl text-gray-700 dark:text-gray-300 relative z-10">מבחר הדרכות, וובינרים וכלים ישירות מיוטיוב – פתוחים לכולם בחינם.</p>
                     </div>
-                    {loading ? <div className="text-center py-12 animate-spin"><Icon name="RefreshCw" /></div> : 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {loading ? <div className="flex justify-center py-20"><Icon name="RefreshCw" size={40} className="animate-spin text-red-500" /></div> : 
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                             {videos.map(v => (
-                                <div key={v.id} onClick={() => onFileInteract(v)} className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg cursor-pointer group">
-                                    <div className="relative aspect-video bg-gray-200">
-                                        <img src={v.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><Icon name="PlayCircle" size={48} className="text-white" /></div>
+                                <div key={v.id} onClick={() => onFileInteract(v)} className="bg-white dark:bg-gray-800 rounded-[2rem] overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col">
+                                    <div className="relative aspect-video bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                                        <img src={v.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={v.name} />
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <Icon name="PlayCircle" size={60} className="text-white drop-shadow-md" />
+                                        </div>
                                     </div>
-                                    <div className="p-4 font-bold text-sm h-16 overflow-hidden">{v.name}</div>
+                                    <div className="p-6 flex-1 flex flex-col">
+                                        <h3 className="font-bold text-gray-800 dark:text-white leading-tight line-clamp-2" dir="rtl">{v.name}</h3>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -479,65 +584,87 @@
             );
         };
 
-        const AdminPage = ({ forumTopics, setForumTopics, setMessage }) => {
+        const AdminPage = ({ forumTopics, setMessage }) => {
+            const [userEmailToUpgrade, setUserEmailToUpgrade] = React.useState("");
 
             const handleDeleteTopic = async (topic) => {
                 if(!confirm("מחיקת נושא זה תסיר אותו לצמיתות מהענן. להמשיך?")) return;
                 try {
-                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                    await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.id));
+                    await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'pisga_forum', topic.id));
                     setMessage("הנושא נמחק בהצלחה.");
-                } catch (e) { setMessage("שגיאה במחיקה: " + e.message); }
+                } catch (e) { alert("שגיאה: " + e.message); }
             };
 
             const handleDeleteReply = async (topic, reply) => {
-                if(!confirm("האם אתה בטוח שברצונך למחוק תגובה זו?")) return;
+                if(!confirm("האם למחוק תגובה זו?")) return;
                 try {
-                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     const updatedReplies = topic.replies.filter(r => r.id !== reply.id);
-                    await window.FB.updateDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.id), { replies: updatedReplies });
+                    await window.FB.updateDoc(window.FB.doc(window.FB.db, 'pisga_forum', topic.id), { replies: updatedReplies });
                     setMessage("התגובה נמחקה בהצלחה.");
-                } catch (e) { setMessage("שגיאה במחיקת התגובה: " + e.message); }
+                } catch (e) { alert("שגיאה במחיקת תגובה."); }
+            };
+
+            const handleManualUpgrade = async (e) => {
+                e.preventDefault();
+                if(!userEmailToUpgrade) return;
+                try {
+                    const userRef = window.FB.doc(window.FB.db, 'pro_users', userEmailToUpgrade.toLowerCase().trim());
+                    await window.FB.setDoc(userRef, { isPro: true, addedAt: new Date().toISOString(), method: 'manual_admin' });
+                    setMessage(`האימייל ${userEmailToUpgrade} הוגדר בהצלחה כמנוי Pro.`);
+                    setUserEmailToUpgrade("");
+                } catch(e) { alert("שגיאה בהוספת המשתמש לשרת."); }
             };
 
             return (
-                <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12 px-4">
-                    {/* Forum Management */}
-                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-brand-primary/20">
-                        <div className="flex items-center justify-between mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
-                            <div className="flex items-center gap-4">
-                                <Icon name="Settings" size={32} className="text-brand-primary" />
-                                <div>
-                                    <h2 className="text-3xl font-black text-brand-primary dark:text-white">ניהול הפורום</h2>
-                                    <p className="text-gray-500 text-sm mt-1">מחיקת נושאים ותגובות לא הולמות.</p>
-                                </div>
+                <div className="max-w-6xl mx-auto p-4 space-y-8 pb-12 animate-fade-in">
+                    {/* Manual User Management */}
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-brand-primary/20 shadow-sm">
+                        <div className="flex items-center gap-4 mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+                            <div className="w-14 h-14 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary"><Icon name="UserPlus" size={28} /></div>
+                            <div>
+                                <h2 className="text-2xl font-black text-gray-800 dark:text-white">ניהול משתמשי Pro</h2>
+                                <p className="text-gray-500 text-sm mt-1">פתיחת גישה ידנית לקורסים עבור תלמידים ששילמו בדרכים אחרות.</p>
                             </div>
-                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">מחובר לענן חי</span>
+                        </div>
+                        <form onSubmit={handleManualUpgrade} className="flex flex-col sm:flex-row gap-4">
+                            <input type="email" value={userEmailToUpgrade} onChange={e=>setUserEmailToUpgrade(e.target.value)} required placeholder="הזן את כתובת המייל של התלמיד..." className="flex-1 p-4 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left" dir="ltr" />
+                            <button type="submit" className="bg-brand-primary hover:bg-brand-dark text-white px-8 py-4 rounded-xl font-bold transition-colors shadow-md">הוסף הרשאת מנוי</button>
+                        </form>
+                    </div>
+
+                    {/* Forum Management */}
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-brand-primary/20 shadow-sm">
+                        <div className="flex items-center gap-4 mb-8 border-b border-gray-100 dark:border-gray-700 pb-4">
+                            <div className="w-14 h-14 bg-brand-secondary/10 rounded-full flex items-center justify-center text-brand-secondary"><Icon name="Settings" size={28} /></div>
+                            <div>
+                                <h2 className="text-2xl font-black text-gray-800 dark:text-white">ניהול הקהילה (פורום)</h2>
+                                <p className="text-gray-500 text-sm mt-1">מחיקת נושאים שלמים או תגובות ספציפיות בתוך נושא.</p>
+                            </div>
                         </div>
                         
                         <div className="space-y-6">
                             {forumTopics.map(topic => (
-                                <div key={topic.id} className="border border-gray-200 dark:border-gray-700 rounded-2xl p-5 bg-white dark:bg-gray-800 shadow-sm transition-all">
-                                    <div className="flex justify-between items-start mb-4 border-b border-gray-100 dark:border-gray-700 pb-4">
+                                <div key={topic.id} className="border border-gray-200 dark:border-gray-700 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/50">
+                                    <div className="flex justify-between items-start mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
                                         <div>
                                             <h3 className="font-bold text-xl text-brand-primary dark:text-white">{topic.title}</h3>
-                                            <p className="text-sm text-gray-500 mt-1">מאת: {topic.realAuthor} | סה"כ תגובות: {topic.replies?.length || 0}</p>
+                                            <p className="text-sm text-gray-500 mt-1">מאת: {topic.realAuthor} | {topic.replies?.length || 0} תגובות</p>
                                         </div>
-                                        <button onClick={() => handleDeleteTopic(topic)} className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl transition flex items-center gap-2 text-sm font-bold" title="מחק נושא">
-                                            <Icon name="Trash2" size={16} /> מחק נושא
+                                        <button onClick={() => handleDeleteTopic(topic)} className="bg-red-100 dark:bg-red-900/30 text-red-600 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl transition flex items-center gap-2 text-sm font-bold">
+                                            <Icon name="Trash2" size={16} /> מחק אשכול
                                         </button>
                                     </div>
                                     
                                     {topic.replies && topic.replies.length > 0 && (
-                                        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 space-y-3">
-                                            <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">תגובות באשכול זה:</h4>
+                                        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 space-y-3 border border-gray-100 dark:border-gray-700">
+                                            <h4 className="text-sm font-bold text-gray-400 mb-2">תגובות:</h4>
                                             {topic.replies.map(reply => (
-                                                <div key={reply.id} className="flex justify-between items-center bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                <div key={reply.id} className="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-100 dark:border-gray-800">
                                                     <div>
                                                         <p className="text-gray-800 dark:text-gray-200 text-sm">{reply.content}</p>
                                                         <span className="text-xs text-gray-500 mt-1 block">מאת: {reply.realAuthor}</span>
                                                     </div>
-                                                    <button onClick={() => handleDeleteReply(topic, reply)} className="text-red-400 hover:bg-red-50 hover:text-red-600 p-2 rounded-lg transition" title="מחק תגובה ספציפית">
+                                                    <button onClick={() => handleDeleteReply(topic, reply)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-800 p-2 rounded-lg transition" title="מחק תגובה">
                                                         <Icon name="X" size={18} />
                                                     </button>
                                                 </div>
@@ -546,104 +673,8 @@
                                     )}
                                 </div>
                             ))}
-                            {forumTopics.length === 0 && <p className="text-center text-gray-500 py-10 font-bold">אין נושאים בפורום כרגע.</p>}
+                            {forumTopics.length === 0 && <p className="text-center text-gray-500 font-bold">אין נושאים בפורום.</p>}
                         </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const ForumPage = ({ user, setShowAuthModal, topics }) => {
-            const [currentTopic, setCurrentTopic] = React.useState(null);
-            const [newTitle, setNewTitle] = React.useState("");
-            const [newContent, setNewContent] = React.useState("");
-            const [newReply, setNewReply] = React.useState("");
-            const [isAnon, setIsAnon] = React.useState(false);
-            const [loading, setLoading] = React.useState(false);
-
-            const handleCreate = async (e) => {
-                e.preventDefault();
-                if(!user) return setShowAuthModal(true);
-                setLoading(true);
-                try {
-                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                    await window.FB.addDoc(window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics'), {
-                        title: newTitle, content: newContent, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
-                        date: new Date().toISOString(), isAnonymous: isAnon, replies: [], isAdminPost: user.isAdmin
-                    });
-                    setNewTitle(""); setNewContent("");
-                } catch(e) { alert("שגיאה בענן"); }
-                setLoading(false);
-            };
-
-            const handleReply = async (e) => {
-                e.preventDefault();
-                if(!user) return setShowAuthModal(true);
-                setLoading(true);
-                const updatedReplies = [...(currentTopic.replies || []), {
-                    id: Date.now().toString(), content: newReply, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
-                    date: new Date().toISOString(), isAnonymous: isAnon
-                }];
-                try {
-                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                    await window.FB.updateDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics', currentTopic.id), { replies: updatedReplies });
-                    setNewReply("");
-                } catch(e) { alert("שגיאה בענן"); }
-                setLoading(false);
-            };
-
-            if (currentTopic) {
-                const topicData = topics.find(t => t.id === currentTopic.id) || currentTopic;
-                return (
-                    <div className="max-w-4xl mx-auto p-4 animate-fade-in">
-                        <button onClick={() => setCurrentTopic(null)} className="mb-4 flex items-center gap-2 font-bold text-gray-500"><Icon name="ChevronRight" /> חזרה</button>
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border-b-4 border-brand-primary mb-6">
-                            <h2 className="text-2xl font-black text-brand-primary mb-2">{topicData.title}</h2>
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{topicData.content}</p>
-                            <div className="mt-4 text-xs text-gray-500">פורסם ע"י {topicData.author} בתאריך {formatDate(topicData.date)}</div>
-                        </div>
-                        <div className="space-y-4 mb-8">
-                            {topicData.replies?.map(r => (
-                                <div key={r.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-100">
-                                    <p className="text-gray-800 dark:text-white">{r.content}</p>
-                                    <div className="mt-2 text-[10px] text-gray-400">{r.author} • {formatDate(r.date)}</div>
-                                </div>
-                            ))}
-                        </div>
-                        <form onSubmit={handleReply} className="space-y-2">
-                            <textarea value={newReply} onChange={e=>setNewReply(e.target.value)} required placeholder="הגב לנושא..." className="w-full p-4 rounded-xl border focus:ring-2 focus:ring-brand-primary outline-none text-gray-800 bg-gray-50 dark:bg-gray-900 dark:text-white"></textarea>
-                            <div className="flex justify-between items-center">
-                                <label className="text-sm"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} /> הגב בעילום שם</label>
-                                <button type="submit" disabled={loading} className="bg-brand-primary text-white px-6 py-2 rounded-xl font-bold">שלח תגובה</button>
-                            </div>
-                        </form>
-                    </div>
-                );
-            }
-
-            return (
-                <div className="max-w-5xl mx-auto p-4 space-y-8 animate-fade-in">
-                    <div className="text-center">
-                        <h2 className="text-3xl font-black text-brand-primary dark:text-white">הקהילה שלנו</h2>
-                        <p className="text-gray-500">דיונים, התייעצויות וצמיחה קהילתית בזמן אמת.</p>
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-100 dark:border-gray-700">
-                        <form onSubmit={handleCreate} className="space-y-4">
-                            <input type="text" value={newTitle} onChange={e=>setNewTitle(e.target.value)} required placeholder="כותרת הנושא..." className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 font-bold outline-none text-gray-800 dark:text-white" />
-                            <textarea value={newContent} onChange={e=>setNewContent(e.target.value)} required placeholder="פרטו כאן את השאלה או הדילמה..." className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 h-24 outline-none text-gray-800 dark:text-white"></textarea>
-                            <div className="flex justify-between items-center">
-                                <label className="text-sm text-gray-600 dark:text-gray-300"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} className="ml-1" /> פרסם בעילום שם</label>
-                                <button type="submit" disabled={loading} className="bg-brand-secondary text-white px-8 py-2 rounded-xl font-bold">פתח נושא לדיון</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div className="space-y-4">
-                        {topics.map(t => (
-                            <div key={t.id} onClick={() => setCurrentTopic(t)} className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-brand-primary transition">
-                                <h4 className="text-xl font-bold flex items-center gap-2 text-gray-800 dark:text-white">{t.isAdminPost && <Icon name="ShieldCheck" className="text-brand-secondary" />} {t.title}</h4>
-                                <div className="text-xs text-gray-400 mt-2">{t.author} • {t.replies?.length || 0} תגובות</div>
-                            </div>
-                        ))}
                     </div>
                 </div>
             );
@@ -660,20 +691,17 @@
             };
             return (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-2 sm:p-8 animate-fade-in">
-                    <div className="bg-black w-full max-w-6xl h-full md:h-[85vh] rounded-2xl overflow-hidden flex flex-col shadow-2xl">
-                        <div className="bg-gray-900 text-white p-4 flex justify-between items-center">
-                            <h3 className="font-bold truncate pr-4">{file.name}</h3>
-                            <button onClick={onClose} className="p-2 bg-gray-800 rounded-full"><Icon name="X" /></button>
+                    <div className="bg-black w-full max-w-6xl h-full md:h-[85vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl border border-gray-800">
+                        <div className="bg-gray-900 text-white p-5 flex justify-between items-center border-b border-gray-800">
+                            <h3 className="font-bold text-lg truncate pr-4">{file.name}</h3>
+                            <button onClick={onClose} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full transition-colors"><Icon name="X" /></button>
                         </div>
-                        <iframe src={getUrl(file)} className="flex-1 w-full h-full border-none" allow="autoplay; fullscreen" allowFullScreen></iframe>
+                        <iframe src={getUrl(file)} className="flex-1 w-full h-full border-none bg-black" allow="autoplay; fullscreen" allowFullScreen></iframe>
                     </div>
                 </div>
             );
         };
 
-        // ----------------------------------------------------
-        // Main App
-        // ----------------------------------------------------
         const App = () => {
             const [showSplash, setShowSplash] = React.useState(true);
             const [user, setUser] = React.useState(() => JSON.parse(localStorage.getItem('pisga_user')) || null);
@@ -695,6 +723,7 @@
             const [authEmail, setAuthEmail] = React.useState('');
             const [authPassword, setAuthPassword] = React.useState('');
             const [authName, setAuthName] = React.useState('');
+            const [authPassAdmin, setAuthPassAdmin] = React.useState('');
             const [authError, setAuthError] = React.useState('');
             const [authLoading, setAuthLoading] = React.useState(false);
 
@@ -704,106 +733,98 @@
 
             // Firebase Live Data & Drive Sync
             React.useEffect(() => {
-                // 1. Fetch from Google Drive Script (Hardcoded URL)
                 if (DRIVE_SCRIPT_URL && DRIVE_SCRIPT_URL.startsWith('http')) {
                     fetch(DRIVE_SCRIPT_URL)
                         .then(res => res.json())
-                        .then(data => {
-                            if (data && Array.isArray(data) && data.length > 0) {
-                                setCourses(data); // Overrides INITIAL_COURSES with live Drive data
-                            }
-                        })
+                        .then(data => { if (data && Array.isArray(data) && data.length > 0) setCourses(data); })
                         .catch(e => console.log("Drive Sync Error:", e));
                 }
 
                 if (!window.FB) return;
                 
-                // 2. Keep anonymous connection active if no user logged in
-                const unsubscribeAuth = window.FB.onAuthStateChanged(window.FB.auth, (fbUser) => {
-                    if (!fbUser) window.FB.signInAnonymously(window.FB.auth).catch(e => console.log(e));
+                let unsubPro = () => {};
+
+                const unsubscribeAuth = window.FB.onAuthStateChanged(window.FB.auth, async (fbUser) => {
+                    if (fbUser && fbUser.email) {
+                        const isAdmin = fbUser.email.toLowerCase() === 'zwolner@gmail.com';
+                        const proRef = window.FB.doc(window.FB.db, 'pro_users', fbUser.email.toLowerCase());
+                        
+                        // Real-time listener for Pro status (Updates instantly if admin adds them!)
+                        unsubPro = window.FB.onSnapshot(proRef, (proDoc) => {
+                            const isPro = proDoc.exists() || isAdmin;
+                            const u = { name: fbUser.displayName || 'משתמש', email: fbUser.email, isAdmin: isAdmin, isSubscribed: isPro, uid: fbUser.uid };
+                            setUser(u);
+                            localStorage.setItem('pisga_user', JSON.stringify(u));
+                        });
+                    } else {
+                        unsubPro();
+                        if (!fbUser) window.FB.signInAnonymously(window.FB.auth).catch(e => console.log(e));
+                        else setUser(null); // Keep UI logged out for anonymous
+                    }
                 });
 
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const q = window.FB.query(window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics'));
-                const unsubForum = window.FB.onSnapshot(q, (snapshot) => {
+                const q = window.FB.query(window.FB.collection(window.FB.db, 'pisga_forum'));
+                const unsubForum = window.FB.onSnapshot(q, s => {
                     const list = [];
-                    snapshot.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+                    s.forEach(d => list.push({ id: d.id, ...d.data() }));
                     setForumTopics(list.sort((a,b) => new Date(b.date) - new Date(a.date)));
-                }, (error) => console.log(error));
+                });
                 
-                return () => { unsubscribeAuth(); unsubForum(); };
+                return () => { unsubscribeAuth(); unsubPro(); unsubForum(); };
             }, []);
 
             // REAL FIREBASE AUTHENTICATION LOGIC
             const handleAuth = async (e) => {
-                e.preventDefault();
-                setAuthError('');
-                setAuthLoading(true);
+                e.preventDefault(); setAuthError(''); setAuthLoading(true);
+                if (!window.FB) { setAuthError("אין חיבור לשרת."); setAuthLoading(false); return; }
 
-                if (!window.FB) {
-                    setAuthError("אין חיבור לשרת (חסרים מפתחות Firebase).");
-                    setAuthLoading(false);
-                    return;
+                let isAdmin = false;
+                if (authName.includes("משה וולנר") || authName.includes("מנהל") || authEmail === "zwolner@gmail.com") {
+                    if (authPassAdmin === ADMIN_PASSWORD) isAdmin = true;
+                    else { setAuthError("סיסמת מנהל שגויה"); setAuthLoading(false); return; }
                 }
 
                 try {
                     if (authMode === 'register') {
-                        const userCredential = await window.FB.createUserWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
-                        await window.FB.updateProfile(userCredential.user, { displayName: authName });
-                        
-                        const isAdmin = (authEmail.toLowerCase() === 'zwolner@gmail.com');
-                        const newUser = { name: authName, email: authEmail, isSubscribed: isAdmin, isAdmin: isAdmin, uid: userCredential.user.uid };
-                        localStorage.setItem('pisga_user', JSON.stringify(newUser));
-                        setUser(newUser);
-                        setShowAuthModal(false);
+                        const res = await window.FB.createUserWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
+                        await window.FB.updateProfile(res.user, { displayName: authName });
                         setAlertMsg({t: "ברוכים הבאים!", m: "החשבון נוצר בהצלחה."});
-
                     } else if (authMode === 'login') {
-                        const userCredential = await window.FB.signInWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
-                        const displayName = userCredential.user.displayName || 'משתמש';
-                        
-                        const isAdmin = (authEmail.toLowerCase() === 'zwolner@gmail.com');
-                        const loggedUser = { name: displayName, email: authEmail, isSubscribed: isAdmin, isAdmin: isAdmin, uid: userCredential.user.uid };
-                        localStorage.setItem('pisga_user', JSON.stringify(loggedUser));
-                        setUser(loggedUser);
-                        setShowAuthModal(false);
-                        setAlertMsg({t: "התחברת בהצלחה", m: `ברוך שובך, ${displayName}!`});
-
+                        await window.FB.signInWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
                     } else if (authMode === 'forgot_password') {
                         await window.FB.sendPasswordResetEmail(window.FB.auth, authEmail);
                         setAlertMsg({t: "נשלח מייל", m: "קישור לאיפוס סיסמה נשלח לכתובת המייל שלך."});
                         setAuthMode('login');
                     }
+                    setShowAuthModal(false);
                 } catch (error) {
-                    console.error("Auth Error:", error);
                     if (error.code === 'auth/email-already-in-use') setAuthError("כתובת המייל כבר קיימת במערכת.");
                     else if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') setAuthError("אימייל או סיסמה שגויים.");
                     else if (error.code === 'auth/weak-password') setAuthError("הסיסמה חלשה מדי (לפחות 6 תווים).");
                     else setAuthError("שגיאה בתהליך. אנא נסה שוב.");
                 }
-                
-                setAuthLoading(false);
+                setAuthLoading(false); setAuthPassAdmin('');
             };
 
-            const navigate = (id) => { window.location.hash = id; setCurrentPage(id); setIsMobileMenuOpen(false); };
-            React.useEffect(() => { 
-                const h = window.location.hash.replace('#','') || 'home';
-                setCurrentPage(h);
-            }, []);
+            const handlePaymentSuccess = async (id) => {
+                if(!user || !user.email) return;
+                try {
+                    const proRef = window.FB.doc(window.FB.db, 'pro_users', user.email.toLowerCase());
+                    await window.FB.setDoc(proRef, { isPro: true, paypalId: id, updatedAt: new Date().toISOString() });
+                    setShowPaymentModal(false);
+                    setAlertMsg({t:"תודה על רכישתך!", m:"מנוי ה-Pro שלך הופעל בהצלחה. כל הקורסים פתוחים עבורך."});
+                } catch(e) { alert("שגיאה בעדכון השרת."); }
+            };
 
-            // A11y Functions
             const toggleA11yMenu = () => setShowA11y(!showA11y);
-            const changeFontSize = (step) => document.body.style.fontSize = `${parseFloat(getComputedStyle(document.body).fontSize || 16) + step}px`;
-            const toggleReadableFont = () => document.body.classList.toggle('a11y-readable-font');
-            const toggleHighlightLinks = () => document.body.classList.toggle('a11y-highlight-links');
-            const resetA11y = () => { document.body.style.fontSize = ''; document.body.classList.remove('a11y-readable-font', 'a11y-highlight-links'); setShowA11y(false); };
+            const navigate = (id) => { window.location.hash = id; setCurrentPage(id); setIsMobileMenuOpen(false); };
+            React.useEffect(() => { const h = window.location.hash.replace('#','') || 'home'; setCurrentPage(h); }, []);
 
             const navItems = [
                 {id:'home', l:'ראשי', i:'Home'},
-                {id:'courses', l:'קורסים בתשלום', i:'PlayCircle'}, 
-                {id:'forum', l:'הקהילה שלנו', i:'MessageSquare'},
                 {id:'youtube', l:'תכנים חינמיים', i:'Youtube'},
-                {id:'about', l:'אודות', i:'Info'}
+                {id:'courses', l:'קורסים בתשלום', i:'PlayCircle'}, 
+                {id:'forum', l:'הקהילה שלנו', i:'MessageSquare'}
             ];
 
             return (
@@ -812,30 +833,27 @@
                     {alertMsg && <CustomMessageBox title={alertMsg.t} message={alertMsg.m} onClose={()=>setAlertMsg(null)} />}
                     <GlobalFileViewer file={globalFile} onClose={()=>setGlobalFile(null)} />
                     
-                    <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 border-b-4 border-brand-secondary">
-                        <div className="max-w-7xl mx-auto px-4 h-24 flex justify-between items-center">
+                    <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 border-b-4 border-brand-secondary h-24 flex items-center">
+                        <div className="max-w-7xl mx-auto px-4 w-full flex justify-between items-center">
                             <div onClick={()=>navigate('home')} className="flex items-center gap-3 cursor-pointer shrink-0">
                                 <Icon name="Mountain" className="text-brand-primary" size={40} />
                                 <h1 className="font-black text-2xl text-brand-primary dark:text-white hidden sm:block">פסגה</h1>
                             </div>
-                            
-                            {/* Updated and Spaced Navigation Bar */}
                             <nav className="hidden lg:flex gap-3 overflow-x-auto scrollbar-hide px-4 items-center justify-center flex-1">
                                 {navItems.map(n => (
                                     <button key={n.id} onClick={()=>navigate(n.id)} className={`px-4 py-2.5 rounded-2xl font-bold text-[15px] flex items-center gap-2 transition-all duration-300 ${currentPage===n.id ? 'bg-brand-primary/10 text-brand-primary dark:bg-brand-secondary/20 dark:text-brand-secondary transform scale-105' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-primary'}`}>
                                         <Icon name={n.i} size={18}/> {n.l}
                                     </button>
                                 ))}
-                                {user?.isAdmin && <button onClick={()=>navigate('admin')} className="px-4 py-2.5 rounded-2xl font-bold text-[15px] bg-gray-800 text-white flex items-center gap-2 hover:bg-gray-700 transition-colors"><Icon name="Settings" size={18}/> ניהול</button>}
+                                {user?.isAdmin && <button onClick={()=>navigate('admin')} className="px-4 py-2.5 rounded-2xl font-bold text-[15px] bg-gray-800 hover:bg-gray-700 text-white flex items-center gap-2 transition-colors"><Icon name="Settings" size={18}/> ניהול</button>}
                             </nav>
-                            
                             <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                                 {!user ? <button onClick={()=>{setAuthMode('login'); setShowAuthModal(true); setAuthError('');}} className="text-[15px] font-bold text-brand-primary border-2 border-brand-primary/30 px-5 py-2 rounded-2xl hover:bg-brand-primary hover:text-white transition-colors shadow-sm">התחברות</button> : 
                                 <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 p-1.5 px-4 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
                                     <span className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate max-w-[100px]">{user.name}</span>
-                                    <button onClick={()=>{localStorage.removeItem('pisga_user');setUser(null);navigate('home')}} className="text-gray-400 hover:text-red-500 transition-colors"><Icon name="LogOut" size={18}/></button>
+                                    <button onClick={()=>{localStorage.removeItem('pisga_user'); window.FB.auth.signOut(); setUser(null); navigate('home');}} className="text-gray-400 hover:text-red-500 transition-colors"><Icon name="LogOut" size={18}/></button>
                                 </div>}
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1 hidden sm:flex">
                                     <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name={isDarkMode ? "Sun" : "Moon"} size={20} /></button>
                                     <button onClick={toggleA11yMenu} className="p-2.5 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name="Accessibility" size={20} /></button>
                                 </div>
@@ -845,58 +863,60 @@
                     </header>
 
                     {isMobileMenuOpen && (
-                        <div className="lg:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 absolute w-full shadow-2xl pb-4 z-40">
-                            <div className="px-4 pt-4 pb-4 space-y-2">
-                                {navItems.map(item => (
-                                    <button key={item.id} onClick={() => navigate(item.id)} className="w-full text-right px-4 py-3 rounded-xl flex items-center gap-3 font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"><Icon name={item.icon} size={20} /> {item.label}</button>
-                                ))}
-                                {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right px-4 py-3 rounded-xl flex items-center gap-3 font-bold text-brand-primary"><Icon name="Settings" size={20} /> ניהול</button>}
-                            </div>
+                        <div className="lg:hidden bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-xl p-4 space-y-2 absolute w-full z-40">
+                            {navItems.map(item => (
+                                <button key={item.id} onClick={() => navigate(item.id)} className="w-full text-right p-4 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3"><Icon name={item.icon} size={20}/> {item.label}</button>
+                            ))}
+                            {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right p-4 rounded-xl font-bold text-brand-primary flex items-center gap-3"><Icon name="Settings" size={20}/> ניהול</button>}
                         </div>
                     )}
 
                     {showAuthModal && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 animate-fade-in">
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
                             <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center relative shadow-2xl border border-gray-200 dark:border-gray-700">
-                                <button onClick={() => setShowAuthModal(false)} className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition"><Icon name="X" size={20} /></button>
-                                <Icon name={authMode === 'forgot_password' ? 'Mail' : 'User'} size={32} className="mx-auto mb-4 text-brand-primary dark:text-brand-secondary" />
-                                <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">{authMode === 'login' ? 'התחברות' : authMode === 'register' ? 'הרשמה' : 'איפוס סיסמה'}</h3>
+                                <button onClick={() => setShowAuthModal(false)} className="absolute top-5 left-5 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={20} /></button>
+                                <Icon name={authMode === 'forgot_password' ? 'Mail' : 'User'} size={36} className="mx-auto mb-4 text-brand-primary dark:text-brand-secondary" />
+                                <h3 className="text-2xl font-black mb-2 text-gray-800 dark:text-white">{authMode === 'login' ? 'התחברות לחשבון' : authMode === 'register' ? 'הרשמה למערכת' : 'איפוס סיסמה'}</h3>
                                 
                                 <form onSubmit={handleAuth} className="space-y-4 text-right animate-fade-in mt-6">
                                     {authMode === 'register' && (
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">שם מלא</label>
-                                            <input type="text" required value={authName} onChange={e => setAuthName(e.target.value)} placeholder="לדוגמה: משה כהן" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-2 focus:border-brand-primary outline-none" />
+                                            <input type="text" required value={authName} onChange={e => setAuthName(e.target.value)} placeholder="לדוגמה: משה כהן" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-3 focus:border-brand-primary outline-none" />
                                         </div>
                                     )}
-                                    
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">כתובת מייל</label>
-                                        <input type="email" required value={authEmail} onChange={e => setAuthEmail(e.target.value)} placeholder="name@example.com" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-2 focus:border-brand-primary outline-none text-left" dir="ltr" />
+                                        <input type="email" required value={authEmail} onChange={e => setAuthEmail(e.target.value)} placeholder="name@example.com" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-3 focus:border-brand-primary outline-none text-left" dir="ltr" />
                                     </div>
-                                    
                                     {authMode !== 'forgot_password' && (
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">סיסמה</label>
-                                            <input type="password" required value={authPassword} onChange={e => setAuthPassword(e.target.value)} placeholder="לפחות 6 תווים" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-2 focus:border-brand-primary outline-none text-left" dir="ltr" />
+                                            <input type="password" required value={authPassword} onChange={e => setAuthPassword(e.target.value)} placeholder="לפחות 6 תווים" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-4 py-3 focus:border-brand-primary outline-none text-left" dir="ltr" />
+                                        </div>
+                                    )}
+
+                                    {authMode === 'login' && (authEmail === 'zwolner@gmail.com' || authEmail.includes('admin')) && (
+                                        <div className="animate-fade-in pt-2">
+                                            <input type="password" value={authPassAdmin} onChange={e=>setAuthPassAdmin(e.target.value)} placeholder="קוד מנהל סודי (לא חובה)" className="w-full border border-brand-secondary/50 bg-brand-secondary/10 dark:bg-brand-secondary/20 text-gray-800 dark:text-white rounded-xl px-4 py-3 outline-none" />
                                         </div>
                                     )}
                                     
-                                    {authError && <div className="text-red-600 bg-red-50 dark:bg-red-900/30 p-2 rounded-lg text-sm text-center font-bold">{authError}</div>}
+                                    {authError && <div className="text-red-600 bg-red-50 dark:bg-red-900/30 p-3 rounded-xl text-sm text-center font-bold border border-red-100 dark:border-red-900/50">{authError}</div>}
 
-                                    <button type="submit" disabled={authLoading} className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition shadow mt-2 disabled:opacity-80 flex justify-center items-center gap-2">
-                                        {authLoading ? <Icon name="RefreshCw" className="animate-spin" size={20} /> : authMode === 'login' ? 'היכנס למערכת' : authMode === 'register' ? 'צור חשבון' : 'שלח קישור לאיפוס'}
+                                    <button type="submit" disabled={authLoading} className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3.5 rounded-xl transition-colors shadow-md mt-4 disabled:opacity-80 flex justify-center items-center gap-2">
+                                        {authLoading ? <Icon name="RefreshCw" className="animate-spin" size={20} /> : authMode === 'login' ? 'היכנס למערכת' : authMode === 'register' ? 'צור חשבון חדש' : 'שלח קישור לאיפוס'}
                                     </button>
                                 </form>
 
-                                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2 text-sm">
+                                <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-3 text-sm">
                                     {authMode === 'login' ? (
                                         <React.Fragment>
-                                            <button onClick={() => { setAuthMode('register'); setAuthError(''); }} className="text-brand-secondary font-bold">אין לך חשבון? הרשמה</button>
-                                            <button onClick={() => { setAuthMode('forgot_password'); setAuthError(''); }} className="text-gray-500">שכחת סיסמה?</button>
+                                            <button onClick={() => { setAuthMode('register'); setAuthError(''); }} className="text-brand-secondary hover:text-[#c15c3c] font-bold transition-colors">אין לך חשבון? הרשמה למערכת</button>
+                                            <button onClick={() => { setAuthMode('forgot_password'); setAuthError(''); }} className="text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors">שכחת סיסמה?</button>
                                         </React.Fragment>
                                     ) : (
-                                        <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="text-brand-secondary font-bold">חזור למסך ההתחברות</button>
+                                        <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="text-brand-secondary hover:text-[#c15c3c] font-bold transition-colors">חזור למסך ההתחברות</button>
                                     )}
                                 </div>
                             </div>
@@ -904,58 +924,53 @@
                     )}
 
                     {showPaymentModal && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 animate-fade-in overflow-y-auto">
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 overflow-y-auto animate-fade-in">
                             <div className="relative w-full max-w-md my-8">
-                                <button onClick={()=>setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 p-2 rounded-full"><Icon name="X" size={24}/></button>
-                                <PayPalSubscription onSuccess={(id)=>{ const u={...user, isSubscribed:true}; setUser(u); localStorage.setItem('pisga_user', JSON.stringify(u)); setShowPaymentModal(false); setAlertMsg({t:"תודה",m:"המנוי הופעל בהצלחה!"}) }} />
+                                <button onClick={()=>setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 hover:bg-white/40 transition-colors p-2 rounded-full"><Icon name="X" size={24}/></button>
+                                <PayPalSubscription onSuccess={handlePaymentSuccess} />
                             </div>
                         </div>
                     )}
 
                     {showA11y && (
-                        <div className="fixed top-28 left-4 sm:left-8 z-[100] flex flex-col items-start animate-fade-in">
-                            <div className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-2xl border-2 border-brand-secondary mb-3 w-64 text-right">
-                                <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-3">
-                                    <button onClick={toggleA11yMenu} className="text-gray-400 hover:text-red-500 transition"><Icon name="X" size={20} /></button>
-                                    <h3 className="font-bold text-brand-primary dark:text-white flex items-center gap-2">נגישות <Icon name="Accessibility" size={20} className="text-brand-secondary" /></h3>
-                                </div>
-                                <div className="space-y-2.5">
-                                    <button onClick={() => changeFontSize(2)} className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">הגדל טקסט <Icon name="ZoomIn" size={16} /></button>
-                                    <button onClick={() => changeFontSize(-2)} className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">הקטן טקסט <Icon name="ZoomOut" size={16} /></button>
-                                    <button onClick={toggleHighlightLinks} className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">הדגשת קישורים <Icon name="Underline" size={16} /></button>
-                                    <button onClick={toggleReadableFont} className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">גופן קריא <Icon name="Type" size={16} /></button>
-                                    <div className="w-full h-px bg-gray-200 dark:bg-gray-700 my-2"></div>
-                                    <button onClick={resetA11y} className="w-full bg-red-50 dark:bg-red-900/30 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50 px-4 py-2.5 rounded-xl text-sm font-bold transition flex justify-between items-center">איפוס הגדרות <Icon name="RefreshCw" size={16} /></button>
-                                </div>
-                            </div>
+                        <div className="fixed top-28 left-4 z-[100] bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-2xl border-2 border-brand-secondary w-64 animate-fade-in text-right">
+                             <div className="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">
+                                <button onClick={()=>setShowA11y(false)} className="text-gray-400 hover:text-red-500 transition-colors"><Icon name="X" size={20}/></button>
+                                <h3 className="font-bold text-brand-primary dark:text-white flex items-center gap-2">נגישות <Icon name="Accessibility" size={18} className="text-brand-secondary" /></h3>
+                             </div>
+                             <div className="space-y-2">
+                                <button onClick={() => {document.body.style.fontSize = '1.2rem'}} className="w-full p-2.5 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-xl text-sm font-bold flex justify-between items-center transition-colors">הגדל טקסט <Icon name="ZoomIn" size={16}/></button>
+                                <button onClick={() => {document.body.style.fontSize = '1rem'}} className="w-full p-2.5 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-xl text-sm font-bold flex justify-between items-center transition-colors">איפוס גודל <Icon name="RefreshCw" size={16}/></button>
+                                <button onClick={() => document.body.classList.toggle('a11y-highlight-links')} className="w-full p-2.5 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-xl text-sm font-bold flex justify-between items-center transition-colors">הדגשת קישורים <Icon name="Underline" size={16}/></button>
+                                <button onClick={() => document.body.classList.toggle('a11y-readable-font')} className="w-full p-2.5 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-xl text-sm font-bold flex justify-between items-center transition-colors">גופן קריא <Icon name="Type" size={16}/></button>
+                             </div>
                         </div>
                     )}
 
-                    <main className="flex-1 pb-20 pt-8">
-                        {currentPage==='admin' && user?.isAdmin ? <AdminPage forumTopics={forumTopics} setForumTopics={setForumTopics} setMessage={(m)=>setAlertMsg({t:"מערכת",m})} /> : 
-                         currentPage==='courses' ? <CoursesPage courses={courses} user={user} onPlay={setGlobalFile} setShowPayment={setShowPaymentModal} /> : 
+                    <main className="flex-1 pb-20 pt-4 relative z-10">
+                        {currentPage==='admin' && user?.isAdmin ? <AdminPage forumTopics={forumTopics} setMessage={m=>setAlertMsg({t:"הודעת מערכת", m})} /> : 
+                         currentPage==='courses' ? <CoursesPage courses={courses} user={user} onPlay={setGlobalFile} setShowPayment={setShowPaymentModal} setShowAuthModal={setShowAuthModal} /> : 
                          currentPage==='forum' ? <ForumPage topics={forumTopics} user={user} setShowAuthModal={setShowAuthModal} /> : 
-                         currentPage==='about' ? <AboutPage /> :
                          currentPage==='youtube' ? <YoutubePage onFileInteract={setGlobalFile} /> : 
                          <HomePage navigate={navigate} />}
                     </main>
 
                     <button 
                         onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} 
-                        className={`fixed bottom-20 sm:bottom-8 right-6 sm:left-6 sm:right-auto bg-brand-primary text-white p-3 rounded-full shadow-xl transition-all duration-300 z-40 hover:scale-110 ${showBackToTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
+                        className={`fixed bottom-24 sm:bottom-8 right-6 sm:left-6 sm:right-auto bg-brand-primary hover:bg-brand-dark text-white p-3 rounded-full shadow-xl transition-all duration-300 z-40 hover:scale-110 ${showBackToTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
                     >
                         <Icon name="ArrowUp" size={24} />
                     </button>
 
                     <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="whatsapp-float"><Icon name="MessageCircle" size={32}/></a>
                     
-                    <footer className="bg-brand-dark dark:bg-gray-900 text-white py-10 transition-colors border-t-4 border-brand-secondary relative z-10">
-                        <div className="max-w-7xl mx-auto px-4 text-center">
+                    <footer className="bg-brand-dark dark:bg-gray-900 text-white py-10 border-t-4 border-brand-secondary text-center relative z-10 mt-auto">
+                        <div className="max-w-7xl mx-auto px-4">
                             <h2 className="text-2xl font-black mb-2">קהילת פסגה</h2>
-                            <p className="text-gray-400 mb-6">הבית העסקי למאמנים ומטפלים בהובלת משה וולנר</p>
-                            <p className="text-sm text-gray-500 mb-1">© {new Date().getFullYear()} כל הזכויות שמורות.</p>
-                            <p className="mt-3 text-sm text-brand-light/60 bg-black/20 inline-block px-4 py-1.5 rounded-full">
-                                נבנה על ידי <a href="https://lev-good.github.io/Good-heart/" target="_blank" rel="noopener noreferrer" className="text-brand-secondary hover:text-white font-bold transition">לב טוב</a>
+                            <p className="text-gray-400 mb-6 font-medium">הבית העסקי למאמנים ומטפלים בהובלת משה וולנר</p>
+                            <p className="text-sm text-gray-500 mb-2">© {new Date().getFullYear()} כל הזכויות שמורות.</p>
+                            <p className="text-sm text-brand-light/50 bg-black/30 inline-block px-4 py-1.5 rounded-full">
+                                נבנה על ידי <a href="https://lev-good.github.io/Good-heart/" target="_blank" rel="noopener noreferrer" className="text-brand-secondary hover:text-white font-bold transition-colors">לב טוב</a>
                             </p>
                         </div>
                     </footer>
@@ -963,8 +978,7 @@
             );
         };
 
-        const init = () => ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-        if (window.FB) init(); else window.addEventListener('firebaseReady', init);
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
 </html>
