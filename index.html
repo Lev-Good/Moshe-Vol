@@ -93,14 +93,15 @@
         import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        const firebaseConfig = {
-            apiKey: "AIzaSyDuQR6wgh64bRHC4cj34HcaTwJbEN040ew",
-            authDomain: "pisga-d3773.firebaseapp.com",
-            projectId: "pisga-d3773",
-            storageBucket: "pisga-d3773.firebasestorage.app",
-            messagingSenderId: "160680335558",
-            appId: "1:160680335558:web:237838b6db44b602a6dfc7"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyDuQR6wgh64bRHC4cj34HcaTwJbEN040ew",
+  authDomain: "pisga-d3773.firebaseapp.com",
+  projectId: "pisga-d3773",
+  storageBucket: "pisga-d3773.firebasestorage.app",
+  messagingSenderId: "160680335558",
+  appId: "1:160680335558:web:237838b6db44b602a6dfc7",
+  measurementId: "G-H2XJ4XHHKJ"
+};
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
