@@ -284,30 +284,30 @@
                 
                 <div className="flex flex-col lg:flex-row gap-6 items-stretch">
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div onClick={() => navigate('courses')} className="bg-gradient-to-br from-brand-primary to-[#060f1c] rounded-[2rem] p-8 text-white shadow-xl hover:shadow-[0_15px_30px_rgba(10,25,47,0.4)] transition-all cursor-pointer group flex flex-col justify-between">
+                        <div onClick={() => navigate('courses')} className="bg-gradient-to-br from-brand-primary to-[#060f1c] rounded-[2rem] p-8 text-white shadow-xl hover:shadow-[0_15px_30px_rgba(10,25,47,0.4)] transition-all cursor-pointer group flex flex-col justify-center h-full transform hover:-translate-y-2 animate-fade-up" style={{animationDelay: '0.2s'}}>
                             <div className="text-center">
                                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-5 border border-white/10 group-hover:bg-brand-secondary transition-colors duration-500">
                                     <Icon name="Crown" size={32} className="text-brand-secondary group-hover:text-white" />
                                 </div>
-                                <h3 className="text-2xl font-black mb-3">כניסת Pro</h3>
+                                <h3 className="text-3xl font-black mb-3">כניסת Pro</h3>
                                 <p className="text-brand-light/80 text-sm leading-relaxed">גישה מלאה לכל קורסי הפרימיום המקצועיים, הכלים והשתתפות בקהילה.</p>
                             </div>
-                            <button className="bg-brand-secondary hover:bg-[#b06734] text-white py-4 mt-6 rounded-2xl font-black text-xl shadow-lg group-hover:scale-105 transition-transform w-full">כניסת חברי מועדון</button>
+                            <button className="bg-brand-secondary hover:bg-[#b06734] text-white py-4 mt-8 rounded-2xl font-black text-xl shadow-lg group-hover:scale-105 transition-transform w-full">כניסת חברי מועדון</button>
                         </div>
                         
-                        <div onClick={() => navigate('youtube')} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[2rem] p-8 text-brand-primary dark:text-white shadow-md hover:shadow-xl hover:border-brand-secondary/50 transition-all cursor-pointer group flex flex-col justify-between">
+                        <div onClick={() => navigate('youtube')} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[2rem] p-8 text-brand-primary dark:text-white shadow-md hover:shadow-xl hover:border-brand-secondary/50 transition-all cursor-pointer group flex flex-col justify-center h-full transform hover:-translate-y-2 animate-fade-up" style={{animationDelay: '0.3s'}}>
                             <div className="text-center">
                                 <div className="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-5 border border-gray-100 dark:border-gray-600 group-hover:bg-red-500 transition-colors duration-500">
                                     <Icon name="Unlock" size={32} className="text-gray-400 group-hover:text-white" />
                                 </div>
-                                <h3 className="text-2xl font-black mb-3 text-brand-primary dark:text-white">כניסה פתוחה</h3>
+                                <h3 className="text-3xl font-black mb-3 text-brand-primary dark:text-white">כניסה פתוחה</h3>
                                 <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">צפייה חופשית בוובינרים, הדרכות ותכנים נבחרים מערוץ היוטיוב.</p>
                             </div>
-                            <button className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-brand-primary dark:text-white py-4 mt-6 rounded-2xl font-black text-xl shadow-sm group-hover:bg-red-500 group-hover:text-white transition-colors w-full">צפו בחינם</button>
+                            <button className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-brand-primary dark:text-white py-4 mt-8 rounded-2xl font-black text-xl shadow-sm group-hover:bg-red-500 group-hover:text-white transition-colors w-full">צפו בחינם</button>
                         </div>
                     </div>
 
-                    <div className="lg:w-[320px] w-full animate-fade-up" style={{animationDelay: '0.2s'}}>
+                    <div className="lg:w-[320px] w-full animate-fade-up" style={{animationDelay: '0.4s'}}>
                         <SidebarWidgets />
                     </div>
                 </div>
