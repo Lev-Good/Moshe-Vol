@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>קהילת פסגה - משה וולנר</title>
     
+    <!-- הוספת הלוגו לסמל הכרטיסיה (Favicon) בדפדפן -->
+    <link rel="icon" href="logo.png" type="image/png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
@@ -17,8 +20,8 @@
                 extend: {
                     colors: {
                         brand: {
-                            primary: '#0a192f', // כחול עמוק ויוקרתי (לוגו/ספר)
-                            secondary: '#c87a3f', // נחושת/זהב עדין
+                            primary: '#0a192f',
+                            secondary: '#c87a3f',
                             light: '#f8fafc',
                             dark: '#060f1c'
                         }
@@ -53,25 +56,19 @@
         @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         
-        /* Shimmer Animation for Title */
         .animate-shimmer-text {
             background: linear-gradient(90deg, #0a192f 0%, #c87a3f 50%, #0a192f 100%);
-            background-size: 200% auto;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
+            background-size: 200% auto; color: transparent;
+            -webkit-background-clip: text; background-clip: text;
             animation: shimmer 4s linear infinite;
         }
         html.dark .animate-shimmer-text {
             background: linear-gradient(90deg, #ffffff 0%, #c87a3f 50%, #ffffff 100%);
-            background-size: 200% auto;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
+            background-size: 200% auto; color: transparent;
+            -webkit-background-clip: text; background-clip: text;
         }
         @keyframes shimmer { to { background-position: 200% center; } }
         
-        /* Floating WhatsApp Button */
         .whatsapp-float {
             position: fixed; width: 50px; height: 50px; bottom: 20px; left: 20px;
             background-color: #25d366; color: #FFF; border-radius: 50px;
@@ -80,7 +77,6 @@
         }
         .whatsapp-float:hover { transform: scale(1.1); background-color: #128C7E; }
 
-        /* Vertical Marquee */
         @keyframes scroll-vertical { from { transform: translateY(0); } to { transform: translateY(-50%); } }
         .marquee-container-vertical {
             overflow: hidden; position: absolute; inset: 0; top: 60px; bottom: 10px;
@@ -97,19 +93,19 @@
 <body className="antialiased">
     <div id="root"></div>
 
-    <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, GoogleAuthProvider, signInWithPopup, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
+        // שימוש ב-trim() כדי להבטיח ששום רווח נסתר לא יגרום לשגיאה!
         const firebaseConfig = {
-            apiKey: "AIzaSyDuQR6wgh64bRHC4cj34HcaTwJbEN040ew",
-            authDomain: "pisga-d3773.firebaseapp.com",
-            projectId: "pisga-d3773",
-            storageBucket: "pisga-d3773.firebasestorage.app",
-            messagingSenderId: "160680335558",
-            appId: "1:160680335558:web:237838b6db44b602a6dfc7"
+            apiKey: "AIzaSyDuQR6wgh64bRHC4cj34HcaTwJbEN040ew".trim(),
+            authDomain: "pisga-d3773.firebaseapp.com".trim(),
+            projectId: "pisga-d3773".trim(),
+            storageBucket: "pisga-d3773.firebasestorage.app".trim(),
+            messagingSenderId: "160680335558".trim(),
+            appId: "1:160680335558:web:237838b6db44b602a6dfc7".trim()
         };
 
         const app = initializeApp(firebaseConfig);
@@ -122,11 +118,11 @@
     </script>
 
     <script type="text/babel">
-        // ----------------------------------------------------
-        // Configuration
-        // ----------------------------------------------------
         const WHATSAPP_LINK = "https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws";
         const DRIVE_SCRIPT_URL = ""; 
+        
+        // הגדרת נתיב הלוגו לכל האתר
+        const LOGO_URL = "logo.png"; 
 
         const { 
             Home, FileVideo, ChevronLeft, ChevronRight, Menu, X, Info,
@@ -177,7 +173,7 @@
 
         const SplashScreen = () => (
             <div className="fixed inset-0 z-[9999] bg-brand-light dark:bg-gray-900 flex flex-col items-center justify-center animate-splash-out">
-                <Icon name="Mountain" size={80} className="text-brand-primary mb-4" />
+                <img src={LOGO_URL} alt="לוגו קהילת פסגה" className="h-32 w-auto mb-4 animate-pulse-soft" onError={(e) => { e.target.style.display='none'; }} />
                 <h1 className="text-4xl font-black text-brand-primary">פסגה</h1>
                 <p className="text-brand-secondary font-bold">הבית העסקי למאמנים ומטפלים</p>
             </div>
@@ -281,13 +277,12 @@
         const HomePage = ({ navigate }) => (
             <div className="max-w-7xl mx-auto px-4 mt-6 pb-12 animate-fade-in">
                 <div className="text-center mb-10 animate-fade-up">
-                    <Icon name="Mountain" size={56} className="mx-auto mb-3 text-brand-secondary" />
+                    <img src={LOGO_URL} alt="לוגו המועדון" className="h-28 md:h-36 w-auto mx-auto mb-4 drop-shadow-lg" onError={(e) => { e.target.style.display='none'; }} />
                     <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 animate-shimmer-text px-2 py-1">ברוכים הבאים לקהילת פסגה</h1>
                     <h2 className="text-xl font-medium text-gray-600 dark:text-gray-400">בהובלת משה וולנר</h2>
                 </div>
                 
                 <div className="flex flex-col lg:flex-row gap-6 items-stretch">
-                    {/* Main Action Cards (Right side on Desktop) */}
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div onClick={() => navigate('courses')} className="bg-gradient-to-br from-brand-primary to-[#060f1c] rounded-[2rem] p-8 text-white shadow-xl hover:shadow-[0_15px_30px_rgba(10,25,47,0.4)] transition-all cursor-pointer group flex flex-col justify-between">
                             <div className="text-center">
@@ -312,13 +307,11 @@
                         </div>
                     </div>
 
-                    {/* Sidebar (Left side on Desktop) */}
                     <div className="lg:w-[320px] w-full animate-fade-up" style={{animationDelay: '0.2s'}}>
                         <SidebarWidgets />
                     </div>
                 </div>
 
-                {/* Integrated About Content */}
                 <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-700 animate-fade-up" style={{animationDelay: '0.3s'}}>
                    <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-10 items-center text-right">
                         <div className="flex-1 space-y-5">
@@ -828,6 +821,7 @@
             const [authEmail, setAuthEmail] = React.useState('');
             const [authPassword, setAuthPassword] = React.useState('');
             const [authName, setAuthName] = React.useState('');
+            const [authPassAdmin, setAuthPassAdmin] = React.useState('');
             const [authError, setAuthError] = React.useState('');
             const [authLoading, setAuthLoading] = React.useState(false);
 
@@ -880,10 +874,9 @@
                 e.preventDefault(); setAuthError(''); setAuthLoading(true);
                 if (!window.FB) { setAuthError("אין חיבור לשרת."); setAuthLoading(false); return; }
 
-                // מנגנון סיסמת המנהל נמצא כעת בטוח בתוך הלוגיקה, בלי באגים של גלובליות
                 let isAdmin = false;
                 if (authEmail.toLowerCase() === "zwolner@gmail.com") {
-                    isAdmin = true; // המייל הזה תמיד מנהל, גוגל מוודא סיסמה
+                    isAdmin = true; 
                 }
 
                 try {
@@ -912,9 +905,24 @@
                  setAuthError(''); setAuthLoading(true);
                  try {
                      const res = await window.FB.signInWithPopup(window.FB.auth, window.FB.googleProvider);
+                     
+                     // בדיקה בשרת האם המשתמש של גוגל כבר מוגדר כ-Pro או מנהל
+                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                     const isAdmin = res.user.email?.toLowerCase() === 'zwolner@gmail.com';
+                     const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', res.user.email?.toLowerCase() || 'unknown');
+                     const proDoc = await window.FB.getDoc(proRef);
+                     const isPro = proDoc.exists() || isAdmin;
+                     
+                     const u = { name: res.user.displayName || 'משתמש', email: res.user.email, isAdmin: isAdmin, isSubscribed: isPro, uid: res.user.uid };
+                     setUser(u);
+                     localStorage.setItem('pisga_user', JSON.stringify(u));
+                     
                      setShowAuthModal(false);
                  } catch (error) {
-                     setAuthError("שגיאה בהתחברות עם גוגל.");
+                     console.error("Google Auth Error:", error);
+                     if (error.code === 'auth/popup-closed-by-user') setAuthError("חלון ההתחברות של גוגל נסגר לפני סיום התהליך.");
+                     else if (error.code === 'auth/operation-not-allowed') setAuthError("שגיאה: התחברות גוגל לא הופעלה במסד הנתונים (Firebase).");
+                     else setAuthError("שגיאה בהתחברות עם גוגל: " + error.message);
                  }
                  setAuthLoading(false);
             }
@@ -922,7 +930,8 @@
             const handlePaymentSuccess = async (id) => {
                 if(!user || !user.email) return;
                 try {
-                    const proRef = window.FB.doc(window.FB.db, 'pro_users', user.email.toLowerCase());
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', user.email.toLowerCase());
                     await window.FB.setDoc(proRef, { isPro: true, paypalId: id, updatedAt: new Date().toISOString() });
                     setShowPaymentModal(false);
                     setAlertMsg({t:"תודה על רכישתך!", m:"מנוי ה-Pro שלך הופעל בהצלחה. כל הקורסים פתוחים עבורך."});
@@ -947,9 +956,9 @@
                     <GlobalFileViewer file={globalFile} onClose={()=>setGlobalFile(null)} />
                     
                     <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 border-b-4 border-brand-secondary h-16 sm:h-20 flex items-center transition-all">
-                        <div className="max-w-7xl mx-auto px-4 w-full flex justify-between items-center h-full">
-                            <div onClick={()=>navigate('home')} className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0 h-full py-2">
-                                <Icon name="Mountain" className="text-brand-primary" size={32} />
+                        <div className="max-w-7xl mx-auto px-3 sm:px-4 w-full flex justify-between items-center h-full relative">
+                            <div onClick={()=>navigate('home')} className="flex items-center gap-1.5 sm:gap-3 cursor-pointer shrink-0 h-full py-2">
+                                <img src={LOGO_URL} alt="לוגו המועדון" className="h-8 sm:h-12 w-auto object-contain" onError={(e) => { e.target.style.display='none'; }} />
                                 <h1 className="font-black text-xl sm:text-2xl text-brand-primary dark:text-white hidden sm:block">פסגה</h1>
                             </div>
                             <nav className="hidden lg:flex gap-1 overflow-x-auto scrollbar-hide px-2 items-center justify-center flex-1 h-full">
@@ -961,11 +970,11 @@
                                 {user?.isAdmin && <button onClick={()=>navigate('admin')} className="px-3 sm:px-4 py-2 rounded-xl font-bold text-sm bg-gray-800 hover:bg-gray-700 text-white flex items-center gap-1.5 transition-colors"><Icon name="Settings" size={16}/> ניהול</button>}
                             </nav>
                             <div className="flex items-center gap-2 sm:gap-3 shrink-0 h-full py-2">
-                                {!user ? <button onClick={()=>{setAuthMode('login'); setShowAuthModal(true); setAuthError('');}} className="text-sm font-bold text-brand-primary border border-brand-primary/30 px-4 sm:px-5 py-1.5 rounded-xl hover:bg-brand-primary hover:text-white transition-colors shadow-sm">התחברות</button> : 
+                                {!user ? <button onClick={()=>{setAuthMode('login'); setShowAuthModal(true); setAuthError('');}} className="text-xs sm:text-sm font-bold text-brand-primary border border-brand-primary/30 px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl hover:bg-brand-primary hover:text-white transition-colors shadow-sm whitespace-nowrap">התחברות</button> : 
                                 <div className="relative">
-                                    <button onClick={()=>setShowUserMenu(!showUserMenu)} className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 p-1 pl-3 pr-1 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm hover:border-brand-primary transition-colors">
-                                        <div className="w-7 h-7 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs"><Icon name="User" size={14}/></div>
-                                        <span className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 truncate max-w-[80px] sm:max-w-[100px]">{user.name}</span>
+                                    <button onClick={()=>setShowUserMenu(!showUserMenu)} className="flex items-center gap-1.5 sm:gap-2 bg-gray-100 dark:bg-gray-800 p-1 pl-2 sm:pl-3 pr-1 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm hover:border-brand-primary transition-colors">
+                                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-brand-primary text-white flex items-center justify-center text-[10px] sm:text-xs shrink-0"><Icon name="User" size={14}/></div>
+                                        <span className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 truncate max-w-[65px] sm:max-w-[100px]">{user.name}</span>
                                     </button>
                                     {showUserMenu && (
                                         <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 p-2 flex flex-col gap-1 z-50 animate-fade-in">
@@ -981,20 +990,21 @@
                                     <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name={isDarkMode ? "Sun" : "Moon"} size={18} /></button>
                                     <button onClick={toggleA11yMenu} className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name="Accessibility" size={18} /></button>
                                 </div>
-                                <button onClick={()=>setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-1.5 text-brand-primary dark:text-white"><Icon name={isMobileMenuOpen ? "X" : "Menu"} size={24}/></button>
+                                <button onClick={()=>setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-1.5 text-brand-primary dark:text-white shrink-0"><Icon name={isMobileMenuOpen ? "X" : "Menu"} size={26}/></button>
                             </div>
                         </div>
-                    </header>
 
-                    {isMobileMenuOpen && (
-                        <div className="lg:hidden bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-xl p-4 space-y-2 absolute w-full top-16 sm:top-20 z-40">
-                            {navItems.map(item => (
-                                <button key={item.id} onClick={() => navigate(item.id)} className="w-full text-right p-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3"><Icon name={item.icon} size={18}/> {item.label}</button>
-                            ))}
-                            {user && <button onClick={() => navigate('profile')} className="w-full text-right p-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3"><Icon name="User" size={18}/> הפרופיל שלי</button>}
-                            {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right p-3 rounded-xl font-bold text-brand-primary flex items-center gap-3"><Icon name="Settings" size={18}/> ניהול</button>}
-                        </div>
-                    )}
+                        {/* תפריט מובייל - חייב להיות בתוך ההדר כדי שיגלל איתו */}
+                        {isMobileMenuOpen && (
+                            <div className="lg:hidden bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-xl p-4 space-y-2 absolute w-full top-full left-0 z-40 max-h-[85vh] overflow-y-auto">
+                                {navItems.map(item => (
+                                    <button key={item.id} onClick={() => navigate(item.id)} className="w-full text-right p-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3"><Icon name={item.icon || item.i} size={18}/> {item.label || item.l}</button>
+                                ))}
+                                {user && <button onClick={() => navigate('profile')} className="w-full text-right p-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 border-t border-gray-100 dark:border-gray-700 mt-2 pt-4"><Icon name="User" size={18}/> הפרופיל שלי</button>}
+                                {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right p-3 rounded-xl font-bold text-brand-primary flex items-center gap-3 border-t border-gray-100 dark:border-gray-700 mt-2 pt-4"><Icon name="Settings" size={18}/> ניהול מערכת</button>}
+                            </div>
+                        )}
+                    </header>
 
                     {showAuthModal && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
