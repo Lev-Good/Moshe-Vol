@@ -171,13 +171,42 @@
             </div>
         );
 
-        const SplashScreen = () => (
-            <div className="fixed inset-0 z-[9999] bg-brand-light dark:bg-gray-900 flex flex-col items-center justify-center animate-splash-out">
-                <img src={LOGO_URL} alt="לוגו קהילת פסגה" className="h-32 w-auto mb-4 animate-pulse-soft" onError={(e) => { e.target.style.display='none'; }} />
-                <h1 className="text-4xl font-black text-brand-primary">פסגה</h1>
-                <p className="text-brand-secondary font-bold">הבית העסקי למאמנים ומטפלים</p>
-            </div>
-        );
+        const SplashScreen = () => {
+            const fallbackIconRef = React.useRef(null);
+            return (
+                <div className="fixed inset-0 z-[9999] bg-brand-light dark:bg-gray-900 flex flex-col items-center justify-center animate-splash-out relative overflow-hidden">
+                    {/* אפקט של הילה/קרקע בתחתית המסך */}
+                    <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-brand-primary/5 dark:from-brand-primary/20 to-transparent"></div>
+                    
+                    <div className="flex flex-col items-center animate-climb z-10">
+                        <div className="relative mb-6">
+                            <img 
+                                src={LOGO_URL} 
+                                alt="לוגו קהילת פסגה" 
+                                className="h-32 md:h-40 w-auto animate-glow object-contain drop-shadow-xl" 
+                                onError={(e) => { 
+                                    e.target.style.display='none'; 
+                                    if(fallbackIconRef.current) fallbackIconRef.current.style.display='block'; 
+                                }} 
+                            />
+                            {/* אייקון גיבוי למקרה שהלוגו עוד לא נטען */}
+                            <div ref={fallbackIconRef} style={{display: 'none'}} className="animate-glow">
+                                <Icon name="Mountain" size={100} className="text-brand-primary dark:text-white drop-shadow-xl" />
+                            </div>
+                        </div>
+                        
+                        <h1 className="text-3xl md:text-4xl font-black text-brand-primary dark:text-white mb-3 tracking-wide">
+                            עולים לפסגה<span className="animate-pulse">...</span>
+                        </h1>
+                        
+                        {/* פס טעינה מתמלא */}
+                        <div className="w-48 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden shadow-inner">
+                            <div className="h-full bg-brand-secondary rounded-full animate-loading-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         const formatDate = (isoString) => {
             const d = new Date(isoString);
