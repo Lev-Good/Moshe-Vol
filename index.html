@@ -854,7 +854,7 @@
             const [authError, setAuthError] = React.useState('');
             const [authLoading, setAuthLoading] = React.useState(false);
 
-            React.useEffect(() => { setTimeout(() => setShowSplash(false), 2000); }, []);
+            React.useEffect(() => { setTimeout(() => setShowSplash(false), 2500); }, []);
             React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('darkMode', isDarkMode); }, [isDarkMode]);
             React.useEffect(() => { const h = () => setShowBackToTop(window.scrollY > 300); window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h); }, []);
 
