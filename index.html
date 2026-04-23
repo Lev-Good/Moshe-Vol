@@ -174,9 +174,9 @@
         const SplashScreen = () => {
             const fallbackIconRef = React.useRef(null);
             return (
-                <div className="fixed inset-0 z-[9999] bg-brand-light dark:bg-gray-900 flex flex-col items-center justify-center animate-splash-out relative overflow-hidden">
+                <div className="fixed inset-0 w-full h-full z-[9999] bg-brand-light dark:bg-gray-900 flex flex-col items-center justify-center animate-splash-out overflow-hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
                     {/* אפקט של הילה/קרקע בתחתית המסך */}
-                    <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-brand-primary/5 dark:from-brand-primary/20 to-transparent"></div>
+                    <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-brand-primary/5 dark:from-brand-primary/20 to-transparent pointer-events-none"></div>
                     
                     <div className="flex flex-col items-center animate-climb z-10">
                         <div className="relative mb-6">
@@ -595,7 +595,7 @@
             React.useEffect(() => {
                 const fetchYT = async () => {
                     try {
-                        const rss = `https://www.youtube.com/feeds/videos.xml?channel_id=UC_x5XG1OV2P6uZZ5FSM9Ttw`; 
+                        const rss = `https://www.youtube.com/feeds/videos.xml?channel_id=UCiZYtPnLm6KvO79XfUOW9iA`; 
                         const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
                         const res = await fetch(api);
                         const data = await res.json();
