@@ -874,11 +874,18 @@
                 const unsubscribeAuth = window.FB.onAuthStateChanged(window.FB.auth, async (fbUser) => {
                     if (fbUser && fbUser.email) {
                         const isAdmin = fbUser.email.toLowerCase() === 'zwolner@gmail.com';
-                        const proRef = window.FB.doc(window.FB.db, 'pro_users', fbUser.email.toLowerCase());
+                        
+                        // תמיד נעדכן את ה-State קודם עם הנתונים הבסיסיים כדי שכפתור הניהול יופיע מיד
+                        const baseUser = { name: fbUser.displayName || 'משתמש', email: fbUser.email, isAdmin: isAdmin, isSubscribed: isAdmin, uid: fbUser.uid };
+                        setUser(baseUser);
+                        localStorage.setItem('pisga_user', JSON.stringify(baseUser));
+
+                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                        const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', fbUser.email.toLowerCase());
                         
                         unsubPro = window.FB.onSnapshot(proRef, (proDoc) => {
                             const isPro = proDoc.exists() || isAdmin;
-                            const u = { name: fbUser.displayName || 'משתמש', email: fbUser.email, isAdmin: isAdmin, isSubscribed: isPro, uid: fbUser.uid };
+                            const u = { ...baseUser, isSubscribed: isPro };
                             setUser(u);
                             localStorage.setItem('pisga_user', JSON.stringify(u));
                         });
@@ -889,7 +896,8 @@
                     }
                 });
 
-                const q = window.FB.query(window.FB.collection(window.FB.db, 'pisga_forum'));
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const q = window.FB.query(window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics'));
                 const unsubForum = window.FB.onSnapshot(q, s => {
                     const list = [];
                     s.forEach(d => list.push({ id: d.id, ...d.data() }));
@@ -923,7 +931,11 @@
                     setShowAuthModal(false);
                 } catch (error) {
                     if (error.code === 'auth/email-already-in-use') setAuthError("כתובת המייל כבר קיימת במערכת.");
-                    else if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') setAuthError("אימייל או סיסמה שגויים.");
+                    else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') setAuthError("אימייל או סיסמה שגויים.");
+                    else if (error.code === 'auth/user-not-found') {
+                        if (authMode === 'forgot_password') setAuthError("כתובת המייל הזו לא רשומה במערכת.");
+                        else setAuthError("אימייל או סיסמה שגויים.");
+                    }
                     else if (error.code === 'auth/weak-password') setAuthError("הסיסמה חלשה מדי (לפחות 6 תווים).");
                     else setAuthError("שגיאה בתהליך. אנא נסה שוב.");
                 }
