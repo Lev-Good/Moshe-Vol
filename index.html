@@ -640,7 +640,8 @@
             const handleDeleteTopic = async (topic) => {
                 if(!confirm("מחיקת נושא זה תסיר אותו לצמיתות מהענן. להמשיך?")) return;
                 try {
-                    await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'pisga_forum', topic.id));
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.id));
                     setMessage("הנושא נמחק בהצלחה.");
                 } catch (e) { alert("שגיאה: " + e.message); }
             };
@@ -648,8 +649,9 @@
             const handleDeleteReply = async (topic, reply) => {
                 if(!confirm("האם למחוק תגובה זו?")) return;
                 try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     const updatedReplies = topic.replies.filter(r => r.id !== reply.id);
-                    await window.FB.updateDoc(window.FB.doc(window.FB.db, 'pisga_forum', topic.id), { replies: updatedReplies });
+                    await window.FB.updateDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.id), { replies: updatedReplies });
                     setMessage("התגובה נמחקה בהצלחה.");
                 } catch (e) { alert("שגיאה במחיקת תגובה."); }
             };
