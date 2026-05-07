@@ -1683,12 +1683,14 @@
             const [authError, setAuthError] = React.useState('');
             const [authLoading, setAuthLoading] = React.useState(false);
             const [dynamicDriveUrl, setDynamicDriveUrl] = React.useState("");
+            const [zoomLevel, setZoomLevel] = React.useState(100);
 
             const [showA11yStatement, setShowA11yStatement] = React.useState(false);
             const [showPrivacyPolicy, setShowPrivacyPolicy] = React.useState(false);
             const [showTerms, setShowTerms] = React.useState(false);
 
             React.useEffect(() => { setTimeout(() => setShowSplash(false), 2500); }, []);
+            React.useEffect(() => { document.documentElement.style.fontSize = `${zoomLevel}%`; }, [zoomLevel]);
             React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('darkMode', isDarkMode); }, [isDarkMode]);
             React.useEffect(() => { const h = () => setShowBackToTop(window.scrollY > 300); window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h); }, []);
 
@@ -2020,8 +2022,8 @@
                                 <h3 className="font-bold text-brand-primary dark:text-white flex items-center gap-2 text-sm">נגישות <Icon name="Accessibility" size={16} className="text-brand-secondary" /></h3>
                             </div>
                             <div className="space-y-1.5">
-                                <button onClick={() => document.body.classList.add('a11y-large-text')} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">הגדל טקסט <Icon name="ZoomIn" size={14} /></button>
-                                <button onClick={() => document.body.classList.remove('a11y-large-text')} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">איפוס גודל <Icon name="RefreshCw" size={14} /></button>
+                                <button onClick={() => setZoomLevel(prev => Math.min(prev + 4, 140))} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">הגדל טקסט <Icon name="ZoomIn" size={14} /></button>
+                                <button onClick={() => setZoomLevel(100)} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">איפוס גודל <Icon name="RefreshCw" size={14} /></button>
                                 <button onClick={() => document.body.classList.toggle('a11y-highlight-links')} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">הדגשת קישורים <Icon name="Underline" size={14} /></button>
                                 <button onClick={() => document.body.classList.toggle('a11y-readable-font')} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">גופן קריא <Icon name="Type" size={14} /></button>
                             </div>
