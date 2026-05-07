@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>קהילת פסגה - משה וולנר</title>
-    
+
     <!-- הוספת הלוגו לסמל הכרטיסיה (Favicon) בדפדפן -->
     <link rel="icon" href="logo.png" type="image/png">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap"
+        rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -38,58 +40,178 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        body { transition: background-color 0.3s ease, color 0.3s ease, font-size 0.3s ease; }
-        html.dark body { background-color: #0f172a; color: #f8fafc; }
-        html:not(.dark) body { background-color: #f8fafc; color: #1e293b; }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #c87a3f; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #0a192f; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        
-        @keyframes fadeOutSplash { from { opacity: 1; } to { opacity: 0; visibility: hidden; z-index: -1; } }
-        .animate-splash-out { animation: fadeOutSplash 0.8s ease-in-out forwards; animation-delay: 1.5s; }
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease, font-size 0.3s ease;
+        }
 
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-        
+        html.dark body {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        html:not(.dark) body {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c87a3f;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0a192f;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeOutSplash {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                visibility: hidden;
+                z-index: -1;
+            }
+        }
+
+        .animate-splash-out {
+            animation: fadeOutSplash 0.8s ease-in-out forwards;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
         .animate-shimmer-text {
             background: linear-gradient(90deg, #0a192f 0%, #c87a3f 50%, #0a192f 100%);
-            background-size: 200% auto; color: transparent;
-            -webkit-background-clip: text; background-clip: text;
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
             animation: shimmer 4s linear infinite;
         }
+
         html.dark .animate-shimmer-text {
             background: linear-gradient(90deg, #ffffff 0%, #c87a3f 50%, #ffffff 100%);
-            background-size: 200% auto; color: transparent;
-            -webkit-background-clip: text; background-clip: text;
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
         }
-        @keyframes shimmer { to { background-position: 200% center; } }
-        
-        .whatsapp-float {
-            position: fixed; width: 50px; height: 50px; bottom: 20px; left: 20px;
-            background-color: #25d366; color: #FFF; border-radius: 50px;
-            text-align: center; font-size: 26px; box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-            z-index: 100; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
-        }
-        .whatsapp-float:hover { transform: scale(1.1); background-color: #128C7E; }
 
-        @keyframes scroll-vertical { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+        @keyframes shimmer {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .whatsapp-float {
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            bottom: 20px;
+            left: 20px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 26px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            background-color: #128C7E;
+        }
+
+        @keyframes scroll-vertical {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-50%);
+            }
+        }
+
         .marquee-container-vertical {
-            overflow: hidden; position: absolute; inset: 0; top: 60px; bottom: 10px;
+            overflow: hidden;
+            position: absolute;
+            inset: 0;
+            top: 60px;
+            bottom: 10px;
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
             mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
         }
-        .marquee-vertical { display: flex; flex-direction: column; gap: 1rem; animation: scroll-vertical 25s linear infinite; }
-        .marquee-container-vertical:hover .marquee-vertical { animation-play-state: paused; }
 
-        .a11y-readable-font * { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.5px !important; }
-        .a11y-highlight-links a, .a11y-highlight-links button { text-decoration: underline !important; font-weight: 800 !important; }
+        .marquee-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            animation: scroll-vertical 25s linear infinite;
+        }
+
+        .marquee-container-vertical:hover .marquee-vertical {
+            animation-play-state: paused;
+        }
+
+        .a11y-readable-font * {
+            font-family: Arial, Helvetica, sans-serif !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        .a11y-highlight-links a,
+        .a11y-highlight-links button {
+            text-decoration: underline !important;
+            font-weight: 800 !important;
+        }
     </style>
 </head>
+
 <body className="antialiased">
     <div id="root"></div>
 
@@ -97,7 +219,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, GoogleAuthProvider, signInWithPopup, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
+
         // שימוש ב-trim() כדי להבטיח ששום רווח נסתר לא יגרום לשגיאה!
         const firebaseConfig = {
             apiKey: "AIzaSyDuQR6wgh64bRHC4cj34HcaTwJbEN040ew".trim(),
@@ -119,15 +241,15 @@
 
     <script type="text/babel">
         const WHATSAPP_LINK = "https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws";
-        const DRIVE_SCRIPT_URL = ""; 
-        
-        // הגדרת נתיב הלוגו לכל האתר
-        const LOGO_URL = "logo.png"; 
+        const DRIVE_SCRIPT_URL = "";
 
-        const { 
+        // הגדרת נתיב הלוגו לכל האתר
+        const LOGO_URL = "logo.png";
+
+        const {
             Home, FileVideo, ChevronLeft, ChevronRight, Menu, X, Info,
-            PlayCircle, ExternalLink, ShieldCheck, Mountain, User, 
-            LogOut, Lock, MessageCircle, RefreshCw, MessageSquare, Trash2, Ghost, 
+            PlayCircle, ExternalLink, ShieldCheck, Mountain, User,
+            LogOut, Lock, MessageCircle, RefreshCw, MessageSquare, Trash2, Ghost,
             Youtube, CheckCircle, ArrowUp, CreditCard, Settings, Plus, Crown, Unlock,
             Accessibility, ZoomIn, ZoomOut, Underline, Type, Quote, Mail, BookOpen, Star, UserPlus, Key
         } = lucide;
@@ -161,7 +283,7 @@
             }
         ];
 
-        const CustomMessageBox = ({ message, title="הודעת מערכת", onClose }) => (
+        const CustomMessageBox = ({ message, title = "הודעת מערכת", onClose }) => (
             <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl border border-brand-primary/20">
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{title}</h3>
@@ -177,28 +299,28 @@
                 <div className="fixed inset-0 w-full h-full z-[9999] bg-brand-light dark:bg-gray-900 flex flex-col items-center justify-center animate-splash-out overflow-hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
                     {/* אפקט של הילה/קרקע בתחתית המסך */}
                     <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-brand-primary/5 dark:from-brand-primary/20 to-transparent pointer-events-none"></div>
-                    
+
                     <div className="flex flex-col items-center animate-climb z-10">
                         <div className="relative mb-6">
-                            <img 
-                                src={LOGO_URL} 
-                                alt="לוגו קהילת פסגה" 
-                                className="h-32 md:h-40 w-auto animate-glow object-contain drop-shadow-xl" 
-                                onError={(e) => { 
-                                    e.target.style.display='none'; 
-                                    if(fallbackIconRef.current) fallbackIconRef.current.style.display='block'; 
-                                }} 
+                            <img
+                                src={LOGO_URL}
+                                alt="לוגו קהילת פסגה"
+                                className="h-32 md:h-40 w-auto animate-glow object-contain drop-shadow-xl"
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    if (fallbackIconRef.current) fallbackIconRef.current.style.display = 'block';
+                                }}
                             />
                             {/* אייקון גיבוי למקרה שהלוגו עוד לא נטען */}
-                            <div ref={fallbackIconRef} style={{display: 'none'}} className="animate-glow">
+                            <div ref={fallbackIconRef} style={{ display: 'none' }} className="animate-glow">
                                 <Icon name="Mountain" size={100} className="text-brand-primary dark:text-white drop-shadow-xl" />
                             </div>
                         </div>
-                        
+
                         <h1 className="text-3xl md:text-4xl font-black text-brand-primary dark:text-white mb-3 tracking-wide">
                             עולים לפסגה<span className="animate-pulse">...</span>
                         </h1>
-                        
+
                         {/* פס טעינה מתמלא */}
                         <div className="w-48 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden shadow-inner">
                             <div className="h-full bg-brand-secondary rounded-full animate-loading-bar"></div>
@@ -210,7 +332,7 @@
 
         const formatDate = (isoString) => {
             const d = new Date(isoString);
-            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
         };
 
         const PayPalSubscription = ({ onSuccess }) => {
@@ -225,8 +347,8 @@
                         if (window.paypal) {
                             window.paypal.Buttons({
                                 style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'subscribe' },
-                                createSubscription: function(data, actions) { return actions.subscription.create({ plan_id: 'P-2H242596WM328212DNHQMPHI' }); },
-                                onApprove: function(data, actions) { onSuccess(data.subscriptionID); }
+                                createSubscription: function (data, actions) { return actions.subscription.create({ plan_id: 'P-2H242596WM328212DNHQMPHI' }); },
+                                onApprove: function (data, actions) { onSuccess(data.subscriptionID); }
                             }).render('#paypal-button-container-P-2H242596WM328212DNHQMPHI');
                         }
                     };
@@ -235,10 +357,10 @@
                     try {
                         window.paypal.Buttons({
                             style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'subscribe' },
-                            createSubscription: function(data, actions) { return actions.subscription.create({ plan_id: 'P-2H242596WM328212DNHQMPHI' }); },
-                            onApprove: function(data, actions) { onSuccess(data.subscriptionID); }
+                            createSubscription: function (data, actions) { return actions.subscription.create({ plan_id: 'P-2H242596WM328212DNHQMPHI' }); },
+                            onApprove: function (data, actions) { onSuccess(data.subscriptionID); }
                         }).render('#paypal-button-container-P-2H242596WM328212DNHQMPHI');
-                    } catch(e) { }
+                    } catch (e) { }
                 }
             }, [onSuccess]);
 
@@ -306,14 +428,14 @@
         const HomePage = ({ navigate }) => (
             <div className="max-w-7xl mx-auto px-4 mt-6 pb-12 animate-fade-in">
                 <div className="text-center mb-10 animate-fade-up">
-                    <img src={LOGO_URL} alt="לוגו המועדון" className="h-28 md:h-36 w-auto mx-auto mb-4 drop-shadow-lg" onError={(e) => { e.target.style.display='none'; }} />
+                    <img src={LOGO_URL} alt="לוגו המועדון" className="h-28 md:h-36 w-auto mx-auto mb-4 drop-shadow-lg" onError={(e) => { e.target.style.display = 'none'; }} />
                     <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 animate-shimmer-text px-2 py-1">ברוכים הבאים לקהילת פסגה</h1>
                     <h2 className="text-xl font-medium text-gray-600 dark:text-gray-400">בהובלת משה וולנר</h2>
                 </div>
-                
+
                 <div className="flex flex-col lg:flex-row gap-6 items-stretch">
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div onClick={() => navigate('courses')} className="bg-gradient-to-br from-brand-primary to-[#060f1c] rounded-[2rem] p-8 text-white shadow-xl hover:shadow-[0_15px_30px_rgba(10,25,47,0.4)] transition-all cursor-pointer group flex flex-col justify-center h-full transform hover:-translate-y-2 animate-fade-up" style={{animationDelay: '0.2s'}}>
+                        <div onClick={() => navigate('courses')} className="bg-gradient-to-br from-brand-primary to-[#060f1c] rounded-[2rem] p-8 text-white shadow-xl hover:shadow-[0_15px_30px_rgba(10,25,47,0.4)] transition-all cursor-pointer group flex flex-col justify-center h-full transform hover:-translate-y-2 animate-fade-up" style={{ animationDelay: '0.2s' }}>
                             <div className="text-center">
                                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-5 border border-white/10 group-hover:bg-brand-secondary transition-colors duration-500">
                                     <Icon name="Crown" size={32} className="text-brand-secondary group-hover:text-white" />
@@ -323,8 +445,8 @@
                             </div>
                             <button className="bg-brand-secondary hover:bg-[#b06734] text-white py-4 mt-8 rounded-2xl font-black text-xl shadow-lg group-hover:scale-105 transition-transform w-full">כניסת חברי מועדון</button>
                         </div>
-                        
-                        <div onClick={() => navigate('youtube')} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[2rem] p-8 text-brand-primary dark:text-white shadow-md hover:shadow-xl hover:border-brand-secondary/50 transition-all cursor-pointer group flex flex-col justify-center h-full transform hover:-translate-y-2 animate-fade-up" style={{animationDelay: '0.3s'}}>
+
+                        <div onClick={() => navigate('youtube')} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[2rem] p-8 text-brand-primary dark:text-white shadow-md hover:shadow-xl hover:border-brand-secondary/50 transition-all cursor-pointer group flex flex-col justify-center h-full transform hover:-translate-y-2 animate-fade-up" style={{ animationDelay: '0.3s' }}>
                             <div className="text-center">
                                 <div className="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-5 border border-gray-100 dark:border-gray-600 group-hover:bg-red-500 transition-colors duration-500">
                                     <Icon name="Unlock" size={32} className="text-gray-400 group-hover:text-white" />
@@ -336,13 +458,13 @@
                         </div>
                     </div>
 
-                    <div className="lg:w-[320px] w-full animate-fade-up" style={{animationDelay: '0.4s'}}>
+                    <div className="lg:w-[320px] w-full animate-fade-up" style={{ animationDelay: '0.4s' }}>
                         <SidebarWidgets />
                     </div>
                 </div>
 
-                <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-700 animate-fade-up" style={{animationDelay: '0.3s'}}>
-                   <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-10 items-center text-right">
+                <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-700 animate-fade-up" style={{ animationDelay: '0.3s' }}>
+                    <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-10 items-center text-right">
                         <div className="flex-1 space-y-5">
                             <h2 className="text-3xl md:text-4xl font-black text-brand-primary dark:text-white">הייתי שם.</h2>
                             <div className="text-base text-gray-700 dark:text-gray-300 leading-relaxed space-y-3">
@@ -357,12 +479,12 @@
                         <div className="shrink-0 hidden md:block">
                             <div className="w-40 h-56 bg-brand-primary rounded-xl shadow-xl flex flex-col items-center justify-center p-6 text-white text-center transform rotate-3 border border-brand-secondary/20">
                                 <Icon name="Mountain" size={40} className="text-brand-secondary mb-4" />
-                                <h2 className="font-black text-xl leading-none mb-2">מומחה<br/>שכיר</h2>
+                                <h2 className="font-black text-xl leading-none mb-2">מומחה<br />שכיר</h2>
                                 <div className="w-full h-px bg-white/30 my-2"></div>
-                                <h2 className="font-black text-xl leading-none text-brand-secondary">מומחה<br/>יוצר</h2>
+                                <h2 className="font-black text-xl leading-none text-brand-secondary">מומחה<br />יוצר</h2>
                             </div>
                         </div>
-                   </div>
+                    </div>
                 </div>
             </div>
         );
@@ -404,7 +526,7 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        <button onClick={() => { if(!user) setShowAuthModal(true); else setShowPayment(true); }} className="bg-brand-secondary hover:bg-[#b06734] text-white px-8 py-3 rounded-xl font-bold shadow-md transition-all w-full sm:w-auto shrink-0 z-10">
+                                        <button onClick={() => { if (!user) setShowAuthModal(true); else setShowPayment(true); }} className="bg-brand-secondary hover:bg-[#b06734] text-white px-8 py-3 rounded-xl font-bold shadow-md transition-all w-full sm:w-auto shrink-0 z-10">
                                             {!user ? 'התחברות לרכישה' : 'לרכישת גישה'}
                                         </button>
                                     </div>
@@ -438,7 +560,7 @@
                         <h2 className="text-3xl font-black text-brand-primary dark:text-white mb-2">קורסים בתשלום</h2>
                         <p className="text-lg text-gray-600 dark:text-gray-400">הידע המקצועי המלא שיקדם את העסק שלכם.</p>
                     </div>
-                    
+
                     {courses.length === 0 ? (
                         <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
                             <Icon name="BookOpen" size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
@@ -479,7 +601,7 @@
 
             const handleCreate = async (e) => {
                 e.preventDefault();
-                if(!user) return setShowAuthModal(true);
+                if (!user) return setShowAuthModal(true);
                 setLoading(true);
                 try {
                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -488,13 +610,13 @@
                         date: new Date().toISOString(), isAnonymous: isAnon, replies: [], isAdminPost: user.isAdmin
                     });
                     setNewTitle(""); setNewContent(""); setIsFormOpen(false);
-                } catch(e) { alert("שגיאה בענן"); }
+                } catch (e) { alert("שגיאה בענן"); }
                 setLoading(false);
             };
 
             const handleReply = async (e) => {
                 e.preventDefault();
-                if(!user) return setShowAuthModal(true);
+                if (!user) return setShowAuthModal(true);
                 setLoading(true);
                 const updatedReplies = [...(currentTopic.replies || []), {
                     id: Date.now().toString(), content: newReply, author: isAnon ? 'אנונימי' : user.name, realAuthor: user.name,
@@ -504,7 +626,7 @@
                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     await window.FB.updateDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics', currentTopic.id), { replies: updatedReplies });
                     setNewReply("");
-                } catch(e) { alert("שגיאה בענן"); }
+                } catch (e) { alert("שגיאה בענן"); }
                 setLoading(false);
             };
 
@@ -517,7 +639,7 @@
                             <h2 className="text-2xl font-black text-brand-primary dark:text-white mb-3">{t.title}</h2>
                             <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed">{t.content}</p>
                             <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400 flex items-center gap-2">
-                                <Icon name={t.isAdminPost ? "ShieldCheck" : "User"} size={14} className={t.isAdminPost ? "text-brand-secondary" : ""} /> 
+                                <Icon name={t.isAdminPost ? "ShieldCheck" : "User"} size={14} className={t.isAdminPost ? "text-brand-secondary" : ""} />
                                 פורסם ע"י {t.author} • {formatDate(t.date)}
                             </div>
                         </div>
@@ -531,9 +653,9 @@
                         </div>
                         <form onSubmit={handleReply} className="space-y-3 bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 pl-0 md:pl-10">
                             <h3 className="font-bold text-gray-800 dark:text-white mb-1 text-sm">הוספת תגובה:</h3>
-                            <textarea value={newReply} onChange={e=>setNewReply(e.target.value)} required placeholder="כתוב תגובה..." className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-secondary resize-none h-20 text-sm"></textarea>
+                            <textarea value={newReply} onChange={e => setNewReply(e.target.value)} required placeholder="כתוב תגובה..." className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-secondary resize-none h-20 text-sm"></textarea>
                             <div className="flex justify-between items-center pt-1">
-                                <label className="text-xs text-gray-600 dark:text-gray-300 flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} className="rounded" /> עילום שם</label>
+                                <label className="text-xs text-gray-600 dark:text-gray-300 flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={isAnon} onChange={e => setIsAnon(e.target.checked)} className="rounded" /> עילום שם</label>
                                 <button type="submit" disabled={loading} className="bg-brand-primary hover:bg-brand-dark text-white px-6 py-2 rounded-xl font-bold text-sm transition-colors">שלח תגובה</button>
                             </div>
                         </form>
@@ -554,13 +676,13 @@
                         </button>
                     ) : (
                         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-200 dark:border-gray-700 animate-fade-in relative">
-                             <button onClick={() => setIsFormOpen(false)} className="absolute top-5 left-5 text-gray-400 hover:text-red-500 transition-colors"><Icon name="X" size={20}/></button>
-                             <h3 className="font-black text-xl text-brand-primary dark:text-white mb-4">נושא חדש</h3>
-                             <form onSubmit={handleCreate} className="space-y-3">
-                                <input type="text" value={newTitle} onChange={e=>setNewTitle(e.target.value)} required placeholder="כותרת הנושא (לדוגמה: איך לשווק קליניקה?)" className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-bold outline-none text-gray-800 dark:text-white focus:border-brand-primary text-sm" />
-                                <textarea value={newContent} onChange={e=>setNewContent(e.target.value)} required placeholder="פרטו כאן את השאלה או הדילמה שלכם..." className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 h-24 outline-none text-gray-800 dark:text-white focus:border-brand-primary resize-none text-sm"></textarea>
+                            <button onClick={() => setIsFormOpen(false)} className="absolute top-5 left-5 text-gray-400 hover:text-red-500 transition-colors"><Icon name="X" size={20} /></button>
+                            <h3 className="font-black text-xl text-brand-primary dark:text-white mb-4">נושא חדש</h3>
+                            <form onSubmit={handleCreate} className="space-y-3">
+                                <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} required placeholder="כותרת הנושא (לדוגמה: איך לשווק קליניקה?)" className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-bold outline-none text-gray-800 dark:text-white focus:border-brand-primary text-sm" />
+                                <textarea value={newContent} onChange={e => setNewContent(e.target.value)} required placeholder="פרטו כאן את השאלה או הדילמה שלכם..." className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 h-24 outline-none text-gray-800 dark:text-white focus:border-brand-primary resize-none text-sm"></textarea>
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
-                                    <label className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={isAnon} onChange={e=>setIsAnon(e.target.checked)} className="rounded" /> פרסם בעילום שם</label>
+                                    <label className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={isAnon} onChange={e => setIsAnon(e.target.checked)} className="rounded" /> פרסם בעילום שם</label>
                                     <button type="submit" disabled={loading} className="bg-brand-secondary hover:bg-[#c15c3c] text-white w-full sm:w-auto px-8 py-2.5 rounded-xl font-bold transition-colors text-sm">פרסם בקהילה</button>
                                 </div>
                             </form>
@@ -590,68 +712,61 @@
         };
 
         const YoutubePage = ({ onFileInteract }) => {
-            const [videos, setVideos] = React.useState([]);
-            const [loading, setLoading] = React.useState(true);
+            const [latestVideos, setLatestVideos] = React.useState([]);
+            const [curatedVideos, setCuratedVideos] = React.useState([]);
+            const [loadingLatest, setLoadingLatest] = React.useState(true);
+            const [loadingCurated, setLoadingCurated] = React.useState(true);
+
             React.useEffect(() => {
                 const fetchYT = async () => {
                     try {
-                        const rss = `https://www.youtube.com/feeds/videos.xml?channel_id=UCiZYtPnLm6KvO79XfUOW9iA`; 
-                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rss)}`;
-                        const res = await fetch(proxyUrl);
+                        const rss = `https://www.youtube.com/feeds/videos.xml?channel_id=UCiZYtPnLm6KvO79XfUOW9iA`;
+                        const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
+                        const res = await fetch(api);
                         const data = await res.json();
-                        if (data && data.contents) {
-                            const parser = new DOMParser();
-                            const xmlDoc = parser.parseFromString(data.contents, "text/xml");
-                            const entries = xmlDoc.getElementsByTagName("entry");
-                            const items = Array.from(entries).map((entry, idx) => {
-                                const videoId = entry.getElementsByTagName("yt:videoId")[0]?.textContent || '';
-                                const title = entry.getElementsByTagName("title")[0]?.textContent || '';
-                                const link = entry.getElementsByTagName("link")[0]?.getAttribute("href") || `https://www.youtube.com/watch?v=${videoId}`;
-                                const thumbnail = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
-                                return { id: `yt_${idx}`, name: title, url: link, thumbnail: thumbnail, type: 'youtube' };
-                            });
-                            setVideos(items);
-                        } else {
-                            // Fallback if allorigins proxy has an issue
-                            const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
-                            const resFallback = await fetch(api);
-                            const dataFallback = await resFallback.json();
-                            if (dataFallback.status === 'ok') {
-                                setVideos(dataFallback.items.map((i, idx) => ({ id: `yt_${idx}`, name: i.title, url: i.link, thumbnail: i.thumbnail, type: 'youtube' })));
-                            }
+                        if (data && data.status === 'ok') {
+                            setLatestVideos(data.items.map((i, idx) => ({ id: `yt_latest_${idx}`, name: i.title, url: i.link, thumbnail: i.thumbnail, type: 'youtube' })));
                         }
                     } catch (e) {
                         console.error("Error loading YouTube feed:", e);
-                        // Safe JSON fallback in case of CORS errors
-                        try {
-                            const rss = `https://www.youtube.com/feeds/videos.xml?channel_id=UCiZYtPnLm6KvO79XfUOW9iA`; 
-                            const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
-                            const resFallback = await fetch(api);
-                            const dataFallback = await resFallback.json();
-                            if (dataFallback.status === 'ok') {
-                                setVideos(dataFallback.items.map((i, idx) => ({ id: `yt_${idx}`, name: i.title, url: i.link, thumbnail: i.thumbnail, type: 'youtube' })));
-                            }
-                        } catch(err) {}
                     }
-                    setLoading(false);
+                    setLoadingLatest(false);
                 };
+
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const curatedRef = window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'curated_videos');
+                const unsub = window.FB.onSnapshot(curatedRef, (snapshot) => {
+                    const list = [];
+                    snapshot.forEach(doc => {
+                        list.push({ id: doc.id, ...doc.data() });
+                    });
+                    setCuratedVideos(list.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)));
+                    setLoadingCurated(false);
+                }, (err) => {
+                    console.error("Error fetching curated videos:", err);
+                    setLoadingCurated(false);
+                });
+
                 fetchYT();
+
+                return () => unsub();
             }, []);
+
             return (
-                <div className="max-w-6xl mx-auto p-4 space-y-10 animate-fade-in pb-12">
-                    {/* Premium Modern Hero Section */}
-                    <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-red-700 via-red-800 to-[#120202] dark:from-red-950 dark:via-[#1e0202] dark:to-black p-8 md:p-12 shadow-2xl border border-red-500/20 text-right">
+                <div className="max-w-6xl mx-auto p-4 space-y-12 animate-fade-in pb-12">
+                    {/* Premium Modern Hero Section - Styled in Site Brand Colors */}
+                    <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand-primary to-brand-dark dark:from-[#0b192f] dark:to-[#040a14] p-8 md:p-12 shadow-2xl border border-brand-primary/20 text-right">
                         {/* Glow and Floating Youtube Icon Effects */}
-                        <div className="absolute right-[-10%] top-[-10%] w-72 h-72 bg-red-500/10 rounded-full blur-[100px] pointer-events-none"></div>
-                        <div className="absolute left-[-5%] bottom-[-5%] w-72 h-72 bg-red-600/15 rounded-full blur-[80px] pointer-events-none"></div>
+                        <div className="absolute right-[-10%] top-[-10%] w-72 h-72 bg-brand-secondary/10 rounded-full blur-[100px] pointer-events-none"></div>
+                        <div className="absolute left-[-5%] bottom-[-5%] w-72 h-72 bg-brand-primary/20 rounded-full blur-[80px] pointer-events-none"></div>
                         <div className="absolute left-10 md:left-16 top-1/2 -translate-y-1/2 opacity-10 blur-[1px] scale-150 hidden md:block select-none pointer-events-none">
-                            <Icon name="Youtube" size={180} className="text-white" />
+                            <Icon name="Youtube" size={180} className="text-brand-secondary" />
                         </div>
 
                         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                             <div className="space-y-4 max-w-2xl">
-                                <div className="inline-flex items-center gap-2 bg-white/10 dark:bg-red-500/10 px-3.5 py-1.5 rounded-full text-white font-extrabold text-xs tracking-wider border border-white/10">
-                                    <Icon name="Youtube" size={14} className="text-red-500" /> הערוץ הרשמי פתוח לכולם
+                                <div className="inline-flex items-center gap-2 bg-white/10 dark:bg-brand-secondary/10 px-3.5 py-1.5 rounded-full text-brand-secondary font-extrabold text-xs tracking-wider border border-brand-secondary/20">
+                                    <Icon name="Youtube" size={14} className="text-brand-secondary" /> הערוץ הרשמי פתוח לכולם
                                 </div>
                                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight">
                                     תכנים חינמיים להצלחה שלכם
@@ -662,71 +777,155 @@
                             </div>
 
                             <div className="shrink-0 flex flex-col items-center gap-2">
-                                <a 
-                                    href="https://www.youtube.com/@moshevol8942" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black text-base px-8 py-4 rounded-2xl shadow-[0_10px_25px_rgba(220,38,38,0.3)] hover:shadow-[0_15px_30px_rgba(220,38,38,0.5)] transition-all group"
+                                <a
+                                    href="https://www.youtube.com/@moshevol8942"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-3 bg-brand-secondary hover:bg-[#b06734] active:scale-95 text-white font-black text-base px-8 py-4 rounded-2xl shadow-[0_10px_25px_rgba(200,122,63,0.3)] hover:shadow-[0_15px_30px_rgba(200,122,63,0.5)] transition-all group"
                                 >
                                     <Icon name="Youtube" size={22} className="group-hover:scale-110 transition-transform" /> מעבר לערוץ היוטיוב
                                     <Icon name="ExternalLink" size={16} />
                                 </a>
-                                <p className="text-[11px] text-gray-300 font-medium">הירשמו לערוץ לקבלת תכנים חדשים מדי שבוע!</p>
+                                <p className="text-[11px] text-gray-300 font-medium">הירשמו לערוץ לקבלת תכנים חדשים!</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Videos Grid */}
-                    {loading ? (
-                        <div className="flex flex-col items-center justify-center py-24 gap-4">
-                            <Icon name="RefreshCw" size={40} className="animate-spin text-red-500" />
-                            <p className="text-sm font-bold text-gray-500">טוען סרטונים מערוץ היוטיוב...</p>
+                    {/* Automatic Latest Videos Section (The original fast-load feed) */}
+                    <div className="space-y-4 text-right">
+                        <div className="flex items-center gap-2 border-r-4 border-brand-secondary pr-3 py-1">
+                            <Icon name="Youtube" size={20} className="text-brand-secondary" />
+                            <h3 className="text-lg md:text-xl font-black text-brand-primary dark:text-white">הסרטונים האחרונים בערוץ (טעינה אוטומטית)</h3>
                         </div>
-                    ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {videos.map(v => (
-                                <div key={v.id} onClick={() => onFileInteract(v)} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 hover:border-red-500/30 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col">
-                                    <div className="relative aspect-video bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                                        <img src={v.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={v.name} />
-                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <Icon name="PlayCircle" size={48} className="text-white drop-shadow-md" />
+                        {loadingLatest ? (
+                            <div className="flex justify-center py-10"><Icon name="RefreshCw" size={24} className="animate-spin text-brand-secondary" /></div>
+                        ) : (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                                {latestVideos.slice(0, 5).map(v => (
+                                    <div key={v.id} onClick={() => onFileInteract(v)} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700 hover:border-brand-secondary/30 transition-all cursor-pointer group flex flex-col">
+                                        <div className="relative aspect-video bg-gray-200 dark:bg-gray-700 overflow-hidden shrink-0">
+                                            <img src={v.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={v.name} />
+                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                <Icon name="PlayCircle" size={32} className="text-white drop-shadow-md" />
+                                            </div>
+                                        </div>
+                                        <div className="p-3 flex-1 flex flex-col justify-center text-right">
+                                            <h4 className="font-bold text-gray-800 dark:text-white text-[10px] leading-snug line-clamp-2" dir="rtl">{v.name}</h4>
                                         </div>
                                     </div>
-                                    <div className="p-5 flex-1 flex flex-col justify-center">
-                                        <h3 className="font-bold text-gray-800 dark:text-white leading-snug line-clamp-2 text-sm text-right" dir="rtl">{v.name}</h3>
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
+                                {latestVideos.length === 0 && (
+                                    <p className="text-center text-gray-400 py-6 font-medium col-span-full">לא נטענו סרטונים אוטומטיים.</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
 
-                            {/* Go to channel Call To Action card */}
-                            <a 
-                                href="https://www.youtube.com/@moshevol8942" 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="bg-gradient-to-br from-red-600/5 to-red-800/10 hover:from-red-600/10 hover:to-red-800/20 dark:from-red-950/40 dark:to-black/60 rounded-2xl p-6 border-2 border-dashed border-red-500/20 hover:border-red-500/40 transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-4 min-h-[220px] group"
-                            >
-                                <div className="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-red-600/20 group-hover:scale-110 transition-transform duration-300">
-                                    <Icon name="Youtube" size={28} />
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="font-black text-gray-800 dark:text-white group-hover:text-red-500 transition-colors text-base">לצפייה בכל הסרטונים</h3>
-                                    <p className="text-gray-400 text-xs font-medium">מעבר לערוץ היוטיוב הרשמי של משה וולנר</p>
-                                </div>
-                                <span className="inline-flex items-center gap-1 text-xs font-extrabold text-red-600 dark:text-red-400 group-hover:underline">
-                                    מעבר לערוץ <Icon name="ChevronLeft" size={14} />
-                                </span>
-                            </a>
+                    {/* Curated Manual Videos Library */}
+                    <div className="space-y-6 text-right pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <div className="flex items-center gap-2 border-r-4 border-brand-secondary pr-3 py-1 mb-2">
+                            <Icon name="PlayCircle" size={20} className="text-brand-secondary" />
+                            <h3 className="text-xl md:text-2xl font-black text-brand-primary dark:text-white">ספריית הדרכות נבחרות וקורסים חינמיים</h3>
                         </div>
-                    )}
+
+                        {loadingCurated ? (
+                            <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                <Icon name="RefreshCw" size={36} className="animate-spin text-brand-secondary" />
+                                <p className="text-xs font-bold text-gray-500">טוען את ספריית ההדרכות הנבחרות...</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-8">
+                                {curatedVideos.map(v => (
+                                    <div key={v.id} onClick={() => onFileInteract(v)} className="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 hover:border-brand-secondary/30 hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col md:flex-row items-stretch">
+                                        {/* Thumbnail section */}
+                                        <div className="relative w-full md:w-5/12 aspect-video bg-gray-200 dark:bg-gray-700 overflow-hidden shrink-0">
+                                            <img src={v.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={v.name} />
+                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                <Icon name="PlayCircle" size={48} className="text-white drop-shadow-md" />
+                                            </div>
+                                        </div>
+                                        {/* Description & details section */}
+                                        <div className="p-6 md:p-8 flex-1 flex flex-col justify-between text-right">
+                                            <div className="space-y-3">
+                                                <span className="inline-flex items-center gap-1.5 bg-brand-secondary/10 text-brand-secondary px-2.5 py-1 rounded-lg text-[11px] font-black">
+                                                    <Icon name="Youtube" size={12} /> הדרכת פרימיום פתוחה
+                                                </span>
+                                                <h3 className="font-black text-gray-900 dark:text-white leading-snug text-base md:text-lg lg:text-xl group-hover:text-brand-secondary transition-colors line-clamp-2" dir="rtl">{v.name}</h3>
+                                                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-3">
+                                                    {v.description || "הדרכה עסקית ומקצועית מערוץ היוטיוב של משה וולנר, המציגה פתרונות, כלים מעשיים ושיטות עבודה שיעזרו לכם להתפתח ולעבור לפסגה הבאה שלכם."}
+                                                </p>
+                                            </div>
+                                            <div className="mt-4 pt-4 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between text-[11px] font-bold text-gray-400 dark:text-gray-500">
+                                                <span className="flex items-center gap-1"><Icon name="CheckCircle" size={12} className="text-brand-secondary" /> חופשי לצפייה</span>
+                                                <span className="text-brand-secondary hover:underline flex items-center gap-1 font-black">נגן הדרכה <Icon name="ChevronLeft" size={14} /></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {curatedVideos.length === 0 && (
+                                    <div className="text-center py-16 bg-gray-50 dark:bg-gray-900/20 rounded-2xl border border-dashed border-gray-200 dark:border-gray-800">
+                                        <Icon name="FileVideo" size={36} className="mx-auto text-gray-400 mb-2" />
+                                        <p className="text-gray-500 font-bold text-sm">הספרייה ריקה כרגע. סרטונים נבחרים יתווספו בקרוב!</p>
+                                    </div>
+                                )}
+
+                                {/* Go to channel Call To Action card - Styled in Brand Colors */}
+                                <a
+                                    href="https://www.youtube.com/@moshevol8942"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-gradient-to-br from-brand-primary/5 to-brand-primary/10 hover:from-brand-primary/10 hover:to-brand-primary/15 dark:from-gray-800/40 dark:to-gray-800/80 rounded-3xl p-8 border-2 border-dashed border-brand-secondary/30 hover:border-brand-secondary/50 transition-all cursor-pointer flex flex-col md:flex-row items-center justify-between gap-6 group"
+                                >
+                                    <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-right">
+                                        <div className="w-16 h-16 bg-brand-secondary text-white rounded-full flex items-center justify-center shadow-lg shadow-brand-secondary/25 group-hover:scale-110 transition-transform duration-300 shrink-0">
+                                            <Icon name="Youtube" size={32} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <h3 className="font-black text-gray-800 dark:text-white group-hover:text-brand-secondary transition-colors text-lg md:text-xl">לצפייה בכל הסרטונים וההדרכות</h3>
+                                            <p className="text-gray-400 text-xs md:text-sm font-medium">מעבר לערוץ היוטיוב הרשמי של משה וולנר עם עשרות תכנים נוספים</p>
+                                        </div>
+                                    </div>
+                                    <span className="inline-flex items-center gap-1 text-sm font-extrabold text-brand-secondary group-hover:underline shrink-0">
+                                        מעבר לערוץ <Icon name="ChevronLeft" size={16} />
+                                    </span>
+                                </a>
+                            </div>
+                        )}
+                    </div>
                 </div>
             );
         };
 
-        const AdminPage = ({ forumTopics, setMessage }) => {
+        const AdminPage = ({ forumTopics, setMessage, driveScriptUrl }) => {
             const [userEmailToUpgrade, setUserEmailToUpgrade] = React.useState("");
             const [adminEmailToAdd, setAdminEmailToAdd] = React.useState("");
             const [proSearchQuery, setProSearchQuery] = React.useState("");
-            
+
+            const [videoUrl, setVideoUrl] = React.useState("");
+            const [videoTitle, setVideoTitle] = React.useState("");
+            const [videoDesc, setVideoDesc] = React.useState("");
+            const [curatedVideos, setCuratedVideos] = React.useState([]);
+            const [loadingVideos, setLoadingVideos] = React.useState(true);
+
+            const [localDriveScriptUrl, setLocalDriveScriptUrl] = React.useState(driveScriptUrl || "");
+
+            React.useEffect(() => {
+                if (driveScriptUrl) setLocalDriveScriptUrl(driveScriptUrl);
+            }, [driveScriptUrl]);
+
+            const handleSaveSettings = async (e) => {
+                e.preventDefault();
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const settingsRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'settings', 'general');
+                    await window.FB.setDoc(settingsRef, { driveScriptUrl: localDriveScriptUrl }, { merge: true });
+                    setMessage("הגדרות סנכרון Google Drive נשמרו בהצלחה!");
+                } catch (e) {
+                    alert("שגיאה בשמירת הגדרות: " + e.message);
+                }
+            };
+
             const [proUsers, setProUsers] = React.useState([]);
             const [admins, setAdmins] = React.useState([]);
             const [loadingPro, setLoadingPro] = React.useState(true);
@@ -735,7 +934,7 @@
             React.useEffect(() => {
                 if (!window.FB) return;
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                
+
                 // Subscribe to pro_users
                 const proCollectionRef = window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users');
                 const unsubPro = window.FB.onSnapshot(proCollectionRef, (snapshot) => {
@@ -764,14 +963,29 @@
                     setLoadingAdmins(false);
                 });
 
+                // Subscribe to curated_videos
+                const videosCollectionRef = window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'curated_videos');
+                const unsubVideos = window.FB.onSnapshot(videosCollectionRef, (snapshot) => {
+                    const list = [];
+                    snapshot.forEach(doc => {
+                        list.push({ id: doc.id, ...doc.data() });
+                    });
+                    setCuratedVideos(list.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)));
+                    setLoadingVideos(false);
+                }, (err) => {
+                    console.error("Error fetching curated videos:", err);
+                    setLoadingVideos(false);
+                });
+
                 return () => {
                     unsubPro();
                     unsubAdmins();
+                    unsubVideos();
                 };
             }, []);
 
             const handleDeleteTopic = async (topic) => {
-                if(!confirm("מחיקת נושא זה תסיר אותו לצמיתות מהענן. להמשיך?")) return;
+                if (!confirm("מחיקת נושא זה תסיר אותו לצמיתות מהענן. להמשיך?")) return;
                 try {
                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics', topic.id));
@@ -780,7 +994,7 @@
             };
 
             const handleDeleteReply = async (topic, reply) => {
-                if(!confirm("האם למחוק תגובה זו?")) return;
+                if (!confirm("האם למחוק תגובה זו?")) return;
                 try {
                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     const updatedReplies = topic.replies.filter(r => r.id !== reply.id);
@@ -792,20 +1006,20 @@
             const handleManualUpgrade = async (e) => {
                 e.preventDefault();
                 const email = userEmailToUpgrade.toLowerCase().trim();
-                if(!email) return;
+                if (!email) return;
                 try {
                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     const userRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', email);
-                    await window.FB.setDoc(userRef, { 
-                        isPro: true, 
-                        addedAt: new Date().toISOString(), 
-                        method: 'manual', 
-                        addedBy: window.FB.auth.currentUser?.email || 'system' 
+                    await window.FB.setDoc(userRef, {
+                        isPro: true,
+                        addedAt: new Date().toISOString(),
+                        method: 'manual',
+                        addedBy: window.FB.auth.currentUser?.email || 'system'
                     });
                     setMessage(`האימייל ${email} הוגדר בהצלחה כמנוי Pro.`);
                     setUserEmailToUpgrade("");
-                } catch(e) { 
-                    alert("שגיאה בהוספת המשתמש לשרת: " + e.message); 
+                } catch (e) {
+                    alert("שגיאה בהוספת המשתמש לשרת: " + e.message);
                 }
             };
 
@@ -816,7 +1030,7 @@
                     const userRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', email);
                     await window.FB.deleteDoc(userRef);
                     setMessage(`מנוי ה-Pro של ${email} בוטל בהצלחה.`);
-                } catch(e) {
+                } catch (e) {
                     alert("שגיאה בביטול המנוי: " + e.message);
                 }
             };
@@ -828,13 +1042,13 @@
                 try {
                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', email);
-                    await window.FB.setDoc(adminRef, { 
-                        addedAt: new Date().toISOString(), 
-                        addedBy: window.FB.auth.currentUser?.email || 'system' 
+                    await window.FB.setDoc(adminRef, {
+                        addedAt: new Date().toISOString(),
+                        addedBy: window.FB.auth.currentUser?.email || 'system'
                     });
                     setMessage(`האימייל ${email} הוגדר בהצלחה כמנהל מערכת.`);
                     setAdminEmailToAdd("");
-                } catch(e) {
+                } catch (e) {
                     alert("שגיאה בהוספת מנהל: " + e.message);
                 }
             };
@@ -850,12 +1064,61 @@
                     const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', email);
                     await window.FB.deleteDoc(adminRef);
                     setMessage(`הרשאות הניהול של ${email} בוטלו בהצלחה.`);
-                } catch(e) {
+                } catch (e) {
                     alert("שגיאה בהסרת מנהל: " + e.message);
                 }
             };
 
-            const filteredProUsers = proUsers.filter(u => 
+            const getYoutubeId = (url) => {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            };
+
+            const handleAddVideo = async (e) => {
+                e.preventDefault();
+                const url = videoUrl.trim();
+                const title = videoTitle.trim();
+                const desc = videoDesc.trim();
+                if (!url || !title) return;
+
+                const ytId = getYoutubeId(url);
+                if (!ytId) {
+                    alert("נא להזין קישור יוטיוב תקין.");
+                    return;
+                }
+
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const docRef = window.FB.doc(window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'curated_videos'));
+                    await window.FB.setDoc(docRef, {
+                        url: `https://www.youtube.com/watch?v=${ytId}`,
+                        name: title,
+                        description: desc,
+                        thumbnail: `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`,
+                        addedAt: new Date().toISOString()
+                    });
+                    setMessage("הסרטון נוסף בהצלחה לרשימה הידנית.");
+                    setVideoUrl("");
+                    setVideoTitle("");
+                    setVideoDesc("");
+                } catch (e) {
+                    alert("שגיאה בהוספת הסרטון: " + e.message);
+                }
+            };
+
+            const handleDeleteVideo = async (id) => {
+                if (!confirm("האם למחוק סרטון זה מהרשימה?")) return;
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'curated_videos', id));
+                    setMessage("הסרטון נמחק בהצלחה.");
+                } catch (e) {
+                    alert("שגיאה במחיקת הסרטון: " + e.message);
+                }
+            };
+
+            const filteredProUsers = proUsers.filter(u =>
                 u.email.toLowerCase().includes(proSearchQuery.toLowerCase().trim())
             );
 
@@ -905,9 +1168,9 @@
                                         <p className="text-gray-500 text-xs mt-1">פתיחת גישה ידנית לקורסים עבור תלמידים ששילמו בדרכים אחרות.</p>
                                     </div>
                                 </div>
-                                
+
                                 <form onSubmit={handleManualUpgrade} className="flex flex-col sm:flex-row gap-3 mb-6">
-                                    <input type="email" value={userEmailToUpgrade} onChange={e=>setUserEmailToUpgrade(e.target.value)} required placeholder="הזן את כתובת המייל של התלמיד..." className="flex-1 p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left text-sm" dir="ltr" />
+                                    <input type="email" value={userEmailToUpgrade} onChange={e => setUserEmailToUpgrade(e.target.value)} required placeholder="הזן את כתובת המייל של התלמיד..." className="flex-1 p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left text-sm" dir="ltr" />
                                     <button type="submit" className="bg-brand-primary hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-md text-sm shrink-0">הוסף הרשאת מנוי</button>
                                 </form>
 
@@ -915,7 +1178,7 @@
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="font-bold text-gray-800 dark:text-white text-sm">רשימת מנויי Pro קיימים</h3>
                                         <div className="relative max-w-[200px] w-full">
-                                            <input type="text" value={proSearchQuery} onChange={e=>setProSearchQuery(e.target.value)} placeholder="חפש מייל..." className="w-full p-2 pr-3 pl-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white text-xs outline-none focus:border-brand-primary" />
+                                            <input type="text" value={proSearchQuery} onChange={e => setProSearchQuery(e.target.value)} placeholder="חפש מייל..." className="w-full p-2 pr-3 pl-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white text-xs outline-none focus:border-brand-primary" />
                                         </div>
                                     </div>
 
@@ -968,7 +1231,7 @@
                                 </div>
 
                                 <form onSubmit={handleAddAdmin} className="flex flex-col sm:flex-row gap-3 mb-6">
-                                    <input type="email" value={adminEmailToAdd} onChange={e=>setAdminEmailToAdd(e.target.value)} required placeholder="הזן מייל של מנהל נוסף..." className="flex-1 p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left text-sm" dir="ltr" />
+                                    <input type="email" value={adminEmailToAdd} onChange={e => setAdminEmailToAdd(e.target.value)} required placeholder="הזן מייל של מנהל נוסף..." className="flex-1 p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left text-sm" dir="ltr" />
                                     <button type="submit" className="bg-brand-primary hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-md text-sm shrink-0">הוסף מנהל</button>
                                 </form>
 
@@ -1009,6 +1272,146 @@
                         </div>
                     </div>
 
+                    {/* Curated Videos Management */}
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 border border-brand-primary/10 shadow-sm">
+                        <div className="flex items-center gap-4 mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+                            <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary"><Icon name="Youtube" size={24} /></div>
+                            <div>
+                                <h2 className="text-xl font-black text-gray-800 dark:text-white">ניהול סרטוני הדרכה ידניים (דף חינם)</h2>
+                                <p className="text-gray-500 text-xs mt-1">הוספת סרטונים ספציפיים מערוץ היוטיוב שיוצגו בדף התכנים החינמיים באופן קבוע, כולל כותרת ותיאור משלכם.</p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleAddVideo} className="space-y-4 mb-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1 text-right">
+                                    <label className="text-xs font-bold text-gray-500">קישור לסרטון ביוטיוב:</label>
+                                    <input type="text" value={videoUrl} onChange={e => setVideoUrl(e.target.value)} required placeholder="https://www.youtube.com/watch?v=..." className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left text-sm" dir="ltr" />
+                                </div>
+                                <div className="space-y-1 text-right">
+                                    <label className="text-xs font-bold text-gray-500">כותרת הסרטון:</label>
+                                    <input type="text" value={videoTitle} onChange={e => setVideoTitle(e.target.value)} required placeholder="למשל: איך לבנות הצעה שאי אפשר לסרב לה" className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-sm" />
+                                </div>
+                            </div>
+                            <div className="space-y-1 text-right">
+                                <label className="text-xs font-bold text-gray-500">תיאור מפורט של הסרטון:</label>
+                                <textarea value={videoDesc} onChange={e => setVideoDesc(e.target.value)} required placeholder="הזן תיאור מפורט ומושך שישכנע את הגולשים לצפות בהדרכה..." className="w-full p-3 h-24 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary resize-none text-sm"></textarea>
+                            </div>
+                            <button type="submit" className="w-full md:w-auto bg-brand-primary hover:bg-brand-dark text-white px-8 py-3 rounded-xl font-bold transition-colors shadow-md text-sm">הוסף סרטון לרשימה</button>
+                        </form>
+
+                        <div className="border-t border-gray-100 dark:border-gray-700 pt-6">
+                            <h3 className="font-bold text-gray-800 dark:text-white text-sm mb-4">סרטונים ידניים שהתווספו:</h3>
+                            {loadingVideos ? (
+                                <div className="flex justify-center py-6"><Icon name="RefreshCw" size={24} className="animate-spin text-brand-secondary" /></div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {curatedVideos.map(v => {
+                                        const ytId = getYoutubeId(v.url);
+                                        return (
+                                            <div key={v.id} className="bg-gray-50 dark:bg-gray-900/40 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-start gap-4">
+                                                <img src={v.thumbnail} className="w-24 aspect-video rounded-lg object-cover shrink-0 bg-gray-200" alt={v.name} />
+                                                <div className="flex-1 text-right min-w-0">
+                                                    <h4 className="font-bold text-gray-800 dark:text-white text-xs truncate">{v.name}</h4>
+                                                    <p className="text-gray-400 text-[10px] line-clamp-2 mt-1 leading-relaxed">{v.description}</p>
+                                                    <a href={v.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[10px] text-brand-secondary hover:underline mt-2 font-bold">
+                                                        <Icon name="ExternalLink" size={10} /> צפה ביוטיוב
+                                                    </a>
+                                                </div>
+                                                <button onClick={() => handleDeleteVideo(v.id)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 p-1.5 rounded-lg transition-colors shrink-0">
+                                                    <Icon name="Trash2" size={14} />
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                    {curatedVideos.length === 0 && (
+                                        <p className="text-center text-gray-400 py-6 font-medium md:col-span-2">לא התווספו סרטונים ידניים עדיין.</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Google Drive Sync Settings */}
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 border border-brand-primary/10 shadow-sm space-y-6">
+                        <div className="flex items-center gap-4 border-b border-gray-100 dark:border-gray-700 pb-4">
+                            <div className="w-12 h-12 bg-brand-secondary/10 rounded-full flex items-center justify-center text-brand-secondary"><Icon name="RefreshCw" size={24} /></div>
+                            <div>
+                                <h2 className="text-xl font-black text-gray-800 dark:text-white">הגדרות סנכרון Google Drive (קורסים בתשלום)</h2>
+                                <p className="text-gray-500 text-xs mt-1">סנכרון אוטומטי של קורסים ושיעורים ישירות מתיקיית הדרייב הראשית.</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-right">
+                            {/* Explanations & Script Code */}
+                            <div className="space-y-4 bg-gray-50 dark:bg-gray-900/40 p-6 rounded-2xl border border-gray-100 dark:border-gray-800">
+                                <h3 className="font-black text-brand-primary dark:text-brand-secondary text-base flex items-center gap-2"><Icon name="Info" size={18} /> מדריך שלב-אחר-שלב לסנכרון</h3>
+                                <div className="text-xs text-gray-600 dark:text-gray-300 space-y-2.5 leading-relaxed">
+                                    <p>1. היכנסו לתיקייה הראשית של הקורסים ב-Google Drive (מזהה: <code className="bg-white dark:bg-gray-850 px-1 py-0.5 rounded font-mono select-all">1uYrPpyEcpBlpcuClcDewocPdstcZWvLc</code>).</p>
+                                    <p>2. לחצו על <strong>חדש (New)</strong> ← <strong>עוד (More)</strong> ← <strong>Google Apps Script</strong>.</p>
+                                    <p>3. מחקו את כל הקוד הקיים, הדביקו את הקוד הבא ושמרו:</p>
+                                    <pre className="bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto text-[10px] font-mono select-all text-left" dir="ltr">{`function doGet() {
+  var parentId = "1uYrPpyEcpBlpcuClcDewocPdstcZWvLc";
+  try {
+    var parent = DriveApp.getFolderById(parentId);
+    var subfolders = parent.getFolders();
+    var courses = [];
+    while (subfolders.hasNext()) {
+      var folder = subfolders.next();
+      var lessons = [];
+      var files = folder.getFiles();
+      while (files.hasNext()) {
+        var file = files.next();
+        lessons.push({
+          id: file.getId(),
+          name: file.getName(),
+          url: "https://drive.google.com/file/d/" + file.getId() + "/view",
+          type: "video"
+        });
+      }
+      lessons.sort(function(a, b) { return a.name.localeCompare(b.name, 'he'); });
+      courses.push({
+        id: folder.getId(),
+        name: folder.getName(),
+        lessons: lessons
+      });
+    }
+    courses.sort(function(a, b) { return a.name.localeCompare(b.name, 'he'); });
+    return ContentService.createTextOutput(JSON.stringify(courses))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (e) {
+    return ContentService.createTextOutput(JSON.stringify({ error: e.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`}</pre>
+                                    <p>4. לחצו על <strong>פריסה (Deploy)</strong> ← <strong>פריסה חדשה (New deployment)</strong>.</p>
+                                    <p>5. בחרו בסוג: <strong>אפליקציית אינטרנט (Web app)</strong>.</p>
+                                    <p>6. הגדירו: הפעל בתור <strong>אני (Me)</strong> וגישה ל-<strong>כולם (Anyone)</strong>. לחצו על <strong>Deploy</strong> והעתיקו את הקישור שנוצר (Web app URL).</p>
+                                </div>
+                            </div>
+
+                            {/* Configuration Form */}
+                            <form onSubmit={handleSaveSettings} className="space-y-4 flex flex-col justify-between">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500">קישור לאפליקציית האינטרנט (Google Web App URL):</label>
+                                    <input
+                                        type="url"
+                                        value={localDriveScriptUrl}
+                                        onChange={e => setLocalDriveScriptUrl(e.target.value)}
+                                        placeholder="https://script.google.com/macros/s/.../exec"
+                                        className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left text-sm"
+                                        dir="ltr"
+                                    />
+                                    <span className="text-[10px] text-gray-400 block leading-normal mt-1.5">הדבקת הקישור כאן תסנכרן את עמוד הקורסים בתשלום באופן אוטומטי ובזמן אמת עבור כל חברי המועדון שיש להם גישה.</span>
+                                </div>
+
+                                <button type="submit" className="w-full bg-brand-primary hover:bg-brand-dark text-white py-3.5 rounded-xl font-bold transition-all shadow-md text-sm">
+                                    שמור הגדרות סנכרון
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
                     {/* Forum Management */}
                     <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 border border-brand-primary/20 shadow-sm">
                         <div className="flex items-center gap-4 mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
@@ -1018,7 +1421,7 @@
                                 <p className="text-gray-500 text-xs mt-1">מחיקת נושאים שלמים או תגובות ספציפיות.</p>
                             </div>
                         </div>
-                        
+
                         <div className="space-y-4">
                             {forumTopics.map(topic => (
                                 <div key={topic.id} className="border border-gray-200 dark:border-gray-700 p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 text-right" dir="rtl">
@@ -1031,7 +1434,7 @@
                                             <Icon name="Trash2" size={14} /> מחק אשכול
                                         </button>
                                     </div>
-                                    
+
                                     {topic.replies && topic.replies.length > 0 && (
                                         <div className="bg-white dark:bg-gray-800 rounded-xl p-3 space-y-2 border border-gray-100 dark:border-gray-700">
                                             <h4 className="text-xs font-bold text-gray-400 mb-2">תגובות:</h4>
@@ -1067,27 +1470,27 @@
                 setLoading(true);
                 try {
                     await window.FB.updatePassword(window.FB.auth.currentUser, newPassword);
-                    setAlertMsg({t: "הצלחה", m: "הסיסמה שונתה בהצלחה!"});
+                    setAlertMsg({ t: "הצלחה", m: "הסיסמה שונתה בהצלחה!" });
                     setNewPassword("");
                 } catch (error) {
                     if (error.code === 'auth/requires-recent-login') {
-                        setAlertMsg({t: "שגיאת אבטחה", m: "כדי לשנות סיסמה, יש להתנתק מהחשבון ולהתחבר מחדש (מטעמי אבטחה של גוגל), ואז לנסות שוב."});
+                        setAlertMsg({ t: "שגיאת אבטחה", m: "כדי לשנות סיסמה, יש להתנתק מהחשבון ולהתחבר מחדש (מטעמי אבטחה של גוגל), ואז לנסות שוב." });
                     } else if (error.code === 'auth/weak-password') {
-                        setAlertMsg({t: "שגיאה", m: "הסיסמה חלשה מדי (לפחות 6 תווים)."});
+                        setAlertMsg({ t: "שגיאה", m: "הסיסמה חלשה מדי (לפחות 6 תווים)." });
                     } else {
-                        setAlertMsg({t: "שגיאה", m: "אירעה שגיאה בשינוי הסיסמה."});
+                        setAlertMsg({ t: "שגיאה", m: "אירעה שגיאה בשינוי הסיסמה." });
                     }
                 }
                 setLoading(false);
             };
 
             const sendResetEmail = async () => {
-                if(!window.FB || !user?.email) return;
+                if (!window.FB || !user?.email) return;
                 try {
                     await window.FB.sendPasswordResetEmail(window.FB.auth, user.email);
-                    setAlertMsg({t: "מייל נשלח", m: "קישור לאיפוס סיסמה נשלח לתיבת הדואר שלך."});
-                } catch(e) {
-                    setAlertMsg({t: "שגיאה", m: "אירעה שגיאה בשליחת המייל."});
+                    setAlertMsg({ t: "מייל נשלח", m: "קישור לאיפוס סיסמה נשלח לתיבת הדואר שלך." });
+                } catch (e) {
+                    setAlertMsg({ t: "שגיאה", m: "אירעה שגיאה בשליחת המייל." });
                 }
             }
 
@@ -1099,7 +1502,7 @@
                         </div>
                         <h2 className="text-2xl font-black text-gray-800 dark:text-white mb-1">{user?.name}</h2>
                         <p className="text-gray-500 mb-4">{user?.email}</p>
-                        
+
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm font-bold">
                             סטטוס חשבון: {user?.isAdmin ? <span className="text-brand-primary">מנהל מערכת</span> : user?.isSubscribed ? <span className="text-brand-secondary">מנוי Pro פעיל</span> : <span className="text-gray-500">חשבון חינמי</span>}
                         </div>
@@ -1111,7 +1514,7 @@
                             <h3 className="text-xl font-black text-gray-800 dark:text-white">אבטחה וסיסמה</h3>
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400 mb-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50">
-                            <p className="font-bold flex items-center gap-2 mb-1"><Icon name="Info" size={16}/> מידע חשוב על סיסמאות</p>
+                            <p className="font-bold flex items-center gap-2 mb-1"><Icon name="Info" size={16} /> מידע חשוב על סיסמאות</p>
                             מטעמי אבטחת מידע קפדניים של מערכות גוגל (Firebase), הסיסמה שלך מוצפנת בשרת ולא ניתנת לצפייה על ידי אף אדם (גם לא על ידי מנהל האתר). עם זאת, תוכל לשנות אותה בקלות.
                         </div>
 
@@ -1124,7 +1527,7 @@
                                 {loading ? <Icon name="RefreshCw" size={16} className="animate-spin" /> : null} שנה סיסמה עכשיו
                             </button>
                         </form>
-                        
+
                         <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
                             <button onClick={sendResetEmail} className="text-sm text-brand-secondary font-bold hover:underline">לחלופין: שלח לי קישור איפוס למייל</button>
                         </div>
@@ -1147,7 +1550,7 @@
                     <div className="bg-black w-full max-w-6xl h-full md:h-[85vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl border border-gray-800">
                         <div className="bg-gray-900 text-white p-4 flex justify-between items-center border-b border-gray-800">
                             <h3 className="font-bold text-sm sm:text-base truncate pr-4">{file.name}</h3>
-                            <button onClick={onClose} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full transition-colors"><Icon name="X" size={20}/></button>
+                            <button onClick={onClose} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full transition-colors"><Icon name="X" size={20} /></button>
                         </div>
                         <iframe src={getUrl(file)} className="flex-1 w-full h-full border-none bg-black" allow="autoplay; fullscreen" allowFullScreen></iframe>
                     </div>
@@ -1163,7 +1566,7 @@
             const [currentPage, setCurrentPage] = React.useState('home');
             const [globalFile, setGlobalFile] = React.useState(null);
             const [alertMsg, setAlertMsg] = React.useState(null);
-            
+
             const [isDarkMode, setIsDarkMode] = React.useState(() => localStorage.getItem('darkMode') === 'true');
             const [showA11y, setShowA11y] = React.useState(false);
             const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
@@ -1180,36 +1583,42 @@
             const [authPassAdmin, setAuthPassAdmin] = React.useState('');
             const [authError, setAuthError] = React.useState('');
             const [authLoading, setAuthLoading] = React.useState(false);
+            const [dynamicDriveUrl, setDynamicDriveUrl] = React.useState("");
 
             React.useEffect(() => { setTimeout(() => setShowSplash(false), 2500); }, []);
             React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('darkMode', isDarkMode); }, [isDarkMode]);
             React.useEffect(() => { const h = () => setShowBackToTop(window.scrollY > 300); window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h); }, []);
 
-            // Firebase Live Data & Drive Sync
+            // Fetch from Google Drive when dynamicDriveUrl changes
             React.useEffect(() => {
-                if (DRIVE_SCRIPT_URL && DRIVE_SCRIPT_URL.startsWith('http')) {
-                    fetch(DRIVE_SCRIPT_URL)
+                const url = dynamicDriveUrl || DRIVE_SCRIPT_URL;
+                if (url && url.startsWith('http')) {
+                    fetch(url)
                         .then(res => res.json())
                         .then(data => { if (data && Array.isArray(data) && data.length > 0) setCourses(data); })
                         .catch(e => console.log("Drive Sync Error:", e));
                 }
+            }, [dynamicDriveUrl]);
 
+            // Firebase Live Data & Drive Sync
+            React.useEffect(() => {
                 if (!window.FB) return;
-                
-                let unsubPro = () => {};
-                let unsubAdmin = () => {};
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+                let unsubPro = () => { };
+                let unsubAdmin = () => { };
 
                 const unsubscribeAuth = window.FB.onAuthStateChanged(window.FB.auth, async (fbUser) => {
                     if (fbUser && fbUser.email) {
                         const emailLower = fbUser.email.toLowerCase();
                         const isSuperAdmin = emailLower === 'zwolner@gmail.com';
-                        
-                        const baseUser = { 
-                            name: fbUser.displayName || 'משתמש', 
-                            email: fbUser.email, 
-                            isAdmin: isSuperAdmin, 
-                            isSubscribed: isSuperAdmin, 
-                            uid: fbUser.uid 
+
+                        const baseUser = {
+                            name: fbUser.displayName || 'משתמש',
+                            email: fbUser.email,
+                            isAdmin: isSuperAdmin,
+                            isSubscribed: isSuperAdmin,
+                            uid: fbUser.uid
                         };
                         setUser(baseUser);
                         localStorage.setItem('pisga_user', JSON.stringify(baseUser));
@@ -1217,15 +1626,15 @@
                         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                         const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', emailLower);
                         const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', emailLower);
-                        
+
                         let adminState = isSuperAdmin;
                         let proState = isSuperAdmin;
 
                         const updateMerged = () => {
-                            const u = { 
-                                ...baseUser, 
-                                isAdmin: adminState, 
-                                isSubscribed: adminState || proState 
+                            const u = {
+                                ...baseUser,
+                                isAdmin: adminState,
+                                isSubscribed: adminState || proState
                             };
                             setUser(u);
                             localStorage.setItem('pisga_user', JSON.stringify(u));
@@ -1244,19 +1653,28 @@
                         unsubPro();
                         unsubAdmin();
                         if (!fbUser) window.FB.signInAnonymously(window.FB.auth).catch(e => console.log(e));
-                        else setUser(null); 
+                        else setUser(null);
                     }
                 });
 
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 const q = window.FB.query(window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'forum_topics'));
                 const unsubForum = window.FB.onSnapshot(q, s => {
                     const list = [];
                     s.forEach(d => list.push({ id: d.id, ...d.data() }));
-                    setForumTopics(list.sort((a,b) => new Date(b.date) - new Date(a.date)));
+                    setForumTopics(list.sort((a, b) => new Date(b.date) - new Date(a.date)));
                 });
-                
-                return () => { unsubscribeAuth(); unsubPro(); unsubAdmin(); unsubForum(); };
+
+                const settingsRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'settings', 'general');
+                const unsubSettings = window.FB.onSnapshot(settingsRef, (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        if (data && data.driveScriptUrl) {
+                            setDynamicDriveUrl(data.driveScriptUrl);
+                        }
+                    }
+                });
+
+                return () => { unsubscribeAuth(); unsubPro(); unsubAdmin(); unsubForum(); unsubSettings(); };
             }, []);
 
             const handleAuth = async (e) => {
@@ -1265,19 +1683,19 @@
 
                 let isAdmin = false;
                 if (authEmail.toLowerCase() === "zwolner@gmail.com") {
-                    isAdmin = true; 
+                    isAdmin = true;
                 }
 
                 try {
                     if (authMode === 'register') {
                         const res = await window.FB.createUserWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
                         await window.FB.updateProfile(res.user, { displayName: authName });
-                        setAlertMsg({t: "ברוכים הבאים!", m: "החשבון נוצר בהצלחה."});
+                        setAlertMsg({ t: "ברוכים הבאים!", m: "החשבון נוצר בהצלחה." });
                     } else if (authMode === 'login') {
                         await window.FB.signInWithEmailAndPassword(window.FB.auth, authEmail, authPassword);
                     } else if (authMode === 'forgot_password') {
                         await window.FB.sendPasswordResetEmail(window.FB.auth, authEmail);
-                        setAlertMsg({t: "נשלח מייל", m: "קישור לאיפוס סיסמה נשלח לכתובת המייל שלך."});
+                        setAlertMsg({ t: "נשלח מייל", m: "קישור לאיפוס סיסמה נשלח לכתובת המייל שלך." });
                         setAuthMode('login');
                     }
                     setShowAuthModal(false);
@@ -1295,100 +1713,100 @@
             };
 
             const handleGoogleLogin = async () => {
-                 setAuthError(''); setAuthLoading(true);
-                 try {
-                     const res = await window.FB.signInWithPopup(window.FB.auth, window.FB.googleProvider);
-                     
-                     // בדיקה בשרת האם המשתמש של גוגל כבר מוגדר כ-Pro או מנהל
-                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                     const isSuperAdmin = res.user.email?.toLowerCase() === 'zwolner@gmail.com';
-                     
-                     const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', res.user.email?.toLowerCase() || 'unknown');
-                     const adminDoc = await window.FB.getDoc(adminRef);
-                     const isAdmin = isSuperAdmin || adminDoc.exists();
-                     
-                     const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', res.user.email?.toLowerCase() || 'unknown');
-                     const proDoc = await window.FB.getDoc(proRef);
-                     const isPro = proDoc.exists() || isAdmin;
-                     
-                     const u = { name: res.user.displayName || 'משתמש', email: res.user.email, isAdmin: isAdmin, isSubscribed: isPro, uid: res.user.uid };
-                     setUser(u);
-                     localStorage.setItem('pisga_user', JSON.stringify(u));
-                     
-                     setShowAuthModal(false);
-                 } catch (error) {
-                     console.error("Google Auth Error:", error);
-                     if (error.code === 'auth/popup-closed-by-user') setAuthError("חלון ההתחברות של גוגל נסגר לפני סיום התהליך.");
-                     else if (error.code === 'auth/operation-not-allowed') setAuthError("שגיאה: התחברות גוגל לא הופעלה במסד הנתונים (Firebase).");
-                     else setAuthError("שגיאה בהתחברות עם גוגל: " + error.message);
-                 }
-                 setAuthLoading(false);
+                setAuthError(''); setAuthLoading(true);
+                try {
+                    const res = await window.FB.signInWithPopup(window.FB.auth, window.FB.googleProvider);
+
+                    // בדיקה בשרת האם המשתמש של גוגל כבר מוגדר כ-Pro או מנהל
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const isSuperAdmin = res.user.email?.toLowerCase() === 'zwolner@gmail.com';
+
+                    const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', res.user.email?.toLowerCase() || 'unknown');
+                    const adminDoc = await window.FB.getDoc(adminRef);
+                    const isAdmin = isSuperAdmin || adminDoc.exists();
+
+                    const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', res.user.email?.toLowerCase() || 'unknown');
+                    const proDoc = await window.FB.getDoc(proRef);
+                    const isPro = proDoc.exists() || isAdmin;
+
+                    const u = { name: res.user.displayName || 'משתמש', email: res.user.email, isAdmin: isAdmin, isSubscribed: isPro, uid: res.user.uid };
+                    setUser(u);
+                    localStorage.setItem('pisga_user', JSON.stringify(u));
+
+                    setShowAuthModal(false);
+                } catch (error) {
+                    console.error("Google Auth Error:", error);
+                    if (error.code === 'auth/popup-closed-by-user') setAuthError("חלון ההתחברות של גוגל נסגר לפני סיום התהליך.");
+                    else if (error.code === 'auth/operation-not-allowed') setAuthError("שגיאה: התחברות גוגל לא הופעלה במסד הנתונים (Firebase).");
+                    else setAuthError("שגיאה בהתחברות עם גוגל: " + error.message);
+                }
+                setAuthLoading(false);
             }
 
             const handlePaymentSuccess = async (id) => {
-                if(!user || !user.email) return;
+                if (!user || !user.email) return;
                 try {
                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', user.email.toLowerCase());
                     await window.FB.setDoc(proRef, { isPro: true, paypalId: id, updatedAt: new Date().toISOString() });
                     setShowPaymentModal(false);
-                    setAlertMsg({t:"תודה על רכישתך!", m:"מנוי ה-Pro שלך הופעל בהצלחה. כל הקורסים פתוחים עבורך."});
-                } catch(e) { alert("שגיאה בעדכון השרת."); }
+                    setAlertMsg({ t: "תודה על רכישתך!", m: "מנוי ה-Pro שלך הופעל בהצלחה. כל הקורסים פתוחים עבורך." });
+                } catch (e) { alert("שגיאה בעדכון השרת."); }
             };
 
             const toggleA11yMenu = () => setShowA11y(!showA11y);
             const navigate = (id) => { window.location.hash = id; setCurrentPage(id); setIsMobileMenuOpen(false); setShowUserMenu(false); };
-            React.useEffect(() => { const h = window.location.hash.replace('#','') || 'home'; setCurrentPage(h); }, []);
+            React.useEffect(() => { const h = window.location.hash.replace('#', '') || 'home'; setCurrentPage(h); }, []);
 
             const navItems = [
-                {id:'home', l:'ראשי', i:'Home'},
-                {id:'youtube', l:'תכנים חינמיים', i:'Youtube'},
-                {id:'courses', l:'קורסים בתשלום', i:'PlayCircle'}, 
-                {id:'forum', l:'הקהילה שלנו', i:'MessageSquare'}
+                { id: 'home', l: 'ראשי', i: 'Home' },
+                { id: 'youtube', l: 'תכנים חינמיים', i: 'Youtube' },
+                { id: 'courses', l: 'קורסים בתשלום', i: 'PlayCircle' },
+                { id: 'forum', l: 'הקהילה שלנו', i: 'MessageSquare' }
             ];
 
             return (
                 <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0b1b24] font-sans relative">
                     {showSplash && <SplashScreen />}
-                    {alertMsg && <CustomMessageBox title={alertMsg.t} message={alertMsg.m} onClose={()=>setAlertMsg(null)} />}
-                    <GlobalFileViewer file={globalFile} onClose={()=>setGlobalFile(null)} />
-                    
+                    {alertMsg && <CustomMessageBox title={alertMsg.t} message={alertMsg.m} onClose={() => setAlertMsg(null)} />}
+                    <GlobalFileViewer file={globalFile} onClose={() => setGlobalFile(null)} />
+
                     <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 border-b-4 border-brand-secondary h-16 sm:h-20 flex items-center transition-all">
                         <div className="max-w-7xl mx-auto px-3 sm:px-4 w-full flex justify-between items-center h-full relative">
-                            <div onClick={()=>navigate('home')} className="flex items-center gap-1.5 sm:gap-3 cursor-pointer shrink-0 h-full py-2">
-                                <img src={LOGO_URL} alt="לוגו המועדון" className="h-8 sm:h-12 w-auto object-contain" onError={(e) => { e.target.style.display='none'; }} />
+                            <div onClick={() => navigate('home')} className="flex items-center gap-1.5 sm:gap-3 cursor-pointer shrink-0 h-full py-2">
+                                <img src={LOGO_URL} alt="לוגו המועדון" className="h-8 sm:h-12 w-auto object-contain" onError={(e) => { e.target.style.display = 'none'; }} />
                                 <h1 className="font-black text-xl sm:text-2xl text-brand-primary dark:text-white hidden sm:block">פסגה</h1>
                             </div>
                             <nav className="hidden lg:flex gap-1 overflow-x-auto scrollbar-hide px-2 items-center justify-center flex-1 h-full">
                                 {navItems.map(n => (
-                                    <button key={n.id} onClick={()=>navigate(n.id)} className={`px-3 sm:px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-1.5 transition-all duration-300 ${currentPage===n.id ? 'bg-brand-primary/10 text-brand-primary dark:bg-brand-secondary/20 dark:text-brand-secondary' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-primary'}`}>
-                                        <Icon name={n.i} size={16}/> {n.l}
+                                    <button key={n.id} onClick={() => navigate(n.id)} className={`px-3 sm:px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-1.5 transition-all duration-300 ${currentPage === n.id ? 'bg-brand-primary/10 text-brand-primary dark:bg-brand-secondary/20 dark:text-brand-secondary' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-primary'}`}>
+                                        <Icon name={n.i} size={16} /> {n.l}
                                     </button>
                                 ))}
-                                {user?.isAdmin && <button onClick={()=>navigate('admin')} className="px-3 sm:px-4 py-2 rounded-xl font-bold text-sm bg-gray-800 hover:bg-gray-700 text-white flex items-center gap-1.5 transition-colors"><Icon name="Settings" size={16}/> ניהול</button>}
+                                {user?.isAdmin && <button onClick={() => navigate('admin')} className="px-3 sm:px-4 py-2 rounded-xl font-bold text-sm bg-gray-800 hover:bg-gray-700 text-white flex items-center gap-1.5 transition-colors"><Icon name="Settings" size={16} /> ניהול</button>}
                             </nav>
                             <div className="flex items-center gap-2 sm:gap-3 shrink-0 h-full py-2">
-                                {!user ? <button onClick={()=>{setAuthMode('login'); setShowAuthModal(true); setAuthError('');}} className="text-xs sm:text-sm font-bold text-brand-primary border border-brand-primary/30 px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl hover:bg-brand-primary hover:text-white transition-colors shadow-sm whitespace-nowrap">התחברות</button> : 
-                                <div className="relative">
-                                    <button onClick={()=>setShowUserMenu(!showUserMenu)} className="flex items-center gap-1.5 sm:gap-2 bg-gray-100 dark:bg-gray-800 p-1 pl-2 sm:pl-3 pr-1 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm hover:border-brand-primary transition-colors">
-                                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-brand-primary text-white flex items-center justify-center text-[10px] sm:text-xs shrink-0"><Icon name="User" size={14}/></div>
-                                        <span className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 truncate max-w-[65px] sm:max-w-[100px]">{user.name}</span>
-                                    </button>
-                                    {showUserMenu && (
-                                        <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 p-2 flex flex-col gap-1 z-50 animate-fade-in">
-                                            <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700 mb-1">
-                                                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                                {!user ? <button onClick={() => { setAuthMode('login'); setShowAuthModal(true); setAuthError(''); }} className="text-xs sm:text-sm font-bold text-brand-primary border border-brand-primary/30 px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl hover:bg-brand-primary hover:text-white transition-colors shadow-sm whitespace-nowrap">התחברות</button> :
+                                    <div className="relative">
+                                        <button onClick={() => setShowUserMenu(!showUserMenu)} className="flex items-center gap-1.5 sm:gap-2 bg-gray-100 dark:bg-gray-800 p-1 pl-2 sm:pl-3 pr-1 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm hover:border-brand-primary transition-colors">
+                                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-brand-primary text-white flex items-center justify-center text-[10px] sm:text-xs shrink-0"><Icon name="User" size={14} /></div>
+                                            <span className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 truncate max-w-[65px] sm:max-w-[100px]">{user.name}</span>
+                                        </button>
+                                        {showUserMenu && (
+                                            <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 p-2 flex flex-col gap-1 z-50 animate-fade-in">
+                                                <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700 mb-1">
+                                                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                                                </div>
+                                                <button onClick={() => navigate('profile')} className="w-full text-right px-3 py-2 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"><Icon name="User" size={16} /> הפרופיל שלי</button>
+                                                <button onClick={() => { localStorage.removeItem('pisga_user'); window.FB.auth.signOut(); setUser(null); setShowUserMenu(false); navigate('home'); }} className="w-full text-right px-3 py-2 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"><Icon name="LogOut" size={16} /> יציאה מהחשבון</button>
                                             </div>
-                                            <button onClick={()=>navigate('profile')} className="w-full text-right px-3 py-2 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"><Icon name="User" size={16}/> הפרופיל שלי</button>
-                                            <button onClick={()=>{localStorage.removeItem('pisga_user'); window.FB.auth.signOut(); setUser(null); setShowUserMenu(false); navigate('home');}} className="w-full text-right px-3 py-2 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"><Icon name="LogOut" size={16}/> יציאה מהחשבון</button>
-                                        </div>
-                                    )}
-                                </div>}
+                                        )}
+                                    </div>}
                                 <div className="flex items-center gap-0.5 hidden sm:flex">
                                     <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name={isDarkMode ? "Sun" : "Moon"} size={18} /></button>
                                     <button onClick={toggleA11yMenu} className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name="Accessibility" size={18} /></button>
                                 </div>
-                                <button onClick={()=>setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-1.5 text-brand-primary dark:text-white shrink-0"><Icon name={isMobileMenuOpen ? "X" : "Menu"} size={26}/></button>
+                                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-1.5 text-brand-primary dark:text-white shrink-0"><Icon name={isMobileMenuOpen ? "X" : "Menu"} size={26} /></button>
                             </div>
                         </div>
 
@@ -1396,10 +1814,10 @@
                         {isMobileMenuOpen && (
                             <div className="lg:hidden bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-xl p-4 space-y-2 absolute w-full top-full left-0 z-40 max-h-[85vh] overflow-y-auto">
                                 {navItems.map(item => (
-                                    <button key={item.id} onClick={() => navigate(item.id)} className="w-full text-right p-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3"><Icon name={item.icon || item.i} size={18}/> {item.label || item.l}</button>
+                                    <button key={item.id} onClick={() => navigate(item.id)} className="w-full text-right p-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3"><Icon name={item.icon || item.i} size={18} /> {item.label || item.l}</button>
                                 ))}
-                                {user && <button onClick={() => navigate('profile')} className="w-full text-right p-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 border-t border-gray-100 dark:border-gray-700 mt-2 pt-4"><Icon name="User" size={18}/> הפרופיל שלי</button>}
-                                {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right p-3 rounded-xl font-bold text-brand-primary flex items-center gap-3 border-t border-gray-100 dark:border-gray-700 mt-2 pt-4"><Icon name="Settings" size={18}/> ניהול מערכת</button>}
+                                {user && <button onClick={() => navigate('profile')} className="w-full text-right p-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 border-t border-gray-100 dark:border-gray-700 mt-2 pt-4"><Icon name="User" size={18} /> הפרופיל שלי</button>}
+                                {user?.isAdmin && <button onClick={() => navigate('admin')} className="w-full text-right p-3 rounded-xl font-bold text-brand-primary flex items-center gap-3 border-t border-gray-100 dark:border-gray-700 mt-2 pt-4"><Icon name="Settings" size={18} /> ניהול מערכת</button>}
                             </div>
                         )}
                     </header>
@@ -1410,7 +1828,7 @@
                                 <button onClick={() => setShowAuthModal(false)} className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
                                 <Icon name={authMode === 'forgot_password' ? 'Mail' : 'User'} size={32} className="mx-auto mb-3 text-brand-primary dark:text-brand-secondary" />
                                 <h3 className="text-xl font-black mb-1 text-gray-800 dark:text-white">{authMode === 'login' ? 'התחברות לחשבון' : authMode === 'register' ? 'הרשמה למערכת' : 'איפוס סיסמה'}</h3>
-                                
+
                                 <form onSubmit={handleAuth} className="space-y-3 text-right animate-fade-in mt-4">
                                     {authMode === 'register' && (
                                         <div>
@@ -1428,7 +1846,7 @@
                                             <input type="password" required value={authPassword} onChange={e => setAuthPassword(e.target.value)} placeholder="לפחות 6 תווים" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl px-3 py-2 focus:border-brand-primary outline-none text-left text-sm" dir="ltr" />
                                         </div>
                                     )}
-                                    
+
                                     {authError && <div className="text-red-600 bg-red-50 dark:bg-red-900/30 p-2 rounded-lg text-xs text-center font-bold border border-red-100 dark:border-red-900/50">{authError}</div>}
 
                                     <button type="submit" disabled={authLoading} className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-2.5 rounded-xl transition-colors shadow-sm mt-2 disabled:opacity-80 flex justify-center items-center gap-2 text-sm">
@@ -1439,7 +1857,7 @@
                                 {(authMode === 'login' || authMode === 'register') && (
                                     <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                                         <button onClick={handleGoogleLogin} type="button" disabled={authLoading} className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white font-bold py-2.5 rounded-xl transition-colors shadow-sm flex justify-center items-center gap-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-600">
-                                            <svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/><path d="M1 1h22v22H1z" fill="none"/></svg>
+                                            <svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /><path d="M1 1h22v22H1z" fill="none" /></svg>
                                             המשך עם Google
                                         </button>
                                     </div>
@@ -1462,7 +1880,7 @@
                     {showPaymentModal && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 overflow-y-auto animate-fade-in">
                             <div className="relative w-full max-w-md my-8">
-                                <button onClick={()=>setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 hover:bg-white/40 transition-colors p-2 rounded-full"><Icon name="X" size={24}/></button>
+                                <button onClick={() => setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 hover:bg-white/40 transition-colors p-2 rounded-full"><Icon name="X" size={24} /></button>
                                 <PayPalSubscription onSuccess={handlePaymentSuccess} />
                             </div>
                         </div>
@@ -1470,37 +1888,37 @@
 
                     {showA11y && (
                         <div className="fixed top-20 left-4 z-[100] bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-2xl border-2 border-brand-secondary w-56 animate-fade-in text-right">
-                             <div className="flex justify-between items-center mb-3 border-b border-gray-100 dark:border-gray-700 pb-2">
-                                <button onClick={()=>setShowA11y(false)} className="text-gray-400 hover:text-red-500 transition-colors"><Icon name="X" size={18}/></button>
+                            <div className="flex justify-between items-center mb-3 border-b border-gray-100 dark:border-gray-700 pb-2">
+                                <button onClick={() => setShowA11y(false)} className="text-gray-400 hover:text-red-500 transition-colors"><Icon name="X" size={18} /></button>
                                 <h3 className="font-bold text-brand-primary dark:text-white flex items-center gap-2 text-sm">נגישות <Icon name="Accessibility" size={16} className="text-brand-secondary" /></h3>
-                             </div>
-                             <div className="space-y-1.5">
-                                <button onClick={() => {document.body.style.fontSize = '1.1rem'}} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">הגדל טקסט <Icon name="ZoomIn" size={14}/></button>
-                                <button onClick={() => {document.body.style.fontSize = '1rem'}} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">איפוס גודל <Icon name="RefreshCw" size={14}/></button>
-                                <button onClick={() => document.body.classList.toggle('a11y-highlight-links')} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">הדגשת קישורים <Icon name="Underline" size={14}/></button>
-                                <button onClick={() => document.body.classList.toggle('a11y-readable-font')} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">גופן קריא <Icon name="Type" size={14}/></button>
-                             </div>
+                            </div>
+                            <div className="space-y-1.5">
+                                <button onClick={() => { document.body.style.fontSize = '1.1rem' }} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">הגדל טקסט <Icon name="ZoomIn" size={14} /></button>
+                                <button onClick={() => { document.body.style.fontSize = '1rem' }} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">איפוס גודל <Icon name="RefreshCw" size={14} /></button>
+                                <button onClick={() => document.body.classList.toggle('a11y-highlight-links')} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">הדגשת קישורים <Icon name="Underline" size={14} /></button>
+                                <button onClick={() => document.body.classList.toggle('a11y-readable-font')} className="w-full p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-xs font-bold flex justify-between items-center transition-colors">גופן קריא <Icon name="Type" size={14} /></button>
+                            </div>
                         </div>
                     )}
 
                     <main className="flex-1 pb-16 pt-4 relative z-10">
-                        {currentPage==='admin' && user?.isAdmin ? <AdminPage forumTopics={forumTopics} setMessage={m=>setAlertMsg({t:"הודעת מערכת", m})} /> : 
-                         currentPage==='profile' && user ? <ProfilePage user={user} setAlertMsg={setAlertMsg} /> :
-                         currentPage==='courses' ? <CoursesPage courses={courses} user={user} onPlay={setGlobalFile} setShowPayment={setShowPaymentModal} setShowAuthModal={setShowAuthModal} /> : 
-                         currentPage==='forum' ? <ForumPage topics={forumTopics} user={user} setShowAuthModal={setShowAuthModal} /> : 
-                         currentPage==='youtube' ? <YoutubePage onFileInteract={setGlobalFile} /> : 
-                         <HomePage navigate={navigate} />}
+                        {currentPage === 'admin' && user?.isAdmin ? <AdminPage forumTopics={forumTopics} setMessage={m => setAlertMsg({ t: "הודעת מערכת", m })} driveScriptUrl={dynamicDriveUrl} /> :
+                            currentPage === 'profile' && user ? <ProfilePage user={user} setAlertMsg={setAlertMsg} /> :
+                                currentPage === 'courses' ? <CoursesPage courses={courses} user={user} onPlay={setGlobalFile} setShowPayment={setShowPaymentModal} setShowAuthModal={setShowAuthModal} /> :
+                                    currentPage === 'forum' ? <ForumPage topics={forumTopics} user={user} setShowAuthModal={setShowAuthModal} /> :
+                                        currentPage === 'youtube' ? <YoutubePage onFileInteract={setGlobalFile} /> :
+                                            <HomePage navigate={navigate} />}
                     </main>
 
-                    <button 
-                        onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} 
+                    <button
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         className={`fixed bottom-20 sm:bottom-6 right-6 sm:left-6 sm:right-auto bg-brand-primary hover:bg-brand-dark text-white p-2.5 rounded-full shadow-xl transition-all duration-300 z-40 hover:scale-110 ${showBackToTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
                     >
                         <Icon name="ArrowUp" size={20} />
                     </button>
 
-                    <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="whatsapp-float"><Icon name="MessageCircle" size={28}/></a>
-                    
+                    <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="whatsapp-float"><Icon name="MessageCircle" size={28} /></a>
+
                     <footer className="bg-brand-dark dark:bg-gray-900 text-white py-8 border-t-4 border-brand-secondary text-center relative z-10 mt-auto">
                         <div className="max-w-7xl mx-auto px-4">
                             <h2 className="text-xl font-black mb-1">קהילת פסגה</h2>
@@ -1518,4 +1936,5 @@
         ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
+
 </html>
