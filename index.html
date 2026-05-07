@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="description" content="קהילת פסגה בהובלת משה וולנר - הבית העסקי למאמנים ומטפלים. מערכת קורסים, שיעורי וידאו, פורום קהילתי, וכלים לפיתוח קליניקה מצליחה.">
+    <meta name="description"
+        content="קהילת פסגה בהובלת משה וולנר - הבית העסקי למאמנים ומטפלים. מערכת קורסים, שיעורי וידאו, פורום קהילתי, וכלים לפיתוח קליניקה מצליחה.">
     <title>קהילת פסגה - משה וולנר</title>
 
     <!-- הוספת הלוגו לסמל הכרטיסיה (Favicon) בדפדפן -->
@@ -217,6 +218,18 @@
             font-size: 112% !important;
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-delay: -1ms !important;
+                animation-duration: 1ms !important;
+                animation-iteration-count: 1 !important;
+                background-attachment: initial !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0s !important;
+                transition-delay: 0s !important;
+            }
+        }
+
         .a11y-float {
             position: fixed;
             width: 50px;
@@ -271,7 +284,7 @@
     </script>
 
     <script type="text/babel">
-        const WHATSAPP_LINK = "https://chat.whatsapp.com/GxuIH8eUwKaIA4qr76Q9ws";
+        const WHATSAPP_LINK = atob("aHR0cHM6Ly9jaGF0LndoYXRzYXBwLmNvbS9HeHVJSDhlVXdLYUlBNHFyNzZROXdz");
         const DRIVE_SCRIPT_URL = "";
 
         // הגדרת נתיב הלוגו לכל האתר
@@ -306,10 +319,10 @@
             {
                 id: "course_webinars", name: "סדרת הוובינרים המלאה",
                 lessons: [
-                    { id: "w1", name: "וובינר 1 - הדיפלומה הנסתרת", url: "https://drive.google.com/file/d/1Vriu7SyPzGt6lYEtU9HZZNmuXq2QYYH7/view", type: "video" },
-                    { id: "w2", name: "וובינר 2 - פרדוקס היעילות", url: "https://drive.google.com/file/d/1ryD7kd4GVKf189gJfm7AmpnG2KUhn8Ak/view", type: "video" },
-                    { id: "w3", name: "וובינר 3 - מנישה למוצר", url: "https://drive.google.com/file/d/1trpWtzIf9HtP82rJ7zoaYtvK77nsHuoJ/view", type: "video" },
-                    { id: "w4", name: "וובינר 4 - בניית הקפסולה", url: "https://drive.google.com/file/d/1U9q0-c-NLAhJg7H8NohVAVF3_zkkbJp2/view", type: "video" }
+                    { id: "w1", name: "וובינר 1 - הדיפלומה הנסתרת", url: "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xVnJpdTdTeVB6R3Q2bFlFdFU5SFpaTm11WHEyUVlZSDcvdmlldw==", type: "video" },
+                    { id: "w2", name: "וובינר 2 - פרדוקס היעילות", url: "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xcnlEN2tkNEdWS2YxODlnSmZtN0FtcG5HMktVaG44QWsvdmlldw==", type: "video" },
+                    { id: "w3", name: "וובינר 3 - מנישה למוצר", url: "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xdHJwV3R6SWY5SHRQODJySjd6b2FZdHZLNzduc0h1b0ovdmlldw==", type: "video" },
+                    { id: "w4", name: "וובינר 4 - בניית הקפסולה", url: "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xVTlxMC1jLU5MQWhKZzdIOE5vaFZBVkYzX3pra2JKcDIvdmlldw==", type: "video" }
                 ]
             }
         ];
@@ -401,6 +414,10 @@
                     <h3 className="text-2xl font-bold text-brand-primary dark:text-white mb-2">הצטרפות למועדון פסגה</h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-6">קבלו גישה מלאה לכל הקורסים, הכלים והקהילה שלנו.</p>
                     <div id="paypal-button-container-P-2H242596WM328212DNHQMPHI" className="min-h-[150px]"></div>
+                    <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 text-right text-[10px] text-gray-400 dark:text-gray-500 space-y-1.5 leading-normal">
+                        <p className="font-bold text-gray-500 dark:text-gray-400">תנאי ביטול ומדיניות החזרים:</p>
+                        <p>בהתאם לחוק הגנת הצרכן בישראל (התשמ"א-1981), הנכם רשאים לבטל את המנוי בכל עת. החיוב הוא מנוי חצי-שנתי מתחדש, וניתן לבטל את החידוש האוטומטי ישירות דרך הגדרות הפרופיל שלכם או בפנייה מהירה אלינו דרך ה-WhatsApp.</p>
+                    </div>
                 </div>
             );
         };
@@ -498,7 +515,7 @@
                     <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-[2.5rem] p-6 md:p-10 shadow-md border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row-reverse gap-8 md:gap-12 items-center text-right">
 
                         {/* Book Cover Container - NOW EXTREMELY LARGE & CLICKABLE */}
-                        <div 
+                        <div
                             onClick={() => onPlay && onPlay({ name: "כריכת הספר - פסגה", url: "book-cover.jpg", type: "image" })}
                             className="w-full md:w-[60%] flex justify-center shrink-0 relative group cursor-zoom-in"
                             title="לחצו להגדלה על מסך מלא"
@@ -518,7 +535,7 @@
                                     if (fallback) fallback.style.display = 'flex';
                                 }}
                             />
-                            
+
                             {/* Floating zoom hint badge */}
                             <div className="absolute bottom-4 right-4 z-20 bg-brand-primary/95 text-white text-[10px] sm:text-xs font-black px-3 py-1.5 rounded-full shadow-lg border border-brand-secondary/30 flex items-center gap-1.5 opacity-85 group-hover:opacity-100 transition-opacity duration-300">
                                 <Icon name="ZoomIn" size={12} className="text-brand-secondary" />
@@ -585,7 +602,13 @@
             const isSubscribed = user && user.isSubscribed;
 
             const handleLessonClick = (lesson) => {
-                if (isSubscribed || user?.isAdmin) onPlay(lesson);
+                if (isSubscribed || user?.isAdmin) {
+                    let playLesson = { ...lesson };
+                    if (lesson.url && lesson.url.startsWith("aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29t")) {
+                        playLesson.url = atob(lesson.url);
+                    }
+                    onPlay(playLesson);
+                }
                 else if (!user) setShowAuthModal(true);
                 else setShowPayment(true);
             };
@@ -1635,6 +1658,7 @@
 
         const App = () => {
             const [showSplash, setShowSplash] = React.useState(true);
+            const [showCookieBanner, setShowCookieBanner] = React.useState(() => !localStorage.getItem('cookie_consent_accepted'));
             const [user, setUser] = React.useState(() => JSON.parse(localStorage.getItem('pisga_user')) || null);
             const [courses, setCourses] = React.useState(INITIAL_COURSES);
             const [forumTopics, setForumTopics] = React.useState([]);
@@ -1662,6 +1686,7 @@
 
             const [showA11yStatement, setShowA11yStatement] = React.useState(false);
             const [showPrivacyPolicy, setShowPrivacyPolicy] = React.useState(false);
+            const [showTerms, setShowTerms] = React.useState(false);
 
             React.useEffect(() => { setTimeout(() => setShowSplash(false), 2500); }, []);
             React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('darkMode', isDarkMode); }, [isDarkMode]);
@@ -1862,6 +1887,17 @@
                     {alertMsg && <CustomMessageBox title={alertMsg.t} message={alertMsg.m} onClose={() => setAlertMsg(null)} />}
                     <GlobalFileViewer file={globalFile} onClose={() => setGlobalFile(null)} />
 
+                    {showCookieBanner && (
+                        <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-xs bg-brand-primary/95 backdrop-blur-md text-white p-5 rounded-2xl shadow-2xl border border-brand-secondary/30 z-[1000] flex flex-col gap-3 animate-fade-in text-right">
+                            <p className="text-xs leading-relaxed">
+                                באתר זה נעשה שימוש בעוגיות (Cookies) כדי להבטיח את חוויית הגלישה הטובה ביותר, לנתח ביצועים ולאפשר הרשמה וגישה מאובטחת לתכנים.
+                            </p>
+                            <div className="flex justify-end gap-3">
+                                <button onClick={() => { localStorage.setItem('cookie_consent_accepted', 'true'); setShowCookieBanner(false); }} className="bg-brand-secondary hover:bg-[#b06730] text-white text-xs font-black px-4 py-2 rounded-xl transition-all">מאשר קוקיז 🍪</button>
+                            </div>
+                        </div>
+                    )}
+
                     <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 border-b-4 border-brand-secondary h-16 sm:h-20 flex items-center transition-all">
                         <div className="max-w-7xl mx-auto px-3 sm:px-4 w-full flex justify-between items-center h-full relative">
                             <div onClick={() => navigate('home')} className="flex items-center gap-1.5 sm:gap-3 cursor-pointer shrink-0 h-full py-2">
@@ -2041,6 +2077,26 @@
                         </div>
                     )}
 
+                    {/* Terms of Service Modal */}
+                    {showTerms && (
+                        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in text-right">
+                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 max-w-2xl w-full relative shadow-2xl border border-gray-200 dark:border-gray-700 max-h-[85vh] overflow-y-auto">
+                                <button onClick={() => setShowTerms(false)} aria-label="סגור תנאי שימוש" className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
+                                <Icon name="FileText" size={32} className="mx-auto mb-3 text-brand-primary dark:text-brand-secondary" />
+                                <h3 className="text-xl font-black mb-4 text-gray-800 dark:text-white text-center">תנאי שימוש - קהילת פסגה</h3>
+                                <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                    <p>ברוכים הבאים לאתר קהילת פסגה. השימוש באתר ובשירותים המוצעים בו כפוף להסכמתכם לתנאים המפורטים להלן:</p>
+                                    <p className="font-bold text-gray-800 dark:text-white">1. הרשמה וחשבון משתמש:</p>
+                                    <p>חלק מהשירותים והקורסים באתר דורשים הרשמה ויצירת חשבון אישי. הנכם מתחייבים לספק פרטים נכונים ומדויקים ולשמור על סודיות פרטי הגישה שלכם.</p>
+                                    <p className="font-bold text-gray-800 dark:text-white">2. זכויות יוצרים וקניין רוחני:</p>
+                                    <p>כל התכנים באתר, לרבות סרטוני הווידאו, ההדרכות, הטקסטים, הלוגו והעיצובים, הם קניינו הרוחני הבלעדי של משה וולנר וקהילת פסגה. חל איסור מוחלט להעתיק, להפיץ, לשכפל או להשתמש בתכנים אלו ללא אישור בכתב ומראש.</p>
+                                    <p className="font-bold text-gray-800 dark:text-white">3. מנוי Pro וביטולים:</p>
+                                    <p>הצטרפות למנוי Pro מקנה גישה לתכני פרימיום לתקופה מוגדרת. ביטול המנוי והחזר כספי יתאפשרו בהתאם להוראות חוק הגנת הצרכן בישראל בפנייה לשירות הלקוחות דרך הודעת ה-WhatsApp הרשמית באתר.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <main className="flex-1 pb-16 pt-4 relative z-10">
                         {currentPage === 'admin' && user?.isAdmin ? <AdminPage forumTopics={forumTopics} setMessage={m => setAlertMsg({ t: "הודעת מערכת", m })} driveScriptUrl={dynamicDriveUrl} /> :
                             currentPage === 'profile' && user ? <ProfilePage user={user} setAlertMsg={setAlertMsg} /> :
@@ -2072,6 +2128,8 @@
                                 <button onClick={() => setShowA11yStatement(true)} className="hover:text-brand-secondary transition-colors">הצהרת נגישות</button>
                                 <span className="text-gray-700 hidden sm:inline">|</span>
                                 <button onClick={() => setShowPrivacyPolicy(true)} className="hover:text-brand-secondary transition-colors">מדיניות פרטיות</button>
+                                <span className="text-gray-700 hidden sm:inline">|</span>
+                                <button onClick={() => setShowTerms(true)} className="hover:text-brand-secondary transition-colors">תנאי שימוש</button>
                                 <span className="text-gray-700 hidden sm:inline">|</span>
                                 <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-brand-secondary transition-colors flex items-center gap-1"><Icon name="MessageCircle" size={12} /> דיווח על בעיית נגישות / צור קשר</a>
                             </div>
