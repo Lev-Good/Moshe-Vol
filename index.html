@@ -596,46 +596,179 @@
                 const fetchYT = async () => {
                     try {
                         const rss = `https://www.youtube.com/feeds/videos.xml?channel_id=UCiZYtPnLm6KvO79XfUOW9iA`; 
-                        const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
-                        const res = await fetch(api);
+                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rss)}`;
+                        const res = await fetch(proxyUrl);
                         const data = await res.json();
-                        if (data.status === 'ok') setVideos(data.items.map((i, idx) => ({ id: `yt_${idx}`, name: i.title, url: i.link, thumbnail: i.thumbnail, type: 'youtube' })));
-                    } catch (e) {}
+                        if (data && data.contents) {
+                            const parser = new DOMParser();
+                            const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+                            const entries = xmlDoc.getElementsByTagName("entry");
+                            const items = Array.from(entries).map((entry, idx) => {
+                                const videoId = entry.getElementsByTagName("yt:videoId")[0]?.textContent || '';
+                                const title = entry.getElementsByTagName("title")[0]?.textContent || '';
+                                const link = entry.getElementsByTagName("link")[0]?.getAttribute("href") || `https://www.youtube.com/watch?v=${videoId}`;
+                                const thumbnail = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+                                return { id: `yt_${idx}`, name: title, url: link, thumbnail: thumbnail, type: 'youtube' };
+                            });
+                            setVideos(items);
+                        } else {
+                            // Fallback if allorigins proxy has an issue
+                            const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
+                            const resFallback = await fetch(api);
+                            const dataFallback = await resFallback.json();
+                            if (dataFallback.status === 'ok') {
+                                setVideos(dataFallback.items.map((i, idx) => ({ id: `yt_${idx}`, name: i.title, url: i.link, thumbnail: i.thumbnail, type: 'youtube' })));
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error loading YouTube feed:", e);
+                        // Safe JSON fallback in case of CORS errors
+                        try {
+                            const rss = `https://www.youtube.com/feeds/videos.xml?channel_id=UCiZYtPnLm6KvO79XfUOW9iA`; 
+                            const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
+                            const resFallback = await fetch(api);
+                            const dataFallback = await resFallback.json();
+                            if (dataFallback.status === 'ok') {
+                                setVideos(dataFallback.items.map((i, idx) => ({ id: `yt_${idx}`, name: i.title, url: i.link, thumbnail: i.thumbnail, type: 'youtube' })));
+                            }
+                        } catch(err) {}
+                    }
                     setLoading(false);
                 };
                 fetchYT();
             }, []);
             return (
-                <div className="max-w-6xl mx-auto p-4 space-y-8 animate-fade-in pb-12">
-                    <div className="text-center p-8 md:p-12 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-gray-800 rounded-[2.5rem] border border-red-200 dark:border-red-900/30 relative overflow-hidden">
-                        <Icon name="Youtube" size={100} className="absolute -left-5 top-1/2 -translate-y-1/2 text-red-500/10 dark:text-red-500/5" />
-                        <Icon name="Youtube" size={48} className="text-red-600 mx-auto mb-3 relative z-10" />
-                        <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2 relative z-10">תכנים חינמיים</h2>
-                        <p className="text-lg text-gray-700 dark:text-gray-300 relative z-10">מבחר הדרכות, וובינרים וכלים ישירות מיוטיוב – פתוחים לכולם.</p>
+                <div className="max-w-6xl mx-auto p-4 space-y-10 animate-fade-in pb-12">
+                    {/* Premium Modern Hero Section */}
+                    <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-red-700 via-red-800 to-[#120202] dark:from-red-950 dark:via-[#1e0202] dark:to-black p-8 md:p-12 shadow-2xl border border-red-500/20 text-right">
+                        {/* Glow and Floating Youtube Icon Effects */}
+                        <div className="absolute right-[-10%] top-[-10%] w-72 h-72 bg-red-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+                        <div className="absolute left-[-5%] bottom-[-5%] w-72 h-72 bg-red-600/15 rounded-full blur-[80px] pointer-events-none"></div>
+                        <div className="absolute left-10 md:left-16 top-1/2 -translate-y-1/2 opacity-10 blur-[1px] scale-150 hidden md:block select-none pointer-events-none">
+                            <Icon name="Youtube" size={180} className="text-white" />
+                        </div>
+
+                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div className="space-y-4 max-w-2xl">
+                                <div className="inline-flex items-center gap-2 bg-white/10 dark:bg-red-500/10 px-3.5 py-1.5 rounded-full text-white font-extrabold text-xs tracking-wider border border-white/10">
+                                    <Icon name="Youtube" size={14} className="text-red-500" /> הערוץ הרשמי פתוח לכולם
+                                </div>
+                                <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight">
+                                    תכנים חינמיים להצלחה שלכם
+                                </h2>
+                                <p className="text-sm md:text-base text-gray-200/90 leading-relaxed max-w-xl">
+                                    מבחר עשיר של הדרכות מוקלטות, וובינרים פרקטיים וכלים יקרי ערך ישירות מערוץ היוטיוב של משה וולנר – פתוחים לצפייה חופשית לכל אחד ובכל זמן.
+                                </p>
+                            </div>
+
+                            <div className="shrink-0 flex flex-col items-center gap-2">
+                                <a 
+                                    href="https://www.youtube.com/@moshevol8942" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black text-base px-8 py-4 rounded-2xl shadow-[0_10px_25px_rgba(220,38,38,0.3)] hover:shadow-[0_15px_30px_rgba(220,38,38,0.5)] transition-all group"
+                                >
+                                    <Icon name="Youtube" size={22} className="group-hover:scale-110 transition-transform" /> מעבר לערוץ היוטיוב
+                                    <Icon name="ExternalLink" size={16} />
+                                </a>
+                                <p className="text-[11px] text-gray-300 font-medium">הירשמו לערוץ לקבלת תכנים חדשים מדי שבוע!</p>
+                            </div>
+                        </div>
                     </div>
-                    {loading ? <div className="flex justify-center py-20"><Icon name="RefreshCw" size={32} className="animate-spin text-red-500" /></div> : 
+
+                    {/* Videos Grid */}
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-24 gap-4">
+                            <Icon name="RefreshCw" size={40} className="animate-spin text-red-500" />
+                            <p className="text-sm font-bold text-gray-500">טוען סרטונים מערוץ היוטיוב...</p>
+                        </div>
+                    ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {videos.map(v => (
-                                <div key={v.id} onClick={() => onFileInteract(v)} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group flex flex-col">
+                                <div key={v.id} onClick={() => onFileInteract(v)} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 hover:border-red-500/30 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col">
                                     <div className="relative aspect-video bg-gray-200 dark:bg-gray-700 overflow-hidden">
                                         <img src={v.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={v.name} />
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                             <Icon name="PlayCircle" size={48} className="text-white drop-shadow-md" />
                                         </div>
                                     </div>
-                                    <div className="p-5 flex-1 flex flex-col">
-                                        <h3 className="font-bold text-gray-800 dark:text-white leading-tight line-clamp-2 text-sm" dir="rtl">{v.name}</h3>
+                                    <div className="p-5 flex-1 flex flex-col justify-center">
+                                        <h3 className="font-bold text-gray-800 dark:text-white leading-snug line-clamp-2 text-sm text-right" dir="rtl">{v.name}</h3>
                                     </div>
                                 </div>
                             ))}
+
+                            {/* Go to channel Call To Action card */}
+                            <a 
+                                href="https://www.youtube.com/@moshevol8942" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="bg-gradient-to-br from-red-600/5 to-red-800/10 hover:from-red-600/10 hover:to-red-800/20 dark:from-red-950/40 dark:to-black/60 rounded-2xl p-6 border-2 border-dashed border-red-500/20 hover:border-red-500/40 transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-4 min-h-[220px] group"
+                            >
+                                <div className="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-red-600/20 group-hover:scale-110 transition-transform duration-300">
+                                    <Icon name="Youtube" size={28} />
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="font-black text-gray-800 dark:text-white group-hover:text-red-500 transition-colors text-base">לצפייה בכל הסרטונים</h3>
+                                    <p className="text-gray-400 text-xs font-medium">מעבר לערוץ היוטיוב הרשמי של משה וולנר</p>
+                                </div>
+                                <span className="inline-flex items-center gap-1 text-xs font-extrabold text-red-600 dark:text-red-400 group-hover:underline">
+                                    מעבר לערוץ <Icon name="ChevronLeft" size={14} />
+                                </span>
+                            </a>
                         </div>
-                    }
+                    )}
                 </div>
             );
         };
 
         const AdminPage = ({ forumTopics, setMessage }) => {
             const [userEmailToUpgrade, setUserEmailToUpgrade] = React.useState("");
+            const [adminEmailToAdd, setAdminEmailToAdd] = React.useState("");
+            const [proSearchQuery, setProSearchQuery] = React.useState("");
+            
+            const [proUsers, setProUsers] = React.useState([]);
+            const [admins, setAdmins] = React.useState([]);
+            const [loadingPro, setLoadingPro] = React.useState(true);
+            const [loadingAdmins, setLoadingAdmins] = React.useState(true);
+
+            React.useEffect(() => {
+                if (!window.FB) return;
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                
+                // Subscribe to pro_users
+                const proCollectionRef = window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users');
+                const unsubPro = window.FB.onSnapshot(proCollectionRef, (snapshot) => {
+                    const list = [];
+                    snapshot.forEach(doc => {
+                        list.push({ email: doc.id, ...doc.data() });
+                    });
+                    setProUsers(list);
+                    setLoadingPro(false);
+                }, (err) => {
+                    console.error("Error fetching pro users:", err);
+                    setLoadingPro(false);
+                });
+
+                // Subscribe to admins
+                const adminCollectionRef = window.FB.collection(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins');
+                const unsubAdmins = window.FB.onSnapshot(adminCollectionRef, (snapshot) => {
+                    const list = [];
+                    snapshot.forEach(doc => {
+                        list.push({ email: doc.id, ...doc.data() });
+                    });
+                    setAdmins(list);
+                    setLoadingAdmins(false);
+                }, (err) => {
+                    console.error("Error fetching admins:", err);
+                    setLoadingAdmins(false);
+                });
+
+                return () => {
+                    unsubPro();
+                    unsubAdmins();
+                };
+            }, []);
 
             const handleDeleteTopic = async (topic) => {
                 if(!confirm("מחיקת נושא זה תסיר אותו לצמיתות מהענן. להמשיך?")) return;
@@ -658,30 +791,222 @@
 
             const handleManualUpgrade = async (e) => {
                 e.preventDefault();
-                if(!userEmailToUpgrade) return;
+                const email = userEmailToUpgrade.toLowerCase().trim();
+                if(!email) return;
                 try {
-                    const userRef = window.FB.doc(window.FB.db, 'pro_users', userEmailToUpgrade.toLowerCase().trim());
-                    await window.FB.setDoc(userRef, { isPro: true, addedAt: new Date().toISOString(), method: 'manual_admin' });
-                    setMessage(`האימייל ${userEmailToUpgrade} הוגדר בהצלחה כמנוי Pro.`);
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const userRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', email);
+                    await window.FB.setDoc(userRef, { 
+                        isPro: true, 
+                        addedAt: new Date().toISOString(), 
+                        method: 'manual', 
+                        addedBy: window.FB.auth.currentUser?.email || 'system' 
+                    });
+                    setMessage(`האימייל ${email} הוגדר בהצלחה כמנוי Pro.`);
                     setUserEmailToUpgrade("");
-                } catch(e) { alert("שגיאה בהוספת המשתמש לשרת."); }
+                } catch(e) { 
+                    alert("שגיאה בהוספת המשתמש לשרת: " + e.message); 
+                }
             };
 
+            const handleCancelSubscription = async (email) => {
+                if (!confirm(`האם אתה בטוח שברצונך לבטל את מנוי ה-Pro של ${email}?`)) return;
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const userRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', email);
+                    await window.FB.deleteDoc(userRef);
+                    setMessage(`מנוי ה-Pro של ${email} בוטל בהצלחה.`);
+                } catch(e) {
+                    alert("שגיאה בביטול המנוי: " + e.message);
+                }
+            };
+
+            const handleAddAdmin = async (e) => {
+                e.preventDefault();
+                const email = adminEmailToAdd.toLowerCase().trim();
+                if (!email) return;
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', email);
+                    await window.FB.setDoc(adminRef, { 
+                        addedAt: new Date().toISOString(), 
+                        addedBy: window.FB.auth.currentUser?.email || 'system' 
+                    });
+                    setMessage(`האימייל ${email} הוגדר בהצלחה כמנהל מערכת.`);
+                    setAdminEmailToAdd("");
+                } catch(e) {
+                    alert("שגיאה בהוספת מנהל: " + e.message);
+                }
+            };
+
+            const handleRemoveAdmin = async (email) => {
+                if (email === 'zwolner@gmail.com') {
+                    alert("לא ניתן להסיר את מנהל העל של האתר.");
+                    return;
+                }
+                if (!confirm(`האם אתה בטוח שברצונך לבטל את הרשאות הניהול של ${email}?`)) return;
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', email);
+                    await window.FB.deleteDoc(adminRef);
+                    setMessage(`הרשאות הניהול של ${email} בוטלו בהצלחה.`);
+                } catch(e) {
+                    alert("שגיאה בהסרת מנהל: " + e.message);
+                }
+            };
+
+            const filteredProUsers = proUsers.filter(u => 
+                u.email.toLowerCase().includes(proSearchQuery.toLowerCase().trim())
+            );
+
             return (
-                <div className="max-w-6xl mx-auto p-4 space-y-6 pb-12 animate-fade-in">
-                    {/* Manual User Management */}
-                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 border border-brand-primary/20 shadow-sm">
-                        <div className="flex items-center gap-4 mb-5 border-b border-gray-100 dark:border-gray-700 pb-4">
-                            <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary"><Icon name="UserPlus" size={24} /></div>
+                <div className="max-w-6xl mx-auto p-4 space-y-8 pb-12 animate-fade-in">
+                    {/* Stats Dashboard */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-gradient-to-br from-brand-primary to-brand-dark p-6 rounded-3xl text-white shadow-lg border border-brand-primary/10 flex items-center justify-between">
                             <div>
-                                <h2 className="text-xl font-black text-gray-800 dark:text-white">ניהול משתמשי Pro</h2>
-                                <p className="text-gray-500 text-xs mt-1">פתיחת גישה ידנית לקורסים עבור תלמידים ששילמו בדרכים אחרות.</p>
+                                <h3 className="text-sm font-bold opacity-80">סה"כ מנויי Pro</h3>
+                                <p className="text-4xl font-black mt-1">{loadingPro ? "..." : proUsers.length}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-brand-secondary">
+                                <Icon name="Crown" size={24} />
                             </div>
                         </div>
-                        <form onSubmit={handleManualUpgrade} className="flex flex-col sm:flex-row gap-3">
-                            <input type="email" value={userEmailToUpgrade} onChange={e=>setUserEmailToUpgrade(e.target.value)} required placeholder="הזן את כתובת המייל של התלמיד..." className="flex-1 p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left text-sm" dir="ltr" />
-                            <button type="submit" className="bg-brand-primary hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-md text-sm">הוסף הרשאת מנוי</button>
-                        </form>
+
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl text-gray-800 dark:text-white shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">סה"כ מנהלים</h3>
+                                <p className="text-4xl font-black mt-1">{loadingAdmins ? "..." : (admins.length + 1)}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-brand-primary/5 dark:bg-gray-700 rounded-full flex items-center justify-center text-brand-primary dark:text-brand-secondary">
+                                <Icon name="ShieldCheck" size={24} />
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl text-gray-800 dark:text-white shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">נושאים בפורום</h3>
+                                <p className="text-4xl font-black mt-1">{forumTopics.length}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-brand-primary/5 dark:bg-gray-700 rounded-full flex items-center justify-center text-brand-primary dark:text-brand-secondary">
+                                <Icon name="MessageSquare" size={24} />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Manual User Management & List */}
+                        <div className="space-y-6">
+                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 border border-brand-primary/10 shadow-sm flex flex-col h-full">
+                                <div className="flex items-center gap-4 mb-5 border-b border-gray-100 dark:border-gray-700 pb-4">
+                                    <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary"><Icon name="UserPlus" size={24} /></div>
+                                    <div>
+                                        <h2 className="text-xl font-black text-gray-800 dark:text-white">ניהול משתמשי Pro</h2>
+                                        <p className="text-gray-500 text-xs mt-1">פתיחת גישה ידנית לקורסים עבור תלמידים ששילמו בדרכים אחרות.</p>
+                                    </div>
+                                </div>
+                                
+                                <form onSubmit={handleManualUpgrade} className="flex flex-col sm:flex-row gap-3 mb-6">
+                                    <input type="email" value={userEmailToUpgrade} onChange={e=>setUserEmailToUpgrade(e.target.value)} required placeholder="הזן את כתובת המייל של התלמיד..." className="flex-1 p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left text-sm" dir="ltr" />
+                                    <button type="submit" className="bg-brand-primary hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-md text-sm shrink-0">הוסף הרשאת מנוי</button>
+                                </form>
+
+                                <div className="border-t border-gray-100 dark:border-gray-700 pt-5 flex-1 flex flex-col">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="font-bold text-gray-800 dark:text-white text-sm">רשימת מנויי Pro קיימים</h3>
+                                        <div className="relative max-w-[200px] w-full">
+                                            <input type="text" value={proSearchQuery} onChange={e=>setProSearchQuery(e.target.value)} placeholder="חפש מייל..." className="w-full p-2 pr-3 pl-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white text-xs outline-none focus:border-brand-primary" />
+                                        </div>
+                                    </div>
+
+                                    {loadingPro ? (
+                                        <div className="flex justify-center py-10"><Icon name="RefreshCw" size={24} className="animate-spin text-brand-secondary" /></div>
+                                    ) : (
+                                        <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
+                                            {filteredProUsers.map(u => (
+                                                <div key={u.email} className="bg-gray-50 dark:bg-gray-900/40 p-3 rounded-xl border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 text-xs">
+                                                    <div className="flex flex-col gap-1 truncate text-right">
+                                                        <span className="font-mono text-gray-800 dark:text-gray-200 truncate select-all">{u.email}</span>
+                                                        <span className="text-[10px] text-gray-400">
+                                                            נוסף ב: {u.addedAt ? new Date(u.addedAt).toLocaleDateString('he-IL') : 'לא ידוע'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 shrink-0">
+                                                        {u.method === 'paypal' ? (
+                                                            <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2.5 py-1 rounded-full font-bold flex items-center gap-1 text-[10px]">
+                                                                <Icon name="CreditCard" size={10} /> PayPal
+                                                            </span>
+                                                        ) : (
+                                                            <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2.5 py-1 rounded-full font-bold text-[10px]">
+                                                                ידני
+                                                            </span>
+                                                        )}
+                                                        <button onClick={() => handleCancelSubscription(u.email)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 p-1.5 rounded-lg transition-colors" title="ביטול מנוי">
+                                                            <Icon name="Trash2" size={14} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {filteredProUsers.length === 0 && (
+                                                <p className="text-center text-gray-400 py-6 font-medium">לא נמצאו מנויי Pro.</p>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Admin Management & List */}
+                        <div className="space-y-6">
+                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 border border-brand-primary/10 shadow-sm flex flex-col h-full">
+                                <div className="flex items-center gap-4 mb-5 border-b border-gray-100 dark:border-gray-700 pb-4">
+                                    <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary"><Icon name="ShieldCheck" size={24} /></div>
+                                    <div>
+                                        <h2 className="text-xl font-black text-gray-800 dark:text-white">ניהול מנהלים</h2>
+                                        <p className="text-gray-500 text-xs mt-1">הוספה וביטול של הרשאות ניהול למשתמשים נוספים באתר.</p>
+                                    </div>
+                                </div>
+
+                                <form onSubmit={handleAddAdmin} className="flex flex-col sm:flex-row gap-3 mb-6">
+                                    <input type="email" value={adminEmailToAdd} onChange={e=>setAdminEmailToAdd(e.target.value)} required placeholder="הזן מייל של מנהל נוסף..." className="flex-1 p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white outline-none focus:border-brand-primary text-left text-sm" dir="ltr" />
+                                    <button type="submit" className="bg-brand-primary hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-md text-sm shrink-0">הוסף מנהל</button>
+                                </form>
+
+                                <div className="border-t border-gray-100 dark:border-gray-700 pt-5 flex-1 flex flex-col">
+                                    <h3 className="font-bold text-gray-800 dark:text-white text-sm mb-4">רשימת מנהלי האתר</h3>
+
+                                    {loadingAdmins ? (
+                                        <div className="flex justify-center py-10"><Icon name="RefreshCw" size={24} className="animate-spin text-brand-secondary" /></div>
+                                    ) : (
+                                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                                            {/* Primary Super Admin */}
+                                            <div className="bg-amber-500/5 dark:bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 flex items-center justify-between text-xs">
+                                                <div className="flex flex-col gap-1 truncate text-right">
+                                                    <span className="font-mono text-amber-600 dark:text-amber-400 font-bold truncate select-all">zwolner@gmail.com</span>
+                                                    <span className="text-[10px] text-amber-500/80 font-medium">מנהל על (ראשי)</span>
+                                                </div>
+                                                <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2.5 py-1 rounded-full font-bold text-[10px]">מנהל על</span>
+                                            </div>
+
+                                            {/* Additional Admins */}
+                                            {admins.map(admin => (
+                                                <div key={admin.email} className="bg-gray-50 dark:bg-gray-900/40 p-3 rounded-xl border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 text-xs">
+                                                    <div className="flex flex-col gap-1 truncate text-right">
+                                                        <span className="font-mono text-gray-800 dark:text-gray-200 truncate select-all">{admin.email}</span>
+                                                        <span className="text-[10px] text-gray-400">
+                                                            נוסף ב: {admin.addedAt ? new Date(admin.addedAt).toLocaleDateString('he-IL') : 'לא ידוע'}
+                                                        </span>
+                                                    </div>
+                                                    <button onClick={() => handleRemoveAdmin(admin.email)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 p-1.5 rounded-lg transition-colors shrink-0" title="ביטול הרשאת ניהול">
+                                                        <Icon name="Trash2" size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Forum Management */}
@@ -696,13 +1021,13 @@
                         
                         <div className="space-y-4">
                             {forumTopics.map(topic => (
-                                <div key={topic.id} className="border border-gray-200 dark:border-gray-700 p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50">
+                                <div key={topic.id} className="border border-gray-200 dark:border-gray-700 p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 text-right" dir="rtl">
                                     <div className="flex justify-between items-start mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
                                         <div>
                                             <h3 className="font-bold text-lg text-brand-primary dark:text-white">{topic.title}</h3>
                                             <p className="text-xs text-gray-500 mt-1">מאת: {topic.realAuthor} | {topic.replies?.length || 0} תגובות</p>
                                         </div>
-                                        <button onClick={() => handleDeleteTopic(topic)} className="bg-red-100 dark:bg-red-900/30 text-red-600 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg transition flex items-center gap-1 text-xs font-bold">
+                                        <button onClick={() => handleDeleteTopic(topic)} className="bg-red-100 dark:bg-red-900/30 text-red-600 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg transition flex items-center gap-1 text-xs font-bold shrink-0">
                                             <Icon name="Trash2" size={14} /> מחק אשכול
                                         </button>
                                     </div>
@@ -711,12 +1036,12 @@
                                         <div className="bg-white dark:bg-gray-800 rounded-xl p-3 space-y-2 border border-gray-100 dark:border-gray-700">
                                             <h4 className="text-xs font-bold text-gray-400 mb-2">תגובות:</h4>
                                             {topic.replies.map(reply => (
-                                                <div key={reply.id} className="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-lg border border-gray-100 dark:border-gray-800">
+                                                <div key={reply.id} className="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-lg border border-gray-100 dark:border-gray-800 text-right">
                                                     <div>
                                                         <p className="text-gray-800 dark:text-gray-200 text-xs">{reply.content}</p>
                                                         <span className="text-[10px] text-gray-500 mt-1 block">מאת: {reply.realAuthor}</span>
                                                     </div>
-                                                    <button onClick={() => handleDeleteReply(topic, reply)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition" title="מחק תגובה">
+                                                    <button onClick={() => handleDeleteReply(topic, reply)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition shrink-0" title="מחק תגובה">
                                                         <Icon name="X" size={16} />
                                                     </button>
                                                 </div>
@@ -872,27 +1197,52 @@
                 if (!window.FB) return;
                 
                 let unsubPro = () => {};
+                let unsubAdmin = () => {};
 
                 const unsubscribeAuth = window.FB.onAuthStateChanged(window.FB.auth, async (fbUser) => {
                     if (fbUser && fbUser.email) {
-                        const isAdmin = fbUser.email.toLowerCase() === 'zwolner@gmail.com';
+                        const emailLower = fbUser.email.toLowerCase();
+                        const isSuperAdmin = emailLower === 'zwolner@gmail.com';
                         
-                        // תמיד נעדכן את ה-State קודם עם הנתונים הבסיסיים כדי שכפתור הניהול יופיע מיד
-                        const baseUser = { name: fbUser.displayName || 'משתמש', email: fbUser.email, isAdmin: isAdmin, isSubscribed: isAdmin, uid: fbUser.uid };
+                        const baseUser = { 
+                            name: fbUser.displayName || 'משתמש', 
+                            email: fbUser.email, 
+                            isAdmin: isSuperAdmin, 
+                            isSubscribed: isSuperAdmin, 
+                            uid: fbUser.uid 
+                        };
                         setUser(baseUser);
                         localStorage.setItem('pisga_user', JSON.stringify(baseUser));
 
                         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                        const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', fbUser.email.toLowerCase());
+                        const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', emailLower);
+                        const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', emailLower);
                         
-                        unsubPro = window.FB.onSnapshot(proRef, (proDoc) => {
-                            const isPro = proDoc.exists() || isAdmin;
-                            const u = { ...baseUser, isSubscribed: isPro };
+                        let adminState = isSuperAdmin;
+                        let proState = isSuperAdmin;
+
+                        const updateMerged = () => {
+                            const u = { 
+                                ...baseUser, 
+                                isAdmin: adminState, 
+                                isSubscribed: adminState || proState 
+                            };
                             setUser(u);
                             localStorage.setItem('pisga_user', JSON.stringify(u));
+                        };
+
+                        unsubAdmin = window.FB.onSnapshot(adminRef, (doc) => {
+                            adminState = doc.exists() || isSuperAdmin;
+                            updateMerged();
+                        });
+
+                        unsubPro = window.FB.onSnapshot(proRef, (doc) => {
+                            proState = doc.exists();
+                            updateMerged();
                         });
                     } else {
                         unsubPro();
+                        unsubAdmin();
                         if (!fbUser) window.FB.signInAnonymously(window.FB.auth).catch(e => console.log(e));
                         else setUser(null); 
                     }
@@ -906,7 +1256,7 @@
                     setForumTopics(list.sort((a,b) => new Date(b.date) - new Date(a.date)));
                 });
                 
-                return () => { unsubscribeAuth(); unsubPro(); unsubForum(); };
+                return () => { unsubscribeAuth(); unsubPro(); unsubAdmin(); unsubForum(); };
             }, []);
 
             const handleAuth = async (e) => {
@@ -951,7 +1301,12 @@
                      
                      // בדיקה בשרת האם המשתמש של גוגל כבר מוגדר כ-Pro או מנהל
                      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                     const isAdmin = res.user.email?.toLowerCase() === 'zwolner@gmail.com';
+                     const isSuperAdmin = res.user.email?.toLowerCase() === 'zwolner@gmail.com';
+                     
+                     const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', res.user.email?.toLowerCase() || 'unknown');
+                     const adminDoc = await window.FB.getDoc(adminRef);
+                     const isAdmin = isSuperAdmin || adminDoc.exists();
+                     
                      const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', res.user.email?.toLowerCase() || 'unknown');
                      const proDoc = await window.FB.getDoc(proRef);
                      const isPro = proDoc.exists() || isAdmin;
