@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="קהילת פסגה בהובלת משה וולנר - הבית העסקי למאמנים ומטפלים. מערכת קורסים, שיעורי וידאו, פורום קהילתי, וכלים לפיתוח קליניקה מצליחה. קישור לספר מומחה שכיר מומחה יוצר.">
     <title>קהילת פסגה - משה וולנר</title>
 
     <!-- הוספת הלוגו לסמל הכרטיסיה (Favicon) בדפדפן -->
@@ -433,7 +434,7 @@
         const HomePage = ({ navigate, onPlay }) => (
             <div className="max-w-7xl mx-auto px-4 mt-6 pb-12 animate-fade-in">
                 <div className="text-center mb-10 animate-fade-up">
-                    <img src={LOGO_URL} alt="לוגו המועדון" className="h-28 md:h-36 w-auto mx-auto mb-4 drop-shadow-lg" onError={(e) => { e.target.style.display = 'none'; }} />
+                    <img src={LOGO_URL} width="144" height="144" alt="לוגו המועדון" className="h-28 md:h-36 w-auto mx-auto mb-4 drop-shadow-lg" onError={(e) => { e.target.style.display = 'none'; }} />
                     <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 animate-shimmer-text px-2 py-1">ברוכים הבאים לקהילת פסגה</h1>
                     <h2 className="text-xl font-medium text-gray-600 dark:text-gray-400">בהובלת משה וולנר</h2>
                 </div>
@@ -480,6 +481,9 @@
                             <div className="absolute inset-0 bg-brand-secondary/15 rounded-[2rem] blur-3xl opacity-60 group-hover:opacity-90 transition-opacity duration-500"></div>
                             <img
                                 src="book-cover.jpg"
+                                width="580"
+                                height="740"
+                                loading="lazy"
                                 alt="כריכת הספר - פסגה - לחצו להגדלה"
                                 className="w-full max-w-[580px] h-auto object-contain rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 relative z-10 transform hover:-translate-y-1.5 hover:scale-[1.03] transition-all duration-500 bg-brand-primary/5"
                                 onError={(e) => {
@@ -1865,10 +1869,10 @@
                                         )}
                                     </div>}
                                 <div className="flex items-center gap-0.5 hidden sm:flex">
-                                    <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name={isDarkMode ? "Sun" : "Moon"} size={18} /></button>
-                                    <button onClick={toggleA11yMenu} className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name="Accessibility" size={18} /></button>
+                                    <button onClick={() => setIsDarkMode(!isDarkMode)} aria-label="שינוי ניגודיות ומצב כהה" className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name={isDarkMode ? "Sun" : "Moon"} size={18} /></button>
+                                    <button onClick={toggleA11yMenu} aria-label="פתח תפריט נגישות" className="p-2 text-gray-500 hover:text-brand-primary dark:hover:text-white rounded-full bg-gray-50 dark:bg-gray-800 transition-colors"><Icon name="Accessibility" size={18} /></button>
                                 </div>
-                                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-1.5 text-brand-primary dark:text-white shrink-0"><Icon name={isMobileMenuOpen ? "X" : "Menu"} size={26} /></button>
+                                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="תפריט ניווט ראשי" className="lg:hidden p-1.5 text-brand-primary dark:text-white shrink-0"><Icon name={isMobileMenuOpen ? "X" : "Menu"} size={26} /></button>
                             </div>
                         </div>
 
@@ -1887,7 +1891,7 @@
                     {showAuthModal && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
                             <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 max-w-sm w-full text-center relative shadow-2xl border border-gray-200 dark:border-gray-700">
-                                <button onClick={() => setShowAuthModal(false)} className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
+                                <button onClick={() => setShowAuthModal(false)} aria-label="סגור חלונית" className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
                                 <Icon name={authMode === 'forgot_password' ? 'Mail' : 'User'} size={32} className="mx-auto mb-3 text-brand-primary dark:text-brand-secondary" />
                                 <h3 className="text-xl font-black mb-1 text-gray-800 dark:text-white">{authMode === 'login' ? 'התחברות לחשבון' : authMode === 'register' ? 'הרשמה למערכת' : 'איפוס סיסמה'}</h3>
 
@@ -1942,7 +1946,7 @@
                     {showPaymentModal && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 overflow-y-auto animate-fade-in">
                             <div className="relative w-full max-w-md my-8">
-                                <button onClick={() => setShowPaymentModal(false)} className="absolute -top-12 right-0 text-white bg-white/20 hover:bg-white/40 transition-colors p-2 rounded-full"><Icon name="X" size={24} /></button>
+                                <button onClick={() => setShowPaymentModal(false)} aria-label="סגור חלונית תשלום" className="absolute -top-12 right-0 text-white bg-white/20 hover:bg-white/40 transition-colors p-2 rounded-full"><Icon name="X" size={24} /></button>
                                 <PayPalSubscription onSuccess={handlePaymentSuccess} />
                             </div>
                         </div>
@@ -1951,7 +1955,7 @@
                     {showA11y && (
                         <div className="fixed top-20 left-4 z-[100] bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-2xl border-2 border-brand-secondary w-56 animate-fade-in text-right">
                             <div className="flex justify-between items-center mb-3 border-b border-gray-100 dark:border-gray-700 pb-2">
-                                <button onClick={() => setShowA11y(false)} className="text-gray-400 hover:text-red-500 transition-colors"><Icon name="X" size={18} /></button>
+                                <button onClick={() => setShowA11y(false)} aria-label="סגור תפריט נגישות" className="text-gray-400 hover:text-red-500 transition-colors"><Icon name="X" size={18} /></button>
                                 <h3 className="font-bold text-brand-primary dark:text-white flex items-center gap-2 text-sm">נגישות <Icon name="Accessibility" size={16} className="text-brand-secondary" /></h3>
                             </div>
                             <div className="space-y-1.5">
@@ -1967,7 +1971,7 @@
                     {showA11yStatement && (
                         <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in text-right">
                             <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 max-w-2xl w-full relative shadow-2xl border border-gray-200 dark:border-gray-700 max-h-[85vh] overflow-y-auto">
-                                <button onClick={() => setShowA11yStatement(false)} className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
+                                <button onClick={() => setShowA11yStatement(false)} aria-label="סגור הצהרת נגישות" className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
                                 <Icon name="Accessibility" size={32} className="mx-auto mb-3 text-brand-primary dark:text-brand-secondary" />
                                 <h3 className="text-xl font-black mb-4 text-gray-800 dark:text-white text-center">הצהרת נגישות - קהילת פסגה</h3>
                                 <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -1994,7 +1998,7 @@
                     {showPrivacyPolicy && (
                         <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in text-right">
                             <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 max-w-2xl w-full relative shadow-2xl border border-gray-200 dark:border-gray-700 max-h-[85vh] overflow-y-auto">
-                                <button onClick={() => setShowPrivacyPolicy(false)} className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
+                                <button onClick={() => setShowPrivacyPolicy(false)} aria-label="סגור מדיניות פרטיות" className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
                                 <Icon name="ShieldCheck" size={32} className="mx-auto mb-3 text-brand-primary dark:text-brand-secondary" />
                                 <h3 className="text-xl font-black mb-4 text-gray-800 dark:text-white text-center">מדיניות פרטיות - קהילת פסגה</h3>
                                 <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -2023,12 +2027,13 @@
 
                     <button
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        aria-label="חזרה לראש העמוד"
                         className={`fixed bottom-20 sm:bottom-6 right-6 sm:left-6 sm:right-auto bg-brand-primary hover:bg-brand-dark text-white p-2.5 rounded-full shadow-xl transition-all duration-300 z-40 hover:scale-110 ${showBackToTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
                     >
                         <Icon name="ArrowUp" size={20} />
                     </button>
 
-                    <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="whatsapp-float"><Icon name="MessageCircle" size={28} /></a>
+                    <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" aria-label="צרו קשר ב-WhatsApp" className="whatsapp-float"><Icon name="MessageCircle" size={28} /></a>
 
                     <footer className="bg-brand-dark dark:bg-gray-900 text-white py-8 border-t-4 border-brand-secondary text-center relative z-10 mt-auto">
                         <div className="max-w-7xl mx-auto px-4">
