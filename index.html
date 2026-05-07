@@ -464,26 +464,84 @@
                 </div>
 
                 <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-700 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-                    <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-10 items-center text-right">
-                        <div className="flex-1 space-y-5">
-                            <h2 className="text-3xl md:text-4xl font-black text-brand-primary dark:text-white">הייתי שם.</h2>
-                            <div className="text-base text-gray-700 dark:text-gray-300 leading-relaxed space-y-3">
-                                <p>הייתי הנער שחיפש כיוון. הייתי זה שהלך לאיבוד בין השבילים כי לא היה מי שיאיר את הדרך. היום אני יודע שאתם הייתם שם - המטפלים, המאמנים, אנשי הלב והמקצוע. הייתם שם, אבל לא ראיתי אתכם.</p>
-                                <p className="text-brand-secondary font-bold text-lg">להפוך את המטפלים ה"נסתרים" לכתובת גלויה וברורה.</p>
-                                <p>קהילת פסגה היא לא עוד מדריך שיווקי. היא המדריך שלך להפוך את הכישרון והנתינה שלך למפעל חיים משגשג.</p>
+                    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-[2.5rem] p-8 md:p-12 shadow-md border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-10 items-center text-right">
+                        
+                        {/* Book Details & Copy */}
+                        <div className="flex-1 space-y-6">
+                            <span className="inline-flex items-center gap-1.5 bg-brand-secondary/10 text-brand-secondary px-3.5 py-1.5 rounded-full text-xs font-black">
+                                <Icon name="BookOpen" size={14} /> ספר חובה לכל מטפל ואיש מקצוע
+                            </span>
+                            <h2 className="text-3xl md:text-4xl font-black text-brand-primary dark:text-white leading-tight">
+                                המדריך המעשי להפיכת הידע והכישרון שלך <span className="text-brand-secondary">למפעל חיים משגשג</span>
+                            </h2>
+                            <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+                                קהילת פסגה היא לא עוד מדריך שיווקי. היא השביל הברור שלך להפוך את הכישרון, הניסיון והנתינה שלך לכתובת גלויה וברורה עבור קהל היעד שלך, ולפתח קליניקה או עסק רווחי ומצליח.
+                            </p>
+                            
+                            {/* Key Buying Bonuses/Bullets styled elegantly */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                                <div className="flex items-center gap-3 bg-white dark:bg-gray-800 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-750 shadow-sm">
+                                    <div className="w-10 h-10 bg-brand-secondary/10 rounded-xl flex items-center justify-center text-brand-secondary shrink-0">
+                                        <Icon name="Truck" size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-gray-800 dark:text-white text-sm">משלוח חינם!</h4>
+                                        <p className="text-gray-400 text-xs mt-0.5">עם שליח מיוחד עד פתח הבית</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 bg-white dark:bg-gray-800 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-750 shadow-sm">
+                                    <div className="w-10 h-10 bg-brand-primary/10 rounded-xl flex items-center justify-center text-brand-primary dark:text-brand-secondary shrink-0">
+                                        <Icon name="Gift" size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-gray-800 dark:text-white text-sm">בונוס מטורף</h4>
+                                        <p className="text-gray-400 text-xs mt-0.5">גישה לכל הקורסים למשך 6 חודשים</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                                <h3 className="text-lg font-black text-brand-primary dark:text-white">משה וולנר, מלווה עסקי</h3>
+
+                            {/* Purchase Button Call to Action */}
+                            <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
+                                <a 
+                                    href="https://bit.ly/4tQuyWs" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="bg-brand-secondary hover:bg-brand-dark hover:scale-[1.03] text-white px-8 py-4 rounded-2xl font-black text-lg transition-all shadow-lg shadow-brand-secondary/20 flex items-center gap-2.5 w-full sm:w-auto justify-center"
+                                >
+                                    רכישת הספר עכשיו <Icon name="ChevronLeft" size={20} />
+                                </a>
+                                <span className="text-xs text-gray-400 font-bold">רכישה מאובטחת ומהירה</span>
                             </div>
                         </div>
-                        <div className="shrink-0 hidden md:block">
-                            <div className="w-40 h-56 bg-brand-primary rounded-xl shadow-xl flex flex-col items-center justify-center p-6 text-white text-center transform rotate-3 border border-brand-secondary/20">
-                                <Icon name="Mountain" size={40} className="text-brand-secondary mb-4" />
-                                <h2 className="font-black text-xl leading-none mb-2">מומחה<br />שכיר</h2>
-                                <div className="w-full h-px bg-white/30 my-2"></div>
-                                <h2 className="font-black text-xl leading-none text-brand-secondary">מומחה<br />יוצר</h2>
+
+                        {/* Book Cover Container with beautiful effects */}
+                        <div className="shrink-0 relative group">
+                            <div className="absolute inset-0 bg-brand-secondary/20 rounded-3xl blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-500"></div>
+                            <img 
+                                src="book-cover.jpg" 
+                                alt="כריכת הספר - פסגה" 
+                                className="w-56 h-auto aspect-[3/4.2] object-cover rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 relative z-10 transform hover:-rotate-2 hover:scale-[1.05] transition-all duration-500 bg-brand-primary/10"
+                                onError={(e) => {
+                                    // Fallback placeholder with stunning brand layout if image doesn't exist yet
+                                    e.target.onerror = null;
+                                    e.target.style.display = 'none';
+                                    const fallback = e.target.nextSibling;
+                                    if (fallback) fallback.style.display = 'flex';
+                                }}
+                            />
+                            {/* Gorgeous Fallback 3D Book design built using pure CSS if book-cover.jpg is not found yet */}
+                            <div className="hidden w-52 h-72 bg-gradient-to-br from-brand-primary to-brand-dark rounded-3xl shadow-2xl relative z-10 transform group-hover:-rotate-2 group-hover:scale-[1.05] transition-all duration-500 border-2 border-brand-secondary/30 flex-col items-center justify-between p-6 text-white text-center">
+                                <Icon name="BookOpen" size={40} className="text-brand-secondary mb-2" />
+                                <div className="space-y-1">
+                                    <h3 className="font-black text-2xl tracking-tight leading-none">ספר<br />הפסגה</h3>
+                                    <p className="text-[10px] text-brand-secondary font-bold">מאת משה וולנר</p>
+                                </div>
+                                <div className="w-full h-px bg-white/20"></div>
+                                <span className="text-[10px] font-extrabold bg-white/10 px-3 py-1 rounded-full text-brand-secondary">המהדורה החדשה</span>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
