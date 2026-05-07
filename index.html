@@ -1759,13 +1759,19 @@
                         };
 
                         unsubAdmin = window.FB.onSnapshot(adminRef, (doc) => {
+                            console.log("🔓 [Snapshot Admin] Document read successfully. Exists:", doc.exists());
                             adminState = doc.exists() || isSuperAdmin;
                             updateMerged();
+                        }, (err) => {
+                            console.error("🛑 [Snapshot Admin Error] Path:", `artifacts/${appId}/public/data/admins/${emailLower}`, "Error details:", err);
                         });
 
                         unsubPro = window.FB.onSnapshot(proRef, (doc) => {
+                            console.log("🔓 [Snapshot Pro] Document read successfully. Exists:", doc.exists());
                             proState = doc.exists();
                             updateMerged();
+                        }, (err) => {
+                            console.error("🛑 [Snapshot Pro Error] Path:", `artifacts/${appId}/public/data/pro_users/${emailLower}`, "Error details:", err);
                         });
                     } else {
                         unsubPro();
@@ -1833,23 +1839,31 @@
             const handleGoogleLogin = async () => {
                 setAuthError(''); setAuthLoading(true);
                 try {
+                    console.log("🚀 Starting Google Login Popup...");
                     const res = await window.FB.signInWithPopup(window.FB.auth, window.FB.googleProvider);
+                    console.log("✅ Google Auth Popup Succeeded. Email:", res.user.email, "UID:", res.user.uid);
 
                     // בדיקה בשרת האם המשתמש של גוגל כבר מוגדר כ-Pro או מנהל
                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     const isSuperAdmin = res.user.email?.toLowerCase() === 'zwolner@gmail.com';
+                    const emailLower = res.user.email?.toLowerCase() || 'unknown';
 
-                    const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', res.user.email?.toLowerCase() || 'unknown');
+                    console.log("🔍 Checking Admin status for:", emailLower, "using path:", `artifacts/${appId}/public/data/admins/${emailLower}`);
+                    const adminRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'admins', emailLower);
                     const adminDoc = await window.FB.getDoc(adminRef);
                     const isAdmin = isSuperAdmin || adminDoc.exists();
+                    console.log("⭐ Admin status check completed. Exists:", adminDoc.exists(), "Result:", isAdmin);
 
-                    const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', res.user.email?.toLowerCase() || 'unknown');
+                    console.log("🔍 Checking Pro status for:", emailLower, "using path:", `artifacts/${appId}/public/data/pro_users/${emailLower}`);
+                    const proRef = window.FB.doc(window.FB.db, 'artifacts', appId, 'public', 'data', 'pro_users', emailLower);
                     const proDoc = await window.FB.getDoc(proRef);
                     const isPro = proDoc.exists() || isAdmin;
+                    console.log("⭐ Pro status check completed. Exists:", proDoc.exists(), "Result:", isPro);
 
                     const u = { name: res.user.displayName || 'משתמש', email: res.user.email, isAdmin: isAdmin, isSubscribed: isPro, uid: res.user.uid };
                     setUser(u);
                     localStorage.setItem('pisga_user', JSON.stringify(u));
+                    console.log("🎉 Login flow completed successfully. User state initialized:", u);
 
                     setShowAuthModal(false);
                 } catch (error) {
