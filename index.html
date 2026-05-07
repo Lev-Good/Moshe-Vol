@@ -464,81 +464,69 @@
                 </div>
 
                 <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-700 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-                    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-[2.5rem] p-8 md:p-12 shadow-md border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-10 items-center text-right">
+                    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-[2.5rem] p-6 md:p-10 shadow-md border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row-reverse gap-8 md:gap-12 items-center text-right">
                         
-                        {/* Book Details & Copy */}
-                        <div className="flex-1 space-y-6">
-                            <span className="inline-flex items-center gap-1.5 bg-brand-secondary/10 text-brand-secondary px-3.5 py-1.5 rounded-full text-xs font-black">
-                                <Icon name="BookOpen" size={14} /> ספר חובה לכל מטפל ואיש מקצוע
-                            </span>
-                            <h2 className="text-3xl md:text-4xl font-black text-brand-primary dark:text-white leading-tight">
-                                המדריך המעשי להפיכת הידע והכישרון שלך <span className="text-brand-secondary">למפעל חיים משגשג</span>
-                            </h2>
-                            <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-                                קהילת פסגה היא לא עוד מדריך שיווקי. היא השביל הברור שלך להפוך את הכישרון, הניסיון והנתינה שלך לכתובת גלויה וברורה עבור קהל היעד שלך, ולפתח קליניקה או עסק רווחי ומצליח.
-                            </p>
-                            
-                            {/* Key Buying Bonuses/Bullets styled elegantly */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                                <div className="flex items-center gap-3 bg-white dark:bg-gray-800 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-750 shadow-sm">
-                                    <div className="w-10 h-10 bg-brand-secondary/10 rounded-xl flex items-center justify-center text-brand-secondary shrink-0">
-                                        <Icon name="Truck" size={20} />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-gray-800 dark:text-white text-sm">משלוח חינם!</h4>
-                                        <p className="text-gray-400 text-xs mt-0.5">עם שליח מיוחד עד פתח הבית</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3 bg-white dark:bg-gray-800 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-750 shadow-sm">
-                                    <div className="w-10 h-10 bg-brand-primary/10 rounded-xl flex items-center justify-center text-brand-primary dark:text-brand-secondary shrink-0">
-                                        <Icon name="Gift" size={20} />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-gray-800 dark:text-white text-sm">בונוס מטורף</h4>
-                                        <p className="text-gray-400 text-xs mt-0.5">גישה לכל הקורסים למשך 6 חודשים</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Purchase Button Call to Action */}
-                            <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
-                                <a 
-                                    href="https://bit.ly/4tQuyWs" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    className="bg-brand-secondary hover:bg-brand-dark hover:scale-[1.03] text-white px-8 py-4 rounded-2xl font-black text-lg transition-all shadow-lg shadow-brand-secondary/20 flex items-center gap-2.5 w-full sm:w-auto justify-center"
-                                >
-                                    רכישת הספר עכשיו <Icon name="ChevronLeft" size={20} />
-                                </a>
-                                <span className="text-xs text-gray-400 font-bold">רכישה מאובטחת ומהירה</span>
-                            </div>
-                        </div>
-
-                        {/* Book Cover Container with beautiful effects */}
-                        <div className="shrink-0 relative group">
-                            <div className="absolute inset-0 bg-brand-secondary/20 rounded-3xl blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-500"></div>
+                        {/* Book Cover Container - NOW THE CENTERPIECE & LARGER */}
+                        <div className="w-full md:w-[55%] flex justify-center shrink-0 relative group">
+                            <div className="absolute inset-0 bg-brand-secondary/15 rounded-[2rem] blur-3xl opacity-60 group-hover:opacity-90 transition-opacity duration-500"></div>
                             <img 
                                 src="book-cover.jpg" 
                                 alt="כריכת הספר - פסגה" 
-                                className="w-56 h-auto aspect-[3/4.2] object-cover rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 relative z-10 transform hover:-rotate-2 hover:scale-[1.05] transition-all duration-500 bg-brand-primary/10"
+                                className="w-full max-w-[480px] h-auto object-contain rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 relative z-10 transform hover:-translate-y-1 hover:scale-[1.02] transition-all duration-500 bg-brand-primary/5"
                                 onError={(e) => {
-                                    // Fallback placeholder with stunning brand layout if image doesn't exist yet
                                     e.target.onerror = null;
                                     e.target.style.display = 'none';
                                     const fallback = e.target.nextSibling;
                                     if (fallback) fallback.style.display = 'flex';
                                 }}
                             />
-                            {/* Gorgeous Fallback 3D Book design built using pure CSS if book-cover.jpg is not found yet */}
-                            <div className="hidden w-52 h-72 bg-gradient-to-br from-brand-primary to-brand-dark rounded-3xl shadow-2xl relative z-10 transform group-hover:-rotate-2 group-hover:scale-[1.05] transition-all duration-500 border-2 border-brand-secondary/30 flex-col items-center justify-between p-6 text-white text-center">
-                                <Icon name="BookOpen" size={40} className="text-brand-secondary mb-2" />
+                            {/* Pure CSS fallback book styled elegantly if the image file is missing */}
+                            <div className="hidden w-64 h-80 bg-gradient-to-br from-brand-primary to-brand-dark rounded-3xl shadow-2xl relative z-10 border-2 border-brand-secondary/30 flex-col items-center justify-between p-8 text-white text-center">
+                                <Icon name="BookOpen" size={48} className="text-brand-secondary mb-2" />
                                 <div className="space-y-1">
                                     <h3 className="font-black text-2xl tracking-tight leading-none">ספר<br />הפסגה</h3>
-                                    <p className="text-[10px] text-brand-secondary font-bold">מאת משה וולנר</p>
+                                    <p className="text-xs text-brand-secondary font-bold">מאת משה וולנר</p>
                                 </div>
                                 <div className="w-full h-px bg-white/20"></div>
-                                <span className="text-[10px] font-extrabold bg-white/10 px-3 py-1 rounded-full text-brand-secondary">המהדורה החדשה</span>
+                                <span className="text-xs font-extrabold bg-white/10 px-4 py-1.5 rounded-full text-brand-secondary">המהדורה החדשה</span>
+                            </div>
+                        </div>
+
+                        {/* Book Details & Call To Action */}
+                        <div className="flex-1 w-full space-y-6">
+                            <span className="inline-flex items-center gap-1.5 bg-brand-secondary/10 text-brand-secondary px-3.5 py-1.5 rounded-full text-xs font-black">
+                                <Icon name="BookOpen" size={14} /> ספר חובה לכל מטפל ואיש מקצוע
+                            </span>
+                            <h2 className="text-2xl md:text-3xl font-black text-brand-primary dark:text-white leading-tight">
+                                המדריך המעשי להפיכת הידע והכישרון שלך <span className="text-brand-secondary">למפעל חיים משגשג</span>
+                            </h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                קהילת פסגה היא לא עוד מדריך שיווקי. היא השביל הברור שלך להפוך את הכישרון והנתינה שלך לכתובת גלויה, ולפתח קליניקה מצליחה.
+                            </p>
+                            
+                            {/* Buying Bonuses / Bullet items */}
+                            <div className="space-y-3 pt-1">
+                                <div className="flex items-center gap-3 bg-white dark:bg-gray-850 p-3 rounded-xl border border-gray-150 dark:border-gray-750 shadow-sm">
+                                    <Icon name="Truck" className="text-brand-secondary shrink-0" size={20} />
+                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-200">משלוח חינם עם שליח עד הבית!</span>
+                                </div>
+                                <div className="flex items-center gap-3 bg-white dark:bg-gray-850 p-3 rounded-xl border border-gray-150 dark:border-gray-750 shadow-sm">
+                                    <Icon name="Gift" className="text-brand-primary dark:text-brand-secondary shrink-0" size={20} />
+                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-200">בונוס: גישה חופשית לכל מערכת הקורסים לחצי שנה!</span>
+                                </div>
+                            </div>
+
+                            {/* Purchase Button Call to Action */}
+                            <div className="pt-2 flex flex-col sm:flex-row items-center gap-4">
+                                <a 
+                                    href="https://bit.ly/4tQuyWs" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="bg-brand-secondary hover:bg-brand-dark hover:scale-[1.03] text-white px-8 py-3.5 rounded-xl font-black text-base transition-all shadow-lg shadow-brand-secondary/20 flex items-center gap-2 w-full sm:w-auto justify-center"
+                                >
+                                    לרכישת הספר עכשיו <Icon name="ChevronLeft" size={18} />
+                                </a>
+                                <span className="text-[11px] text-gray-400 font-bold">רכישה מאובטחת ומהירה</span>
                             </div>
                         </div>
 
@@ -1611,9 +1599,25 @@
             const [authLoading, setAuthLoading] = React.useState(false);
             const [dynamicDriveUrl, setDynamicDriveUrl] = React.useState("");
 
+            const [showA11yStatement, setShowA11yStatement] = React.useState(false);
+            const [showPrivacyPolicy, setShowPrivacyPolicy] = React.useState(false);
+
             React.useEffect(() => { setTimeout(() => setShowSplash(false), 2500); }, []);
             React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('darkMode', isDarkMode); }, [isDarkMode]);
             React.useEffect(() => { const h = () => setShowBackToTop(window.scrollY > 300); window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h); }, []);
+
+            // Dynamically update document title based on currentPage
+            React.useEffect(() => {
+                const titles = {
+                    home: 'פסגה | הבית העסקי למאמנים ומטפלים',
+                    youtube: 'תכנים חינמיים להצלחה שלכם | פסגה',
+                    courses: 'קורסים בתשלום | פסגה',
+                    forum: 'הקהילה שלנו - הפורום | פסגה',
+                    profile: 'הפרופיל שלי | פסגה',
+                    admin: 'מערכת ניהול מועדון | פסגה'
+                };
+                document.title = titles[currentPage] || 'פסגה';
+            }, [currentPage]);
 
             // Fetch from Google Drive when dynamicDriveUrl changes
             React.useEffect(() => {
@@ -1927,6 +1931,55 @@
                         </div>
                     )}
 
+                    {/* Accessibility Statement Modal */}
+                    {showA11yStatement && (
+                        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in text-right">
+                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 max-w-2xl w-full relative shadow-2xl border border-gray-200 dark:border-gray-700 max-h-[85vh] overflow-y-auto">
+                                <button onClick={() => setShowA11yStatement(false)} className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
+                                <Icon name="Accessibility" size={32} className="mx-auto mb-3 text-brand-primary dark:text-brand-secondary" />
+                                <h3 className="text-xl font-black mb-4 text-gray-800 dark:text-white text-center">הצהרת נגישות - קהילת פסגה</h3>
+                                <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                    <p>אנו בקהילת פסגה רואים חשיבות עליונה בהענקת שירות שוויוני, מכבד ונגיש לכלל הגולשים באתר, כולל אנשים עם מוגבלויות.</p>
+                                    <p className="font-bold text-gray-800 dark:text-white">מאמצי הנגישות באתר:</p>
+                                    <ul className="list-disc pr-5 space-y-1">
+                                        <li><strong>ניווט מקלדת:</strong> האתר מותאם לניווט מלא באמצעות המקלדת (TAB).</li>
+                                        <li><strong>רכיב נגישות מובנה:</strong> האתר כולל סרגל נגישות צף המאפשר הגדלת טקסט, הפעלת גופן קריא והדגשת קישורים.</li>
+                                        <li><strong>תיוג תמונות (Alt):</strong> כל התמונות החשובות באתר כוללות תיאור חלופי טקסטואלי תקין.</li>
+                                        <li><strong>קריאות צבעים:</strong> הקפדנו על ניגודיות צבעים תקינה וטובה לקריאה נוחה במצב בהיר ובמצב כהה.</li>
+                                    </ul>
+                                    <p className="font-bold text-gray-800 dark:text-white">דיווח על בעיות נגישות ויצירת קשר:</p>
+                                    <p>במידה ונתקלתם בקושי, שגיאה או בעיית נגישות כלשהי במהלך הגלישה באתר, אנו מתנצלים ומבקשים מכם לדווח לנו על כך כדי שנתקן זאת מיידית.</p>
+                                    <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 space-y-1 text-xs">
+                                        <p><strong>רכז נגישות ומנהל האתר:</strong> משה וולנר</p>
+                                        <p><strong>יצירת קשר מהירה:</strong> <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="text-brand-secondary hover:underline font-bold">שלחו לנו הודעה ב-WhatsApp</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Privacy Policy Modal */}
+                    {showPrivacyPolicy && (
+                        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in text-right">
+                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 max-w-2xl w-full relative shadow-2xl border border-gray-200 dark:border-gray-700 max-h-[85vh] overflow-y-auto">
+                                <button onClick={() => setShowPrivacyPolicy(false)} className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 dark:hover:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded-full transition-colors"><Icon name="X" size={18} /></button>
+                                <Icon name="ShieldCheck" size={32} className="mx-auto mb-3 text-brand-primary dark:text-brand-secondary" />
+                                <h3 className="text-xl font-black mb-4 text-gray-800 dark:text-white text-center">מדיניות פרטיות - קהילת פסגה</h3>
+                                <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                    <p>אנו מכבדים את הפרטיות של משתמשי האתר ומחויבים להגן על המידע האישי שאתם משתפים עמנו.</p>
+                                    <p className="font-bold text-gray-800 dark:text-white">איזה מידע אנו אוספים?</p>
+                                    <p>המידע האישי שנאסף באתר (כמו שם, אימייל ופרטי התחברות) משמש אך ורק לצורך זיהוי אישי, גישה לקורסים שנרכשו, והשתתפות פעילה בפורום הקהילה.</p>
+                                    <p className="font-bold text-gray-800 dark:text-white">אבטחת מידע קפדנית:</p>
+                                    <p>האתר עושה שימוש בשירותי הענן המאובטחים ביותר של חברת גוגל (Google Firebase) לצורך ניהול מסד הנתונים וההתחברות. כל הסיסמאות מוצפנות ואינן ניתנות לצפייה על ידי אף אדם.</p>
+                                    <p className="font-bold text-gray-800 dark:text-white">שיתוף מידע עם צד שלישי:</p>
+                                    <p>אנו מתחייבים לעולם לא למכור, להשכיר, או לשתף את פרטיכם האישיים עם שום גורם חיצוני או צד שלישי ללא הסכמתכם המפורשת.</p>
+                                    <p className="font-bold text-gray-800 dark:text-white">פרטי יצירת קשר:</p>
+                                    <p>לכל שאלה או בקשה בנושא פרטיות ומחיקת מידע אישי מהמערכת, ניתן לפנות אלינו בכל עת <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="text-brand-secondary hover:underline font-bold">דרך הודעת WhatsApp רשמית</a>.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <main className="flex-1 pb-16 pt-4 relative z-10">
                         {currentPage === 'admin' && user?.isAdmin ? <AdminPage forumTopics={forumTopics} setMessage={m => setAlertMsg({ t: "הודעת מערכת", m })} driveScriptUrl={dynamicDriveUrl} /> :
                             currentPage === 'profile' && user ? <ProfilePage user={user} setAlertMsg={setAlertMsg} /> :
@@ -1949,6 +2002,16 @@
                         <div className="max-w-7xl mx-auto px-4">
                             <h2 className="text-xl font-black mb-1">קהילת פסגה</h2>
                             <p className="text-gray-400 mb-4 text-sm font-medium">הבית העסקי למאמנים ומטפלים בהובלת משה וולנר</p>
+                            
+                            {/* Accessibility and Privacy Links */}
+                            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 text-xs font-bold text-gray-400 mb-6">
+                                <button onClick={() => setShowA11yStatement(true)} className="hover:text-brand-secondary transition-colors">הצהרת נגישות</button>
+                                <span className="text-gray-700 hidden sm:inline">|</span>
+                                <button onClick={() => setShowPrivacyPolicy(true)} className="hover:text-brand-secondary transition-colors">מדיניות פרטיות</button>
+                                <span className="text-gray-700 hidden sm:inline">|</span>
+                                <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-brand-secondary transition-colors flex items-center gap-1"><Icon name="MessageCircle" size={12} /> דיווח על בעיית נגישות / צור קשר</a>
+                            </div>
+
                             <p className="text-xs text-gray-500 mb-2">© {new Date().getFullYear()} כל הזכויות שמורות.</p>
                             <p className="text-[10px] text-brand-light/50 bg-black/30 inline-block px-3 py-1 rounded-full">
                                 נבנה על ידי <a href="https://lev-good.github.io/Good-heart/" target="_blank" rel="noopener noreferrer" className="text-brand-secondary hover:text-white font-bold transition-colors">לב טוב</a>
