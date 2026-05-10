@@ -1185,7 +1185,7 @@
             };
 
             const getYoutubeId = (url) => {
-                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
                 const match = url.match(regExp);
                 return (match && match[2].length === 11) ? match[2] : null;
             };
@@ -1624,7 +1624,7 @@
             const isImage = file.url.endsWith('.jpg') || file.url.endsWith('.png') || file.url.endsWith('.jpeg') || file.url.endsWith('.webp') || file.type === 'image';
             const getUrl = (f) => {
                 if (f.url.includes('youtube.com') || f.url.includes('youtu.be')) {
-                    const id = f.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&]{11})/);
+                    const id = f.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|watch\?v=|watch\?.+&v=))([^&]{11})/);
                     return id ? `https://www.youtube.com/embed/${id[1]}?autoplay=1` : f.url;
                 }
                 return f.url.replace('/view', '/preview');
